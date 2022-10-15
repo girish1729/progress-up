@@ -1,6 +1,6 @@
 # Progress.up HTML5 File Upload Progress indicator
 
-![Progess.up](images/Progress.Up.png)
+![Progess.up](/images/Progress.Up.png)
 
 ## What is this?
 
