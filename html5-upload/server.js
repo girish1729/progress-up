@@ -41,7 +41,7 @@ app.post('/uploadmultiple', upload.array('myFiles', 12), (req, res, next) => {
 })
 
 
-app.listen(3000, () => {
-    console.log('Server is up on port 3000');
+app.listen(2324, () => {
+    console.log('Server is up on port 2324');
 })
 
