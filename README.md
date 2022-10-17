@@ -65,6 +65,8 @@ It is using the HTML5 File API.
 
 This is a clean way to get progress indicator for file uploads.
 
+## Next steps
+
 Plugins for 
 
 - [Vue.js](https://www.vuejs.org) 
@@ -72,6 +74,13 @@ Plugins for
 - [React JS](https://reactjs.org) 
 
 are on the way.
+
+Also adding drag and drop and image preview.
+
+Also adding options for the plugin.
+
+If you wish to collaborate and send PR please get in touch using my
+Github profile.
 
 ## Contact
 
