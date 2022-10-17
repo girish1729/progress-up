@@ -23,10 +23,11 @@ cool way to give user feedback.
 ## How to build and run
 
 ```
-$ cd html5-upload
+$ git clone https://github.com/girish1729/progress.up
+$ cd progress.up/html5-upload
 $ yarn install
 
-or
+# or
 
 $ npm install
 
@@ -73,6 +74,8 @@ You can [follow me](https://twitter.com/intent/follow?screen_name=girish1729
   <img src="http://jpillora.com/github-twitter-button/img/tweet.png"
        alt="tweet button" title="Tweet this to your followers"></img>
 </a>
+
+## Buy me a coffee to accelerate development
 
 <a href="https://www.buymeacoffee.com/girish1729" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
