@@ -13,10 +13,12 @@
 	<div class="wrapper">
 	 <header>Progress.up file upload </header>
 	 <div class='text-center'>
-	   <button onClick="location.reload()" class="clearButton" role="button">Clear all</button>
+	   <button @click="location.reload()" class="clearButton" role="button">Clear all</button>
 	 </div>
 	 <form action="#">
-	      <input class="file-input" type="file" name="myFiles" multiple hidden>
+<button id="fileInputButton" onclick="document.getElementById('fileInput').click()">Open File</button>
+
+	      <input id='fileInput' v-on:change="onFileUpload" class="file-input" type="file" name="myFiles" multiple hidden>
 	      <font-awesome-icon size="10x" icon="fa-solid fa-cloud-upload-alt" />
 	      <p>Browse Files to Upload</p>
 	 </form>

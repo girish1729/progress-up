@@ -4,19 +4,18 @@ export default {
   install(app, options) {
 	app.component('uploadarea', HTML5Upload);
   },
-const form = document.querySelector("form"),
+  name: "Home",
+  components: { HTML5Upload },
+  setup(props) {
+    const loading = ref(false);
+    const tasks = ref([]);
+
+    const form = document.querySelector("form"),
     fileInput = document.querySelector(".file-input"),
     progressArea = document.querySelector(".progress-area"),
     uploadedArea = document.querySelector(".uploaded-area");
 
-form.addEventListener("click", () => {
-    fileInput.click();
-});
-
-
-fileInput.onchange = ({
-    target
-}) => {
+    const onFileUpload = async (target) => {
     let files = target.files;
     progressArea.innerHTML = "";
     for (i = 0; i < files.length; i++) {
@@ -44,10 +43,10 @@ fileInput.onchange = ({
             uploadFile(fileName, file.size, progressHTML);
         }
     }
-}
+    };
 
-// file upload function
-function uploadFile(name) {
+	// file upload function
+    const uploadFile = async (name) => {
     let xhr = new XMLHttpRequest();
     xhr.open("POST", "/uploadmultiple");
     xhr.upload.addEventListener("progress", ({
@@ -64,5 +63,10 @@ function uploadFile(name) {
     xhr.send(data);
 }
 
+    return {
+      onFileUpload,
+      ...props,
+    };
+},
 };
 
