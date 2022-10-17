@@ -75,12 +75,14 @@ Plugins for
 
 are on the way.
 
-Also adding drag and drop and image preview.
+- Adding drag and drop and image preview.
 
-Also adding options for the plugin.
+- Options for the plugin (theming, backend endpoint)
 
-If you wish to collaborate and send PR please get in touch using my
-Github profile.
+If you wish to collaborate or send pull requests 
+please get in touch using my Github profile.
+
+If you cannot write code, then buying me a coffee can work as well.
 
 ## Contact
 
