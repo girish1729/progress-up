@@ -46,8 +46,13 @@ The uploaded files are present in `html5-upload/uploads` folder.
 
 ## Backend
 
-This backend is [express.js](https://expressjs.com) with [multer
-middleware](http://expressjs.com/en/resources/middleware/multer.html)
+This backend is [Node.js HTTP server express.js](https://expressjs.com) with [multer middleware](http://expressjs.com/en/resources/middleware/multer.html)
+
+> This ensures that this code is platform agnostic.
+> Most issues with file upload plugins extant today hover around
+> not specifying backend correctly. Not making it easy to use.
+> Not explaining what should be the input file name attribute etc.
+> 
 
 We require a backend that accepts `multipart/form-data` as upload
 protocol.
