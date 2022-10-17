@@ -34,6 +34,8 @@ $ yarn install
 
 $ npm install
 
+$ mkdir uploads
+
 $ npm start
 ```
 
@@ -64,6 +66,10 @@ Also the name of the `<input type='file` attribute should `myFiles`.
 It is using the HTML5 File API.
 
 This is a clean way to get progress indicator for file uploads.
+
+## Screencast of upload
+
+![Progess.up screencast](https://raw.githubusercontent.com/girish1729/progress.up/main/html5-upload/images/progress-up-html5-upload-capture.gif)
 
 ## Next steps
 
