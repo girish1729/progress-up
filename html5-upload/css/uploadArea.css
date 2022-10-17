@@ -79,7 +79,7 @@ section .details span{
 .progress-area .details{
   display: flex;
   align-items: center;
-  a display: inline-flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 7px;
