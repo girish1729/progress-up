@@ -10,6 +10,9 @@ indicator.
 This uses the HTTP File API protocol to show continuous progress.
 
 
+>This is the very first attempt to create a clean no frills upload plugin
+>in 100% Javascript.
+
 ## Screenshot
 
 ![Progess.up
@@ -57,12 +60,17 @@ It is using the HTML5 File API.
 
 This is a clean way to get progress indicator for file uploads.
 
-Plugins for [Vue.js](https://www.vuejs.org), [Angular
-12](https://angular.io) and [React JS](https://reactjs.org) are on the way.
+Plugins for 
+
+- [Vue.js](https://www.vuejs.org) 
+- [Angular 12](https://angular.io) 
+- [React JS](https://reactjs.org) 
+
+are on the way.
 
 ## Contact
 
-You can [Tweet me](https://twitter.com/girish1729) for help/suggestions.
+You can [DM me on Twitter](https://twitter.com/girish1729) for help/suggestions.
 
 You can [follow me](https://twitter.com/intent/follow?screen_name=girish1729
 ) for updates.
