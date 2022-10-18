@@ -1,21 +1,26 @@
 import HTML5Upload from '../components/HTML5Upload.vue';
+import { ref } from "vue";
+
 
 export default {
   install(app, options) {
 	app.component('uploadarea', HTML5Upload);
   },
-  name: "Home",
+  name: "uploadProgress",
   components: { HTML5Upload },
-  setup(props) {
-    const loading = ref(false);
-    const tasks = ref([]);
+  data() {
+    return { 
+    form : document.querySelector("form"),
+    fileInput : document.querySelector(".file-input"),
+    progressArea : document.querySelector(".progress-area"),
+    uploadedArea : document.querySelector(".uploaded-area")
+    }
+  },
+   
+  methods: {
 
-    const form = document.querySelector("form"),
-    fileInput = document.querySelector(".file-input"),
-    progressArea = document.querySelector(".progress-area"),
-    uploadedArea = document.querySelector(".uploaded-area");
-
-    const onFileUpload = async (target) => {
+    onFileUpload(target){
+    alert('hi');
     let files = target.files;
     progressArea.innerHTML = "";
     for (i = 0; i < files.length; i++) {
@@ -43,10 +48,13 @@ export default {
             uploadFile(fileName, file.size, progressHTML);
         }
     }
-    };
+    },
 
-	// file upload function
-    const uploadFile = async (name) => {
+    reloadPage()  {
+	window.location.reload();
+    },
+
+    uploadFile(name) {
     let xhr = new XMLHttpRequest();
     xhr.open("POST", "/uploadmultiple");
     xhr.upload.addEventListener("progress", ({
@@ -61,12 +69,8 @@ export default {
     });
     let data = new FormData(form);
     xhr.send(data);
-}
+    }
+ }
 
-    return {
-      onFileUpload,
-      ...props,
-    };
-},
 };
 

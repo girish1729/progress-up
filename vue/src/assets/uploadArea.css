@@ -71,12 +71,13 @@ section .details span{
   font-size: 14px;
 }
 
-.progress-area .row .content{
+.progressArea .row .content{
   width: 100%;
   margin-left: 15px;
 }
 
-.progress-area .details{
+.progressArea .details{
+  width: 450px;
   display: flex;
   align-items: center;
   display: inline-flex;
@@ -86,9 +87,9 @@ section .details span{
   justify-content: space-between;
 }
 
-.progress-area .content .progress-bar{
+.progressArea .content .progress-bar{
   height: 20px;
-  width: 100%;
+  width: 450px;
   margin-bottom: 4px;
   background: #fff;
   border-radius: 5px;
@@ -101,36 +102,36 @@ section .details span{
   border-radius: inherit;
 }
 
-.uploaded-area{
+.uploadedArea{
   max-height: 232px;
   overflow-y: scroll;
 }
 
-.uploaded-area.onprogress{
+.uploadedArea.onprogress{
   max-height: 150px;
 }
 
-.uploaded-area::-webkit-scrollbar{
+.uploadedArea::-webkit-scrollbar{
   width: 0px;
 }
 
-.uploaded-area .row .content{
+.uploadedArea .row .content{
   display: flex;
   align-items: center;
 }
 
-.uploaded-area .row .details{
+.uploadedArea .row .details{
   display: flex;
   margin-left: 15px;
   flex-direction: column;
 }
 
-.uploaded-area .row .details .size{
+.uploadedArea .row .details .size{
   color: #404040;
   font-size: 11px;
 }
 
-.uploaded-area i.fa-check{
+.uploadedArea i.fa-check{
   font-size: 16px;
 }
 
