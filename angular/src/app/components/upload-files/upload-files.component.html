@@ -1,6 +1,7 @@
 <div *ngIf="currentFile" class="progress">
+  
   <div
-    class="progress-bar progress-bar-info progress-bar-striped"
+    class="progress-area "
     role="progressbar"
     attr.aria-valuenow="{{ progress }}"
     aria-valuemin="0"
@@ -9,6 +10,8 @@
   >
     {{ progress }}%
   </div>
+
+ <section class="uploaded-area"></section>
 </div>
 
 <label class="btn btn-default">
@@ -21,14 +24,3 @@
 
 <div class="alert alert-light" role="alert">{{ message }}</div>
 
-<div class="card">
-  <div class="card-header">List of Files</div>
-  <ul
-    class="list-group list-group-flush"
-    *ngFor="let file of fileInfos | async"
-  >
-    <li class="list-group-item">
-      <a href="{{ file.url }}">{{ file.name }}</a>
-    </li>
-  </ul>
-</div>

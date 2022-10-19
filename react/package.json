@@ -1,5 +1,5 @@
 {
-  "name": "form-upload-progress-bar",
+  "name": "progress.up",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

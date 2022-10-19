@@ -1,12 +1,12 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "cli": {
-    "analytics": "20ed5794-9397-4938-9d18-17a5e3ceccc3"
+    "analytics": "48578735-2cc2-42f4-bbc0-1a1f8378dedb"
   },
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "html5-upload": {
+    "angular": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:application": {
@@ -20,7 +20,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/html5-upload",
+            "outputPath": "dist/angular",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -71,10 +71,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "html5-upload:build:production"
+              "browserTarget": "angular:build:production"
             },
             "development": {
-              "browserTarget": "html5-upload:build:development"
+              "browserTarget": "angular:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -82,7 +82,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "html5-upload:build"
+            "browserTarget": "angular:build"
           }
         },
         "test": {
@@ -105,5 +105,5 @@
       }
     }
   },
-  "defaultProject": "html5-upload"
+  "defaultProject": "angular"
 }

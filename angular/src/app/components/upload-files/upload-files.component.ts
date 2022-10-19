@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component} from '@angular/core';
 import { UploadFileService } from 'src/app/services/upload-file.service';
-import { HttpEventType, HttpResponse } from '@angular/common/http';
+import { HttpEvent, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -8,36 +8,33 @@ import { Observable } from 'rxjs';
   templateUrl: './upload-files.component.html',
   styleUrls: ['./upload-files.component.css']
 })
-export class UploadFilesComponent implements OnInit {
 
-  selectedFiles: FileList;
-  currentFile: File;
+export class UploadFilesComponent {
+
+  selectedFiles: any;
+  currentFile: any;
   progress = 0;
   message = '';
 
-  fileInfos: Observable<any>;
-
   constructor(private uploadService: UploadFileService) { }
 
-  ngOnInit(): void {
-    this.fileInfos = this.uploadService.getFiles();
+  selectFile(event:any) {
+    this.selectedFiles = (event.target as HTMLInputElement).files;
   }
 
-  selectFile(event): void {
-    this.selectedFiles = event.target.files;
-  }
-
-  upload(): void {
+  upload() {
     this.progress = 0;
 
     this.currentFile = this.selectedFiles.item(0);
     this.uploadService.upload(this.currentFile).subscribe(
-      event => {
+      (event: HttpEvent<any>) => {
         if (event.type === HttpEventType.UploadProgress) {
-          this.progress = Math.round(100 * event.loaded / event.total);
+	 if(event.total) {
+	   const total: number = event.total;
+          this.progress = Math.round(100 * event.loaded / total);
+	 }
         } else if (event instanceof HttpResponse) {
           this.message = event.body.message;
-          this.fileInfos = this.uploadService.getFiles();
         }
       },
       err => {
