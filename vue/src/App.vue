@@ -45,23 +45,27 @@ export default {
     },
 
     uploadFile(name) {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "/uploadmultiple");
-    xhr.upload.addEventListener("progress", ({
-        loaded,
-        total
-    }) => {
-        const fileLoaded = Math.floor((loaded / total) * 100);
+    axios.post( 'https://localhost:2324/uploadmultiple',
+	formData,
+  	{
+	headers: { 'Content-Type': 'multipart/form-data'
+		},
+	onUploadProgress: function( progressEvent ) {
+        const fileLoaded = Math.floor((progressEvent.loaded /
+progressEvent.total) * 100);
         document.getElementById(name + '-1').innerHTML = fileLoaded;
         document.getElementById(name + '-2').innerHTML = `
              <div  class="progress" style="width: ${fileLoaded}%"></div>
 	`;
-    });
-    const form = this.$refs.uploadForm;
-    const data = new FormData(form);
-    xhr.send(data);
+					}.bind(this)
+					}
+				).then(function(){
+					console.log('SUCCESS!!');
+				});
+
     }
- }
+
+}
 
 }
 </script>

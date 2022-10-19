@@ -35,7 +35,7 @@ fileInput.onchange = ({
 		 </li>`;
             progressArea.innerHTML += progressHTML;
             uploadedArea.classList.add("onprogress");
-            uploadFile(fileName, file.size, progressHTML);
+            uploadFile(fileName);
         }
     }
 }
