@@ -1,7 +1,5 @@
 import React, {
-    useState,
-    useRef,
-    Component
+    useState
 } from "react";
 import ReactDOM from 'react-dom';
 import axios from "axios";
@@ -19,12 +17,10 @@ interface PostData {
     file: File | null;
 }
 
-
 const Form: React.FunctionComponent = () => {
-
-	let fileLoaded:any = {};
         let progressArea:any = [];
         let displayAll:any;
+	const [progress, SetProgress] = useState(0);
 	const url = "http://localhost:2324/uploadmultiple";
 
         const refreshPage = async () => {
@@ -32,16 +28,20 @@ const Form: React.FunctionComponent = () => {
         };
 
 
+
   const uploadForm = async (fname: string, formData: FormData) => {
     await axios.post(url, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-      onUploadProgress: (progressEvent) => {
-        fileLoaded[fname] = (progressEvent.loaded / progressEvent.total) * 50;
-  	let f = document.getElementById('prog')
-	ReactDOM.render(displayAll, f);
+      onUploadProgress: (progEvent) => {
+         let v = (progEvent.loaded / progEvent.total) * 100;
+	 SetProgress(v);
+	 console.log(v);
       },
+    }).then(function() {
+	 let p = document.getElementById('prog');
+	 ReactDOM.render(displayAll, p);
     });
   };
         const onFileUpload = (e: React.ChangeEvent < HTMLInputElement > ) => {
@@ -51,7 +51,7 @@ const Form: React.FunctionComponent = () => {
                     const file = files[i];
                     if (file) {
                         const fileName = file.name;
-                        fileLoaded[fileName] = 0;
+			SetProgress(100);
                         const size = file.size;
                         const progressHTML =
                <li className="row" key={fileName} >
@@ -59,12 +59,11 @@ const Form: React.FunctionComponent = () => {
                        <div className="content">
                             <div className="details">
                               <span className="name">{fileName} </span>
-                              <span
-className="percent">{fileLoaded[fileName]} %</span>
+                              <span className="percent">{progress} %</span>
                             </div>
                          <div className="progress-bar">
                               <div  className="progress" style={{width:
-fileLoaded[fileName]}}></div>
+progress + '%'}}></div>
                          </div>
                          <span className="size">{size} Bytes</span>
                         </div>

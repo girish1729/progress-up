@@ -25,16 +25,15 @@ export default {
                        <div class="content">
                             <div class="details">
                               <span class="name">${fileName} </span>
-                              <span id="${fileName}-1" class="percent">${fileLoaded} %</span>
+                              <span class="percent">${fileLoaded} %</span>
                             </div>
-                         <div id="${fileName}-2" class="progress-bar">
+                         <div class="progress-bar">
                               <div  class="progress" style="width: ${fileLoaded}%"></div>
                          </div>
                          <span class="size">${size} Bytes</span>
                         </div>
 		 </li>`;
             progressArea.innerHTML += progressHTML;
-            uploadedArea.classList.add("onprogress");
             this.uploadFile(fileName, file.size, progressHTML);
         }
     }
@@ -92,7 +91,6 @@ progressEvent.total) * 100);
 	</span>
 	 </form>
 	 <section class='progressArea' ref="progressArea"></section>
-	 <section class='uploadedArea' ref="uploadedArea"></section>
 	</div>
     </template>
 
