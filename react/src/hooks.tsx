@@ -30,6 +30,5 @@ export const useUploadForm = (url: string) => {
     setIsSuccess(true);
     setProgress(0);
   };
-
   return { uploadForm, isSuccess, isLoading, progress };
 };
