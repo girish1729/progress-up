@@ -21,7 +21,7 @@ import {
 
 export class UploadFilesComponent {
 
-    progress: any = [];
+    progress: any = {};
     fileLoaded = 0;
     uploadFiles: any = [];
 

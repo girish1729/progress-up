@@ -6,8 +6,8 @@
  <form action="#">
     <button class='btn btn-success' (click)="fileInput.click()" >
 	Browse files to upload
-      <input type="file" #fileInput name="myFiles" (change)="onFileUpload($event)" multiple hidden>
     </button>
+      <input type="file" #fileInput name="myFiles" (change)="onFileUpload($event)" multiple hidden />
 	<span class="fas fa-8x fa-cloud-upload-alt"></span>
  </form>
  <section class='progress-area' >
