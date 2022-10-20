@@ -5,5 +5,5 @@ import { Component } from '@angular/core';
   templateUrl: './app.component.html'
 })
 export class AppComponent {
-  title = 'Angular 10 File Upload';
+  title = 'progress.up | HTML5 multi file upload Angular plugin';
 }

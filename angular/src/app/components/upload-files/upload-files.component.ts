@@ -11,38 +11,45 @@ import { Observable } from 'rxjs';
 
 export class UploadFilesComponent {
 
-  selectedFiles: any;
-  currentFile: any;
-  progress = 0;
-  message = '';
+  progress:any = [];
+  fileLoaded = 0;
+  files:any = [];
 
   constructor(private uploadService: UploadFileService) { }
 
-  selectFile(event:any) {
-    this.selectedFiles = (event.target as HTMLInputElement).files;
-  }
-
-  upload() {
-    this.progress = 0;
-
-    this.currentFile = this.selectedFiles.item(0);
-    this.uploadService.upload(this.currentFile).subscribe(
+  uploadOneFile(file:File) {
+	
+  this.uploadService.upload(file).subscribe(
       (event: HttpEvent<any>) => {
         if (event.type === HttpEventType.UploadProgress) {
 	 if(event.total) {
 	   const total: number = event.total;
-          this.progress = Math.round(100 * event.loaded / total);
+          this.progress[file.name] = Math.round(100 * event.loaded / total);
 	 }
         } else if (event instanceof HttpResponse) {
-          this.message = event.body.message;
+          console.log(event);
         }
       },
       err => {
-        this.progress = 0;
-        this.message = 'Could not upload the file!';
-        this.currentFile = undefined;
+        this.progress[file.name] = 0;
       });
+  }
 
-    this.selectedFiles = undefined;
+  onFileUpload(event:any) {
+
+    this.files = (event.target as HTMLInputElement).files;
+     if(this.files) {
+     for (let i = 0; i < this.files.length; i++) {
+        let file = this.files[i];
+        if (file) {
+            this.uploadOneFile(file);
+        }
+    }
+	}
+  }
+
+
+  reloadPage() {
+	location.reload();
   }
 }

@@ -1,7 +1,6 @@
 const form = document.querySelector("form"),
     fileInput = document.querySelector(".file-input"),
     progressArea = document.querySelector(".progress-area"),
-    uploadedArea = document.querySelector(".uploaded-area");
 
 form.addEventListener("click", () => {
     fileInput.click();
@@ -34,7 +33,6 @@ fileInput.onchange = ({
                         </div>
 		 </li>`;
             progressArea.innerHTML += progressHTML;
-            uploadedArea.classList.add("onprogress");
             uploadFile(fileName);
         }
     }

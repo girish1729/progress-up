@@ -1,3 +1,39 @@
+
+<div class="wrapper">
+ <header>Progress.up file upload </header>
+ <div class='text-center'>
+   <button (click)="reloadPage()" class="clearButton" role="button">Clear all</button>
+ </div>
+ <form action="#">
+    <button (click)="fileInput.click()" >
+	Browse files to upload
+      <input #fileInput class="file-input" type="file" name="myFiles" (change)="onFileUpload($event)" multiple hidden>
+    </button>
+	<span class="fas fa-8x fa-cloud-upload-alt"></span>
+ </form>
+ <section>
+   <div *ngFor="let file of files">
+    <li class="row">
+        <span class="fas fa-file-alt"></span>
+          <div class="content">
+                <div class="details">
+                   <span class="name">{{file.name}} </span>
+                    <span class="percent">{{progress[file.name]}} %</span>
+                 </div>
+                 <div class="progress-bar">
+                    <div class="progress" style="width:
+progress[file.name] %">
+		    </div>
+                 </div>
+                 <span class="size">{{file.size}} Bytes</span>
+           </div>
+    </li>
+    </div>
+</section>
+
+</div>
+
+<!--
 <div *ngIf="currentFile" class="progress">
   
   <div
@@ -23,4 +59,6 @@
 </button>
 
 <div class="alert alert-light" role="alert">{{ message }}</div>
+-->
+
 
