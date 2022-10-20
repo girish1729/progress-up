@@ -1,18 +1,18 @@
-
 <div class="wrapper">
  <header>Progress.up file upload </header>
  <div class='text-center'>
    <button (click)="reloadPage()" class="clearButton" role="button">Clear all</button>
  </div>
  <form action="#">
-    <button (click)="fileInput.click()" >
+    <button class='btn btn-success' (click)="fileInput.click()" >
 	Browse files to upload
-      <input #fileInput class="file-input" type="file" name="myFiles" (change)="onFileUpload($event)" multiple hidden>
+      <input type="file" #fileInput name="myFiles" (change)="onFileUpload($event)" multiple hidden>
     </button>
 	<span class="fas fa-8x fa-cloud-upload-alt"></span>
  </form>
- <section>
-   <div *ngFor="let file of files">
+ <section class='progress-area' >
+
+   <div *ngFor="let file of uploadFiles">
     <li class="row">
         <span class="fas fa-file-alt"></span>
           <div class="content">
@@ -21,8 +21,7 @@
                     <span class="percent">{{progress[file.name]}} %</span>
                  </div>
                  <div class="progress-bar">
-                    <div class="progress" style="width:
-progress[file.name] %">
+                    <div class="progress" style="width: {{progress[file.name]}}%">
 		    </div>
                  </div>
                  <span class="size">{{file.size}} Bytes</span>
@@ -32,33 +31,4 @@ progress[file.name] %">
 </section>
 
 </div>
-
-<!--
-<div *ngIf="currentFile" class="progress">
-  
-  <div
-    class="progress-area "
-    role="progressbar"
-    attr.aria-valuenow="{{ progress }}"
-    aria-valuemin="0"
-    aria-valuemax="100"
-    [ngStyle]="{ width: progress + '%' }"
-  >
-    {{ progress }}%
-  </div>
-
- <section class="uploaded-area"></section>
-</div>
-
-<label class="btn btn-default">
-  <input type="file" (change)="selectFile($event)" />
-</label>
-
-<button class="btn btn-success" [disabled]="!selectedFiles" (click)="upload()">
-  Upload
-</button>
-
-<div class="alert alert-light" role="alert">{{ message }}</div>
--->
-
 

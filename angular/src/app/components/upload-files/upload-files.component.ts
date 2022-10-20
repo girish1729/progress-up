@@ -1,55 +1,60 @@
-import { Component} from '@angular/core';
-import { UploadFileService } from 'src/app/services/upload-file.service';
-import { HttpEvent, HttpEventType, HttpResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {
+    Component
+} from '@angular/core';
+import {
+    UploadFileService
+} from 'src/app/services/upload-file.service';
+import {
+    HttpEvent,
+    HttpEventType,
+    HttpResponse
+} from '@angular/common/http';
+import {
+    Observable
+} from 'rxjs';
 
 @Component({
-  selector: 'app-upload-files',
-  templateUrl: './upload-files.component.html',
-  styleUrls: ['./upload-files.component.css']
+    selector: 'app-upload-files',
+    templateUrl: './upload-files.component.html',
+    styleUrls: ['./upload-files.component.css']
 })
 
 export class UploadFilesComponent {
 
-  progress:any = [];
-  fileLoaded = 0;
-  files:any = [];
+    progress: any = [];
+    fileLoaded = 0;
+    uploadFiles: any = [];
 
-  constructor(private uploadService: UploadFileService) { }
+    constructor(private uploadService: UploadFileService) {}
 
-  uploadOneFile(file:File) {
-	
-  this.uploadService.upload(file).subscribe(
-      (event: HttpEvent<any>) => {
-        if (event.type === HttpEventType.UploadProgress) {
-	 if(event.total) {
-	   const total: number = event.total;
-          this.progress[file.name] = Math.round(100 * event.loaded / total);
-	 }
-        } else if (event instanceof HttpResponse) {
-          console.log(event);
-        }
-      },
-      err => {
-        this.progress[file.name] = 0;
-      });
-  }
+    uploadOneFile(file: File) {
 
-  onFileUpload(event:any) {
+        this.uploadService.upload(file).subscribe(
+            (event: HttpEvent < any > ) => {
+                if (event.type === HttpEventType.UploadProgress) {
+                    if (event.total) {
+                        const total: number = event.total;
+                        this.progress[file.name] = Math.round(100 * event.loaded / total);
+                    }
+                } else if (event instanceof HttpResponse) {
+                    console.log(event);
+                }
+            },
+            err => {
+                this.progress[file.name] = 0;
+            });
+    }
 
-    this.files = (event.target as HTMLInputElement).files;
-     if(this.files) {
-     for (let i = 0; i < this.files.length; i++) {
-        let file = this.files[i];
-        if (file) {
+    onFileUpload(event: any) {
+        let files = (event.target as HTMLInputElement).files;
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
             this.uploadOneFile(file);
+            this.uploadFiles.push(file);
         }
     }
-	}
-  }
 
-
-  reloadPage() {
-	location.reload();
-  }
+    reloadPage() {
+        location.reload();
+    }
 }

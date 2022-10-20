@@ -85,6 +85,7 @@ section .details span{
   justify-content: center;
   margin-bottom: 7px;
   justify-content: space-between;
+  width: inherit;
 }
 
 .progress-area .content .progress-bar{
@@ -102,39 +103,6 @@ section .details span{
   border-radius: inherit;
 }
 
-.uploaded-area{
-  max-height: 232px;
-  overflow-y: scroll;
-}
-
-.uploaded-area.onprogress{
-  max-height: 150px;
-}
-
-.uploaded-area::-webkit-scrollbar{
-  width: 0px;
-}
-
-.uploaded-area .row .content{
-  display: flex;
-  align-items: center;
-}
-
-.uploaded-area .row .details{
-  display: flex;
-  margin-left: 15px;
-  flex-direction: column;
-}
-
-.uploaded-area .row .details .size{
-  color: #404040;
-  font-size: 11px;
-}
-
-.uploaded-area i.fa-check{
-  font-size: 16px;
-}
-
 .clearButton {
 	line-height: 1.1;
 	padding: 0.25em 0.75em;
@@ -146,8 +114,4 @@ section .details span{
        	border-radius: 8px;
        	box-shadow: 0 3px 5px rgba(0, 0, 0, 0.18);
 	cursor: pointer;
-}
-
-.text-center {
-	text-align: center;
 }
