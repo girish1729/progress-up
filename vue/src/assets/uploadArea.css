@@ -77,7 +77,7 @@ section .details span{
 }
 
 .progressArea .details{
-  width: 450px;
+  width: inherit;
   display: flex;
   align-items: center;
   display: inline-flex;
@@ -89,50 +89,17 @@ section .details span{
 
 .progressArea .content .progress-bar{
   height: 20px;
-  width: 450px;
+  width: 100%;
   margin-bottom: 4px;
   background: #fff;
   border-radius: 5px;
 }
 
-.content .progress-bar .progress{
+.progress{
   height: 100%;
   width: 0%;
   background: red;
   border-radius: inherit;
-}
-
-.uploadedArea{
-  max-height: 232px;
-  overflow-y: scroll;
-}
-
-.uploadedArea.onprogress{
-  max-height: 150px;
-}
-
-.uploadedArea::-webkit-scrollbar{
-  width: 0px;
-}
-
-.uploadedArea .row .content{
-  display: flex;
-  align-items: center;
-}
-
-.uploadedArea .row .details{
-  display: flex;
-  margin-left: 15px;
-  flex-direction: column;
-}
-
-.uploadedArea .row .details .size{
-  color: #404040;
-  font-size: 11px;
-}
-
-.uploadedArea i.fa-check{
-  font-size: 16px;
 }
 
 .clearButton {
