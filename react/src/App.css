@@ -1,7 +1,3 @@
-.App {
-  text-align: center;
-}
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
 body{
@@ -88,6 +84,7 @@ section .details span{
   justify-content: center;
   margin-bottom: 7px;
   justify-content: space-between;
+  width: inherit;
 }
 
 .progress-area .content .progress-bar{
