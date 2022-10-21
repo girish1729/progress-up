@@ -2,21 +2,21 @@
   <div id="app">
     <div class="container" style="width:600px">
       <div style="margin: 20px">
-        <h3>bezkoder.com</h3>
-        <h4>Vue.js multiple Files upload</h4>
+        <h1>progress.up | HTML5 multi file upload progress bar</h1>
+        <h2>Vue.js plugin </h2>
       </div>
-      <upload-files></upload-files>
+      <upload-files-progress></upload-files-progress>
     </div>
   </div>
 </template>
 
 <script>
-import UploadFiles from "./components/UploadFiles";
+import UploadFilesProgress from "./components/uploadFilesProgress";
 
 export default {
   name: "App",
   components: {
-    UploadFiles
+    UploadFilesProgress
   }
 };
 </script>

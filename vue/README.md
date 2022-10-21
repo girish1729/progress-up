@@ -1,29 +1,54 @@
-# progress.up
+# Vue Multiple Files Upload example with Axios, FormData and Progress Bars
 
-This template should help get you started developing with Vue 3 in Vite.
+For more details, please visit:
+> [Vue Multiple Files Upload example](https://bezkoder.com/vue-multiple-files-upload/)
 
-## Recommended IDE Setup
+> [Vue single File Upload example using Axios](https://bezkoder.com/vue-axios-file-upload/)
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+> [Vuetify File Upload example](https://bezkoder.com/vuetify-file-upload/)
 
-## Customize configuration
+Rest APIs server for this Vue Client:
+> [Node.js Express File Upload Rest API example](https://bezkoder.com/node-js-express-file-upload/)
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+> [Spring Boot Multipart File upload example](https://bezkoder.com/spring-boot-file-upload/)
 
-## Project Setup
+Fullstack CRUD App:
+> [Vue.js + Node.js + Express + MySQL](https://bezkoder.com/vue-js-node-js-express-mysql-crud-example/)
 
-```sh
+> [Vue.js + Node.js + Express + PostgreSQL](https://bezkoder.com/vue-node-express-postgresql/)
+
+> [Vue.js + Node.js + Express + MongoDB](https://bezkoder.com/vue-node-express-mongodb-mevn-crud/)
+
+> [Vue.js + Spring Boot + MySQL/PostgreSQL](https://bezkoder.com/spring-boot-vue-js-crud-example/)
+
+> [Vue.js + Spring Boot + MongoDB](https://bezkoder.com/spring-boot-vue-mongodb/)
+
+> [Vue.js + Django Rest Framework](https://bezkoder.com/django-vue-js-rest-framework/)
+
+## Project setup
+```
 npm install
 ```
 
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
+### Compiles and hot-reloads for development
+```
+npm run serve
 ```
 
-### Compile and Minify for Production
-
-```sh
+### Compiles and minifies for production
+```
 npm run build
 ```
+
+### Run your tests
+```
+npm run test
+```
+
+### Lints and fixes files
+```
+npm run lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).

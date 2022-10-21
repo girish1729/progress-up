@@ -1,8 +1,14 @@
-import Vue from 'vue'
+import { createApp} from 'vue'
 import App from './App.vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons'
+import { faFileAlt } from '@fortawesome/free-solid-svg-icons'
+import { faCheck } from '@fortawesome/free-solid-svg-icons'
+library.add(faCloudUploadAlt, faFileAlt, faCheck);
 
-Vue.config.productionTip = false
+import './assets/uploadArea.css';
 
-new Vue({
-  render: h => h(App),
-}).$mount('#app')
+const app = createApp(App);
+app.component('font-awesome-icon', FontAwesomeIcon);
+app.mount('#app')

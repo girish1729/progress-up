@@ -13,7 +13,5 @@ class UploadFilesService {
       onUploadProgress
     });
   }
-
 }
-
 export default new UploadFilesService();

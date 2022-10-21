@@ -1,22 +1,46 @@
 {
-  "name": "progress.up",
-  "version": "0.0.0",
+  "name": "vue-js-multiple-files-upload",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview --port 4173"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.2.0",
-    "@fortawesome/free-brands-svg-icons": "^6.2.0",
-    "@fortawesome/free-regular-svg-icons": "^6.2.0",
-    "@fortawesome/free-solid-svg-icons": "^6.2.0",
-    "@fortawesome/vue-fontawesome": "^3.0.1",
-     "axios": "^0.21.1",
-    "vue": "^3.2.38"
+    "@fortawesome/fontawesome-svg-core": "*",
+    "@fortawesome/free-solid-svg-icons": "*",
+    "@fortawesome/vue-fontawesome": "^3.0.0-5",
+    "axios": "^0.20.0",
+    "core-js": "*",
+    "vue": "^3.2.37"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^3.0.3",
-    "vite": "^3.0.9"
-  }
+    "@vue/cli-plugin-babel": "^4.5.0",
+    "@vue/cli-plugin-eslint": "^4.5.0",
+    "@vue/cli-service": "^4.5.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "vue-template-compiler": "^3.2.37"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
 }
