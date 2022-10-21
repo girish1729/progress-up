@@ -2,6 +2,7 @@ import React, {
     useState
 } from "react";
 import ReactDOM from 'react-dom';
+import { Box, Container } from "@chakra-ui/react";
 import axios from "axios";
 import {
     FontAwesomeIcon
@@ -13,20 +14,28 @@ import {
     icon
 } from '@fortawesome/fontawesome-svg-core/import.macro';
 
+// types
+type UploadFile = {
+  fileName: string;
+  size: number;
+  progressPercent: number;
+};
+
 interface PostData {
     file: File | null;
 }
 
 const Form: React.FunctionComponent = () => {
-        let progressArea:any = [];
-        let displayAll:any;
-	const [progress, SetProgress] = useState(0);
+
+  const [uploadProg, setProg] = useState<Array<UploadFile>>([]);
+
+      const progFiles:UploadFile[] = [];
+
 	const url = "http://localhost:2324/uploadmultiple";
 
         const refreshPage = async () => {
             return await window.location.reload();
         };
-
 
 
   const uploadForm = async (fname: string, formData: FormData) => {
@@ -35,54 +44,45 @@ const Form: React.FunctionComponent = () => {
         "Content-Type": "multipart/form-data",
       },
       onUploadProgress: (progEvent) => {
-         let v = (progEvent.loaded / progEvent.total) * 100;
-	 SetProgress(v);
-	 console.log(v);
+         let v:number;
+         if(progEvent.total) {
+          v = (progEvent.loaded / progEvent.total) * 100;
+	  console.log(v);
+         }
+        setProg((pre) => {
+              return pre.map((p) => {
+                if (p.fileName === fname) {
+                  p.progressPercent = v;
+                }
+                return p;
+              });
+            });
+
       },
     }).then(function() {
-	 let p = document.getElementById('prog');
-	 ReactDOM.render(displayAll, p);
+	console.log("All files uploaded");
     });
   };
-        const onFileUpload = (e: React.ChangeEvent < HTMLInputElement > ) => {
+    const onFileUpload = (e: React.ChangeEvent < HTMLInputElement > ) => {
             const files = e.target.files;
             if (files) {
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    if (file) {
-                        const fileName = file.name;
-			SetProgress(100);
-                        const size = file.size;
-                        const progressHTML =
-               <li className="row" key={fileName} >
-		<FontAwesomeIcon icon={solid('file-alt')} />
-                       <div className="content">
-                            <div className="details">
-                              <span className="name">{fileName} </span>
-                              <span className="percent">{progress} %</span>
-                            </div>
-                         <div className="progress-bar">
-                              <div  className="progress" style={{width:
-progress + '%'}}></div>
-                         </div>
-                         <span className="size">{size} Bytes</span>
-                        </div>
-		 </li>;
-                        progressArea.push(progressHTML);
-			if(i == files.length - 1) {
-				displayAll = <ul> {progressArea} </ul>;
-			}
+      for (let i = 0; i < files.length; i++) {
                         const formData = new FormData();
-                        formData.append("myFiles", file);
-			console.log(file.name);
-                        uploadForm(fileName, formData);
-                    }
-                }
+      const fileName = files[i].name;
+      const size = files[i].size;
+                formData.append("myFiles", files[i]);
+      progFiles.push({ fileName, size, progressPercent: 0});
+      uploadForm(fileName, formData);
+    }
+      console.log(progFiles);
+      setProg(progFiles);
+
             }
         };
 
   return (
    
+    <Container>
 <div className="wrapper">
  <header>Progress.up file upload </header>
  <div className='text-center'>
@@ -94,12 +94,34 @@ progress + '%'}}></div>
 	<FontAwesomeIcon icon={solid('cloud-upload-alt')} size='10x' />
       <p>Browse Files to Upload</p>
  </form>
-  <>
- <section id="prog" className="progress-area">{displayAll}</section>
-  </>
 </div>
 
+ <Box id="prog" padding="4" className="progress-area">
+    <h3> Girish is great </h3>
+        {progFiles.length > 0
+          ? (
+            progFiles.map(({fileName, progressPercent, size}) => (
 
+     <li className="row" key={fileName} >
+		<FontAwesomeIcon icon={solid('file-alt')} />
+                       <div className="content">
+                            <div className="details">
+                              <span className="name">{fileName} </span>
+                              <span className="percent">{progressPercent} %</span>
+                            </div>
+                         <div className="progress-bar">
+                              <div  className="progress" style={{width:
+progressPercent + '%'}}></div>
+                         </div>
+                         <span className="size">{size} Bytes</span>
+                        </div>
+		 </li>
+            ))
+          )
+          : <div>Multiple upload progress indicator </div>}
+      </Box>
+    </Container>
+      
   );
 };
 export default Form;
