@@ -11,9 +11,38 @@ This uses the HTTP File API protocol to show continuous progress.
 
 
 >This is the very first attempt to create a clean no frills upload plugin
->in 100% Javascript.
+>in 100% Javascript. Now available for Angular, Vue and React.
 
-## Screenshot
+[Canonical home page](https://progress-up.live)
+
+Demos will be added soon to the above page :point_up: .
+
+## Instructions
+
+### Plain js
+
+```shell
+	$npm add progress-up
+```
+
+### Angular 13+
+
+```shell
+	$npm add progress-up/angular
+```
+### Vue 3
+
+```shell
+	$npm add progress-up/vue
+```
+### React.js
+
+```shell
+	$npm add progress-up/react
+```
+
+
+## Screenshots gallery
 
 ![Progess.up
 screenshot](https://raw.githubusercontent.com/girish1729/progress.up/main/html5-upload/images/progress-up-html5-upload-capture.png)
@@ -23,7 +52,20 @@ screenshot](https://raw.githubusercontent.com/girish1729/progress.up/main/html5-
 If you allow multiple large files upload then a progress indicator is a
 cool way to give user feedback.
 
-## How to build and run
+Nowadays HTML5 File API based progress is the best way to achieve your
+goal.
+
+This project was written ground up with latest technology as of Oct 22,
+2022.
+
+However the status of project is `Beta`.
+
+Most testing is needed. If you volunteer please [get in
+touch](https://twitter.com/girish1729).
+
+## How to build and run as plain js
+
+**Instructions or frameworks coming soon**
 
 ```
 $ git clone https://github.com/girish1729/progress.up
