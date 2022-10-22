@@ -22,23 +22,23 @@ Demos will be added soon to the above page :point_up: .
 ### Plain js
 
 ```shell
-	$npm add progress-up
+	$ npm add progress-up
 ```
 
 ### Angular 13+
 
 ```shell
-	$npm add progress-up/angular
+	$ npm add progress-up/angular
 ```
 ### Vue 3
 
 ```shell
-	$npm add progress-up/vue
+	$ npm add progress-up/vue
 ```
 ### React.js
 
 ```shell
-	$npm add progress-up/react
+	$ npm add progress-up/react
 ```
 
 
@@ -82,9 +82,12 @@ $ npm start
 ```
 
 Go to [http://localhost:2324](http://localhost:2324)
+
  and try uploading files.
 
-You may use manual upload or drag and drop into the shaded area.
+You may use manual upload.
+
+ Drag and drop into the shaded area is not implemented yet.
 
 The uploaded files are present in `html5-upload/uploads` folder.
 
