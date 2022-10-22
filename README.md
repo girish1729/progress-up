@@ -41,6 +41,14 @@ Demos will be added soon to the above page :point_up: .
 	$ npm add progress-up/react
 ```
 
+## Detailed instructions
+
+- [Developer docs](https://progress-up.live/docs)
+- [Live demo]((https://progress-up.live/demo)
+- [Vue.js](https://progress-up.live/vue)
+- [Angular](https://progress-up.live/angular)
+- [React](https://progress-up.live/react)
+ 
 
 ## Screenshots gallery
 
