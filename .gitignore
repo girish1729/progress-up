@@ -1,2 +1,5 @@
 node_modules
 uploads
+package-lock.json
+yarn.lock
+
