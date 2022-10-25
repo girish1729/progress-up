@@ -1,54 +1,87 @@
-# Vue Multiple Files Upload example with Axios, FormData and Progress Bars
+<div align="center">
+  <img alt="Vite + Vue Project" src="https://github.com/digikid/vite-vue-project/raw/main/logo.svg" height="117" />
+  <h1>Vite + Vue Project</h1>
+  <p>Modern starter template for Vite with Vue and TypeScript</p>
+  <p>
+    <b>English</b> | <a href="https://github.com/digikid/vite-vue-project/blob/main/README.ru-RU.md">Русский</a></p>
+  <img src="https://img.shields.io/github/release/digikid/vite-vue-project.svg?style=flat-square&logo=appveyor" alt="Release version">
+  <img src="https://img.shields.io/github/languages/top/digikid/vite-vue-project.svg?style=flat-square&logo=appveyor" alt="TypeScript">
+  <img src="https://img.shields.io/github/license/digikid/vite-vue-project.svg?style=flat-square&logo=appveyor" alt="MIT License">
+</div>
 
-For more details, please visit:
-> [Vue Multiple Files Upload example](https://bezkoder.com/vue-multiple-files-upload/)
+## About
 
-> [Vue single File Upload example using Axios](https://bezkoder.com/vue-axios-file-upload/)
+This starter template should help get you started developing with [Vue](https://vuejs.org/), [TypeScript](https://www.typescriptlang.org/) and set of modern UI tools in [Vite](https://vitejs.dev/).
 
-> [Vuetify File Upload example](https://bezkoder.com/vuetify-file-upload/)
+## Additional Tools
 
-Rest APIs server for this Vue Client:
-> [Node.js Express File Upload Rest API example](https://bezkoder.com/node-js-express-file-upload/)
+### CSS Framework
 
-> [Spring Boot Multipart File upload example](https://bezkoder.com/spring-boot-file-upload/)
+Tailwind CSS is basically a utility-first CSS framework for rapidly building custom user interfaces. It is a highly customizable, low-level CSS framework that gives you building blocks you need to build bespoke designs without any annoying opinionated styles you have to fight to override.
 
-Fullstack CRUD App:
-> [Vue.js + Node.js + Express + MySQL](https://bezkoder.com/vue-js-node-js-express-mysql-crud-example/)
+- [Tailwind CSS](https://tailwindcss.com/)
 
-> [Vue.js + Node.js + Express + PostgreSQL](https://bezkoder.com/vue-node-express-postgresql/)
+### CSS Plugins
 
-> [Vue.js + Node.js + Express + MongoDB](https://bezkoder.com/vue-node-express-mongodb-mevn-crud/)
+This template also includes first-party plugins needed for [Tailwind UI](https://tailwindui.com/):
 
-> [Vue.js + Spring Boot + MySQL/PostgreSQL](https://bezkoder.com/spring-boot-vue-js-crud-example/)
+- [forms](https://github.com/tailwindlabs/tailwindcss-forms)
+- [typography](https://github.com/tailwindlabs/tailwindcss-typography)
+- [line-clamp](https://github.com/tailwindlabs/tailwindcss-line-clamp)
+- [aspect-ratio](https://github.com/tailwindlabs/tailwindcss-aspect-ratio)
 
-> [Vue.js + Spring Boot + MongoDB](https://bezkoder.com/spring-boot-vue-mongodb/)
+[PostCSS](https://github.com/postcss/postcss) plugin to parse CSS and add vendor prefixes to CSS rules using values from [Can I Use](https://caniuse.com/). It is recommended by Google and used in Twitter and Alibaba.
 
-> [Vue.js + Django Rest Framework](https://bezkoder.com/django-vue-js-rest-framework/)
+- [Autoprefixer](https://github.com/postcss/autoprefixer)
 
-## Project setup
+### UI Components
+
+Completely unstyled, fully accessible UI components, designed to integrate beautifully with Tailwind CSS.
+
+- [Headless UI](https://headlessui.com/)
+
+### Fonts
+
+Inter is a typeface carefully crafted & designed for computer screens.
+
+- [Inter var](https://github.com/rsms/inter) (self-hosted)
+
+### Coding Style
+
+ESLint is an open source project that helps you find and fix problems with your JavaScript code.
+
+- [ESLint](https://eslint.org/) + [Airbnb Config](https://github.com/airbnb/javascript)
+
+A mighty, modern linter that helps you avoid errors and enforce conventions in your styles.
+
+- [Stylelint](https://stylelint.io/) + [Standard Config](https://github.com/stylelint/stylelint-config-standard)
+
+## Usage
+
+### GitHub Template
+
+[Create a repo from this template on GitHub](https://github.com/digikid/vite-vue-project/generate)
+
+### Local Install
+
+```sh
+npx degit digikid/vite-vue-project my-project
+cd my-project
+npm i
 ```
-npm install
-```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Path Aliases
 
-### Compiles and minifies for production
-```
-npm run build
-```
+By default, all path aliases declared in `tsconfig.json` file are imported into the Vite config, so you don't have to declare them twice.
 
-### Run your tests
-```
-npm run test
-```
+## Browser Support
 
-### Lints and fixes files
-```
-npm run lint
-```
+Only the latest versions of major browsers (e.g. Chrome, Firefox, Safari, Edge etc) are supported.
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+<img src="https://github.com/digikid/vite-vue-project/raw/main/public/images/chrome.svg" width="64" height="64" alt="Chrome"> <img src="https://github.com/digikid/vite-vue-project/raw/main/public/images/firefox.svg" width="64" height="64" alt="Firefox"> <img src="https://github.com/digikid/vite-vue-project/raw/main/public/images/edge.svg" width="64" height="64" alt="Edge"> <img src="https://github.com/digikid/vite-vue-project/raw/main/public/images/safari.svg" width="64" height="64" alt="Safari"> <img src="https://github.com/digikid/vite-vue-project/raw/main/public/images/opera.svg" width="64" height="64" alt="Opera">
+
+**There is no support for any version of IE.**
+
+## License
+
+[The MIT License (MIT)](LICENSE)
