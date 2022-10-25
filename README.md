@@ -4,6 +4,11 @@
 
 ## What is this?
 
+
+<div class="alert alert-danger" role="alert">
+     Vue.js component works only with Vue.js version 3 and above. For vue.js 2 please follow this 
+</div>
+
 This is a HTML5 multiple files Upload plugin with progress bar
 indicator.
 
