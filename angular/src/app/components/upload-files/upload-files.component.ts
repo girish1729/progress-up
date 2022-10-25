@@ -47,10 +47,12 @@ export class UploadFilesComponent {
 
     onFileUpload(event: any) {
         let files = (event.target as HTMLInputElement).files;
-        for (let i = 0; i < files.length; i++) {
-            let file = files[i];
-            this.uploadOneFile(file);
-            this.uploadFiles.push(file);
+        if (files) {
+            for (let i = 0; i < files.length; i++) {
+                let file = files[i];
+                this.uploadOneFile(file);
+                this.uploadFiles.push(file);
+            }
         }
     }
 

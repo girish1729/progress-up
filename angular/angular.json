@@ -1,12 +1,12 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "cli": {
-    "analytics": "48578735-2cc2-42f4-bbc0-1a1f8378dedb"
+    "analytics": false
   },
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular": {
+    "ang": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:application": {
@@ -20,7 +20,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/angular",
+            "outputPath": "dist/ang",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -71,10 +71,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "angular:build:production"
+              "browserTarget": "ang:build:production"
             },
             "development": {
-              "browserTarget": "angular:build:development"
+              "browserTarget": "ang:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -82,7 +82,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "angular:build"
+            "browserTarget": "ang:build"
           }
         },
         "test": {
@@ -103,7 +103,38 @@
           }
         }
       }
+    },
+    "upl": {
+      "projectType": "library",
+      "root": "projects/upl",
+      "sourceRoot": "projects/upl/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/upl/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/upl/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/upl/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/upl/src/test.ts",
+            "tsConfig": "projects/upl/tsconfig.spec.json",
+            "karmaConfig": "projects/upl/karma.conf.js"
+          }
+        }
+      }
     }
   },
-  "defaultProject": "angular"
+  "defaultProject": "ang"
 }
