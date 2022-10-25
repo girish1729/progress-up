@@ -1,7 +1,6 @@
 import React, {
     useState
 } from "react";
-import ReactDOM from 'react-dom';
 import {
     Box,
     Container
@@ -11,10 +10,7 @@ import {
     FontAwesomeIcon
 } from '@fortawesome/react-fontawesome';
 import {
-    solid,
-    regular,
-    brands,
-    icon
+    solid
 } from '@fortawesome/fontawesome-svg-core/import.macro';
 
 // types
@@ -24,7 +20,7 @@ type UploadFile = {
     progressPercent: number;
 };
 
-const Form: React.FunctionComponent = () => {
+const UploadProgress: React.FunctionComponent = () => {
 
         const [progFiles, setProg] = useState < Array < UploadFile >> ([]);
         const url = "http://localhost:2324/uploadmultiple";
@@ -123,4 +119,4 @@ const Form: React.FunctionComponent = () => {
   );
 };
 
-export default Form;
+export default UploadProgress;

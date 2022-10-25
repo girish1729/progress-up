@@ -1,11 +1,11 @@
 import React from "react";
 import "./App.css";
-import Form from "./Form";
+import UploadProgress from "./uploadProgress";
 
 function App() {
   return (
     <div style={{ height: "100vh" }} className="App">
-      <Form />
+      <UploadProgress />
     </div>
   );
 }
