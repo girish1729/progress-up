@@ -87,7 +87,7 @@ With that out of the way let us focus on the frontend.
 
 **Instructions for frameworks coming soon**
 
-```
+```shell
 $ git clone https://github.com/girish1729/progress.up
 
 $ cd progress.up/backend
@@ -100,6 +100,7 @@ $ npm install
 $ mkdir uploads
 
 $ npm start
+```
 
 Go to [http://localhost:2324](http://localhost:2324)
 
@@ -107,9 +108,9 @@ Go to [http://localhost:2324](http://localhost:2324)
 
 You may use manual upload.
 
- Drag and drop into the shaded area is not implemented yet.
+__Drag and drop into the shaded area is not implemented yet.__
 
-The uploaded files are present in `html5-upload/uploads` folder.
+The uploaded files are present in `backend/uploads` folder.
 
 ## Backend
 
