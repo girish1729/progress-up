@@ -52,8 +52,8 @@ Demos will be added soon to the above page :point\_up: .
 
 ## Screenshots gallery
 
-![Progess.up
-screenshot](https://raw.githubusercontent.com/girish1729/progress.up/main/html5-upload/images/progress-up-html5-upload-capture.png)
+![Progess-up start upload](https://raw.githubusercontent.com/girish1729/progress.up/main/images/start-upload.png)
+![Progess-up finish upload](https://raw.githubusercontent.com/girish1729/progress.up/main/images/finish-upload.png)
 
 ## Why should you care?
 
