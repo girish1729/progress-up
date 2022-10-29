@@ -83,28 +83,6 @@ This is a clean way to get progress indicator for file uploads.
 
 Still work in progress. Watch out.
 
-### Plain js
-
-```shell
-	$ npm install progress-up
-```
-
-### Angular 13+
-
-```shell
-	$ npm add progress-up/angular
-```
-### Vue 3
-
-```shell
-	$ npm add progress-up/vue
-```
-### React.js
-
-```shell
-	$ npm add progress-up/react
-```
-
 ## Detailed instructions
 
 - [Developer docs](https://progress-up.live/docs)

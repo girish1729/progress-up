@@ -12,16 +12,24 @@ export default [
     {
         input: 'src/index.ts',
         output: [
-            {
-                file:'dist/bundle.js',
+             {
+                file:'dist/iife/bundle.js',
+                format: 'iife',
+                sourcemap: true,
+                name: 'progressUp'
+            },
+	    {
+                file:'dist/umd/bundle.js',
                 format: 'umd',
                 sourcemap: true,
-                name: 'progress-up'
+                name: 'progressUp'
             },
-            {
-                file: 'dist/bundle.js',
+
+           {
+                file: 'dist/esm/bundle.js',
                 format: 'esm',
-                sourcemap: true
+                sourcemap: true,
+		name: 'progressUp'
             }
         ],
         plugins: [
