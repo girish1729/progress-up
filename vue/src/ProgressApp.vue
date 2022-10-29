@@ -5,8 +5,8 @@
     </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script>
+import { defineComponent } from 'vue';
 import UploadFilesProgress from "@components/uploadFilesProgress.vue";
 
 export default defineComponent({
