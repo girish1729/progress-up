@@ -2,7 +2,7 @@
   "name": "progress-up",
   "version": "0.1.0",
   "description": "A React library for HTML5 file upload progress bar",
-  "main": "src/index.ts",
+  "main": "dist/index.ts",
   "module": "dist/esm/index.ts",
   "files": [
     "dist"

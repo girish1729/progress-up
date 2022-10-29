@@ -13,13 +13,13 @@ export default [
         input: 'src/index.ts',
         output: [
             {
-                file: packageJson.main,
-                format: 'cjs',
+                file:'dist/bundle.js',
+                format: 'umd',
                 sourcemap: true,
                 name: 'progress-up'
             },
             {
-                file: packageJson.module,
+                file: 'dist/bundle.js',
                 format: 'esm',
                 sourcemap: true
             }

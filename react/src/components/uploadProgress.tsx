@@ -1,7 +1,6 @@
 import React, {
     useState
 } from "react";
-import {filesArray, uploadURL} from "./configuration/config";
 import axios from "axios";
 import {
     FontAwesomeIcon
@@ -9,6 +8,7 @@ import {
 import {
     solid
 } from '@fortawesome/fontawesome-svg-core/import.macro';
+import {filesArray, uploadURL} from "../configuration/config";
 
 // types
 type UploadFile = {
