@@ -17,60 +17,6 @@ This uses the HTTP File API protocol to show continuous progress.
 
 Demos will be added soon to the above page :point\_up: .
 
-## Instructions
-
-### Plain js
-
-```shell
-	$ npm install progress-up
-```
-
-### Angular 13+
-
-```shell
-	$ npm add progress-up/angular
-```
-### Vue 3
-
-```shell
-	$ npm add progress-up/vue
-```
-### React.js
-
-```shell
-	$ npm add progress-up/react
-```
-
-## Detailed instructions
-
-- [Developer docs](https://progress-up.live/docs)
-- [Live demo](https://progress-up.live/demo)
-- [Vue.js](https://progress-up.live/vue)
-- [Angular](https://progress-up.live/angular)
-- [React](https://progress-up.live/react)
- 
-
-## Screenshots gallery
-
-![Progess-up start upload](https://raw.githubusercontent.com/girish1729/progress.up/main/images/start-upload.png)
-![Progess-up finish upload](https://raw.githubusercontent.com/girish1729/progress.up/main/images/finish-upload.png)
-
-## Why should you care?
-
-If you allow multiple large files upload then a progress indicator is a
-cool way to give user feedback.
-
-Nowadays HTML5 File API based progress is the best way to achieve your
-goal.
-
-This project was written ground up with latest technology as of Oct 22,
-2022.
-
-However the status of project is `Beta`.
-
-Most testing is needed. If you volunteer please [get in
-touch](https://twitter.com/girish1729).
-
 ## How to build and run as plain js
 
 ### The backend is [CORS enabled](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
@@ -133,9 +79,70 @@ It is using the HTML5 File API.
 
 This is a clean way to get progress indicator for file uploads.
 
+## Instructions for other frameworks
+
+Still work in progress. Watch out.
+
+### Plain js
+
+```shell
+	$ npm install progress-up
+```
+
+### Angular 13+
+
+```shell
+	$ npm add progress-up/angular
+```
+### Vue 3
+
+```shell
+	$ npm add progress-up/vue
+```
+### React.js
+
+```shell
+	$ npm add progress-up/react
+```
+
+## Detailed instructions
+
+- [Developer docs](https://progress-up.live/docs)
+- [Live demo](https://progress-up.live/demo)
+- [Vue.js](https://progress-up.live/vue)
+- [Angular](https://progress-up.live/angular)
+- [React](https://progress-up.live/react)
+ 
+
+## Screenshots gallery
+
+### This is before upload
+
+![Progess-up start upload](https://raw.githubusercontent.com/girish1729/progress.up/main/images/start-upload.png)
+
+### This is after uploading
+
+![Progess-up finish upload](https://raw.githubusercontent.com/girish1729/progress.up/main/images/finish-upload.png)
+
+## Why should you care?
+
+If you allow multiple large files upload then a progress indicator is a
+cool way to give user feedback.
+
+Nowadays HTML5 File API based progress is the best way to achieve your
+goal.
+
+This project was written ground up with latest technology as of Oct 22,
+2022.
+
+However the status of project is `Beta`.
+
+Most testing is needed. If you volunteer please [get in
+touch](https://twitter.com/girish1729).
+
 ## Screencast of upload
 
-![Progess.up screencast](https://raw.githubusercontent.com/girish1729/progress.up/main/html5-upload/images/progress-up-html5-upload-capture.gif)
+![Progess.up screencast](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-html5-upload-capture.gif)
 
 ## Next steps
 
