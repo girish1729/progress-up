@@ -1,38 +1,40 @@
 {
   "name": "progress-up",
   "version": "0.1.0",
-    "description": "A React library for HTML5 file upload progress bar",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "description": "A React library for HTML5 file upload progress bar",
+  "main": "src/index.ts",
+  "module": "dist/esm/index.ts",
   "files": [
     "dist"
   ],
-    "style": "dist/progress-up.min.css",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/girish1729/progress-up.git"
-    },
-    "keywords": ["HTML5","Progress", "Upload" ],
-    "author": "Girish Venkatachalam<girish@gayatri-hitech.com>",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/girish1729/progress-up/issues"
-    },
-    "homepage": "https://progress-up.live",
+  "style": "dist/progress-up.min.css",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/girish1729/progress-up.git"
+  },
+  "keywords": [
+    "HTML5",
+    "Progress",
+    "Upload"
+  ],
+  "author": "Girish Venkatachalam<girish@gayatri-hitech.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/girish1729/progress-up/issues"
+  },
+  "homepage": "https://progress-up.live",
   "dependencies": {
-    "@chakra-ui/react": "^2.3.2",
-    "axios": "^1.1.3",
-    "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.10.4",
     "@fortawesome/fontawesome-svg-core": "^6.2.0",
     "@fortawesome/free-regular-svg-icons": "^6.2.0",
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
-    "@fortawesome/react-fontawesome": "^0.2.0"
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "axios": "^1.1.3",
+    "react-scripts": "^5.0.1"
   },
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && rollup -c",
-    "start": "BROWSER=none react-scripts start"
+    "start": "react-scripts start"
   },
   "eslintConfig": {
     "extends": [
@@ -48,12 +50,24 @@
     "react": "^17.0.2",
     "rimraf": "^3.0.2",
     "rollup": "^2.56.2",
-    "rollup-plugin-scss": "*",
     "rollup-plugin-dts": "^3.0.2",
+    "rollup-plugin-json": "*",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.1",
+    "rollup-plugin-scss": "*",
     "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-json": "*",
     "typescript": "^4.3.5"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

@@ -1,12 +1,14 @@
-import http from "../http-common";
+import axios from "axios";
+import config from '../config.json';
+
 
 class UploadFilesService {
   upload(file, onUploadProgress) {
     let formData = new FormData();
 
-    formData.append("myFiles", file);
+    formData.append(config.filesArray, file);
 
-    return http.post("/uploadmultiple", formData, {
+    return axios.post(config.uploadURL, formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       },

@@ -1,10 +1,7 @@
 import React, {
     useState
 } from "react";
-import {
-    Box,
-    Container
-} from "@chakra-ui/react";
+import {filesArray, uploadURL} from "./configuration/config";
 import axios from "axios";
 import {
     FontAwesomeIcon
@@ -23,7 +20,8 @@ type UploadFile = {
 const UploadProgress: React.FunctionComponent = () => {
 
         const [progFiles, setProg] = useState < Array < UploadFile >> ([]);
-        const url = "http://localhost:2324/uploadmultiple";
+        const url = uploadURL;
+
 
         const refreshPage = async () => {
             return await window.location.reload();
@@ -62,7 +60,7 @@ const UploadProgress: React.FunctionComponent = () => {
                     const formData = new FormData();
                     const fileName = files[i].name;
                     const size = files[i].size;
-                    formData.append("myFiles", files[i]);
+                    formData.append(filesArray, files[i]);
                     progFiles.push({
                         fileName,
                         size,
@@ -75,8 +73,7 @@ const UploadProgress: React.FunctionComponent = () => {
         };
 
   return (
-  <Container>
-  <Box>
+  <div>
   <div className="wrapper">
 	  <header>Progress.up file upload </header>
 	  <div className='text-center'>
@@ -89,9 +86,8 @@ const UploadProgress: React.FunctionComponent = () => {
 		  <p>Browse Files to Upload</p>
 	  </form>
   </div>
-  </Box>
 
-  <Box id="prog" padding="4" className="progress-area">
+  <div id="prog" className="progress-area">
   <section className="progress-area">
   {progFiles.length > 0
   ? (
@@ -114,8 +110,9 @@ const UploadProgress: React.FunctionComponent = () => {
   )
   : <p>HTML5 Multiple upload progress indicator </p>}
   </section>
-  </Box>
-  </Container>
+  </div>
+
+ </div>
   );
 };
 
