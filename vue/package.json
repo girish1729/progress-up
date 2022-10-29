@@ -2,6 +2,7 @@
   "name": "progress-up",
   "version": "0.0.1",
   "description": "A Vue.js component that displays a progress bar",
+  "main": "src/main.ts",
   "type": "module",
   "author": "Girish Venkatachalam",
   "license": "MIT",

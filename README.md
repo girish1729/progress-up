@@ -1,13 +1,8 @@
 # Progress.up HTML5 File Upload Progress indicator
 
-![Progess.up](https://raw.githubusercontent.com/girish1729/progress.up/main/html5-upload/images/Progress.Up.png)
+![Progess.up](https://raw.githubusercontent.com/girish1729/progress.up/main//images/progress-up-logo.svg)
 
 ## What is this?
-
-
-<div class="alert alert-danger" role="alert">
-     Vue.js component works only with Vue.js version 3 and above. For vue.js 2 please follow this 
-</div>
 
 This is a HTML5 multiple files Upload plugin with progress bar
 indicator.
@@ -20,14 +15,14 @@ This uses the HTTP File API protocol to show continuous progress.
 
 [Canonical home page](https://progress-up.live)
 
-Demos will be added soon to the above page :point_up: .
+Demos will be added soon to the above page :point\_up: .
 
 ## Instructions
 
 ### Plain js
 
 ```shell
-	$ npm add progress-up
+	$ npm install progress-up
 ```
 
 ### Angular 13+
@@ -78,11 +73,24 @@ touch](https://twitter.com/girish1729).
 
 ## How to build and run as plain js
 
-**Instructions or frameworks coming soon**
+### The backend is [CORS enabled](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
+
+
+So you don't have to deal with pesky same origin security errors with
+file uploads. Also each plugin enables you to name the file array in the
+HTML `<input>` file selector.
+
+By specifying backend URL and file name in `input HTML element` file
+upload is no longer a hassle.
+
+With that out of the way let us focus on the frontend.
+
+**Instructions for frameworks coming soon**
 
 ```
 $ git clone https://github.com/girish1729/progress.up
-$ cd progress.up/html5-upload
+
+$ cd progress.up/backend
 $ yarn install
 
 # or
@@ -92,7 +100,6 @@ $ npm install
 $ mkdir uploads
 
 $ npm start
-```
 
 Go to [http://localhost:2324](http://localhost:2324)
 
