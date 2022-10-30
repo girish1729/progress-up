@@ -5,7 +5,7 @@ import { faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
 import { faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import ProgressApp from '@components/ProgressApp.vue';
-import '@https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.js';
+import '@https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css';
 
 
 

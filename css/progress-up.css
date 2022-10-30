@@ -5,13 +5,7 @@
   padding: 30px;
 }
 
-.progress-up-wrapper header{
-  font-size: 27px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.progress-up-wrapper form{
+.progress-up-wrapper .progress-up-form {
   height: 260px;
   display: flex;
   cursor: pointer;
@@ -23,20 +17,20 @@
   border: 2px dashed #6990F2;
 }
 
-.progress-up-form form :where(i, p){
+.progress-up-form :where(i, p){
   color: #6990F2;
 }
 
-.progress-up-form form i{
+.progress-up-form i{
   font-size: 50px;
 }
 
-.progress-up-form form p{
+.progress-up-form p{
   margin-top: 15px;
   font-size: 16px;
 }
 
-.progress-up-area section .row{
+.progress-up-area .row{
   margin-bottom: 10px;
   background: #E9F0FF;
   list-style: none;
@@ -47,12 +41,12 @@
   justify-content: space-between;
 }
 
-.progress-up-area section .row i{
+.progress-up-area .row i{
   color: #6990F2;
   font-size: 30px;
 }
 
-.progress-up-area section .details span{
+.progress-up-area .details span{
   font-size: 14px;
 }
 

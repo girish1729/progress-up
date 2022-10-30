@@ -1,6 +1,5 @@
 import {
     Component,
-    ViewEncapsulation
 } from '@angular/core';
 import {
     UploadFileService
@@ -16,9 +15,7 @@ import {
 
 @Component({
     selector: 'app-upload-files',
-    encapsulation: viewEncapsulation.None,
     templateUrl: './upload-files.component.html',
-    styleUrls: ['https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.js']
 })
 
 export class UploadFilesComponent {

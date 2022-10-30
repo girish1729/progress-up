@@ -74,6 +74,8 @@ const UploadProgress: React.FunctionComponent = () => {
 
   return (
   <div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css" />
   <div className="progress-up-wrapper">
 	  <header>Progress.up file upload </header>
 	  <div className='text-center'>

@@ -4,7 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 
 import { AppComponent } from './app.component';
-import { UploadFilesComponent } from './components/upload-files/upload-files.component';
+import { UploadFilesComponent } from './upload-files/upload-files.component';
 
 @NgModule({
   declarations: [
