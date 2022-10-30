@@ -37,13 +37,8 @@
   justify-content: space-between;
 }
 
-.progress-up-area .row i{
-  color: #6990F2;
-  font-size: 30px;
-}
-
 .progress-up-area .details span{
-  font-size: 14px;
+  font-size: 1em;
 }
 
 .progress-up-area .row .content{
@@ -88,5 +83,3 @@
        	box-shadow: 0 3px 5px rgba(0, 0, 0, 0.18);
 	cursor: pointer;
 }
-
-

@@ -2,14 +2,14 @@
   "name": "progress-up",
   "version": "0.0.1",
   "description": "A Vue.js component that displays a progress bar",
-  "main": "src/index.js",
+  "main": "src/main.js",
   "type": "module",
   "author": "Girish Venkatachalam",
   "license": "MIT",
   "scripts": {
-    "dev": "vite",
-    "build": "yarn bili --plugins.vue --moduleName ProgressApp --format umd,es,cjs,umd-min",
-    "preview": "vite preview"
+    "clean": "rimraf dist",
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build --mode prod "
   },
   "repository": {
     "type": "git",
@@ -48,10 +48,16 @@
     "stylelint": "^14.11.0",
     "stylelint-config-standard": "^28.0.0",
     "typescript": "^4.8.2",
-    "vite": "^3.0.9",
-    "vite-tsconfig-paths": "^3.5.0",
     "vue-eslint-parser": "^9.0.3",
     "vue-template-compiler": "^2.7.13",
-    "vue-tsc": "^0.40.1"
+    "vue-tsc": "^0.40.1",
+    "@vue/cli-plugin-babel": "*",
+    "@vue/cli-plugin-eslint": "*",
+    "@vue/cli-service": "*",
+    "babel-eslint": "*",
+    "eslint": "*",
+    "eslint-plugin-vue": "*",
+    "vue-template-compiler": "*"
+ 
   }
 }

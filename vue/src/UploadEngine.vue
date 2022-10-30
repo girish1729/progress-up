@@ -1,22 +1,18 @@
 <template>
  <div>
-
   <div class="progress-up-wrapper">
      <div class='text-center'>
-     <button @click="reloadPage" class="clearButton" role="button">Clear all</button>
+     <button @click="clearAll" class="clearButton" role="button">Clear all</button>
      </div>
 
-     <form class='progress-up-form'>
+     <form class="progress-up-form">
      <input ref="fileInput"  v-on:change="uploadFiles" class="file-input" type="file" name="myFiles" multiple hidden>
      <span @click="$refs.fileInput.click()" >
-     <font-awesome-icon size="10x" icon="cloud-upload-alt" />
-     <p>Browse Files to Upload</p>
+     <font-awesome-icon size="8x" icon="cloud-upload-alt" />
+     <h2>Browse Files to Upload</h2>
      </span>
      </form>
   </div>
-
-    <div v-if="message" class="alert alert-light" role="alert">
-    </div>
 
  <section class="progress-up-area">
   <div v-if="progressInfos">
@@ -30,8 +26,7 @@
             <span class='percent'> {{progressInfo.percentage}} %</span>
            </div>
            <div class='progress-bar'>
-                <div class="progress" :style="{ width:
-progressInfo.percentage + '%' }"> </div>
+                <div class="progress" :style="{ width: progressInfo.percentage + '%' }"> </div>
             </div>
             <span class="size">{{progressInfo.size}} Bytes</span>
           </div>
@@ -43,11 +38,12 @@ progressInfo.percentage + '%' }"> </div>
  </div>
 </template>
 
+
 <script>
-import UploadFilesService from "../services/UploadFilesService";
+import UploadFilesService from "./UploadFilesService";
 
 export default {
-  name: "upload-files-progress",
+  name: "UploadEngine",
   data() {
     return {
       selectedFiles: undefined,
@@ -69,8 +65,8 @@ size: file.size };
       });
     },
 
-    reloadPage() {
-        window.location.reload();
+    clearAll() {
+      this.progressInfos = []; 
     },
 
     uploadFiles(event) {
@@ -84,3 +80,7 @@ size: file.size };
   }
 };
 </script>
+
+<style>
+@import 'https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css';
+</style>

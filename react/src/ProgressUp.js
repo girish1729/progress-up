@@ -1,4 +1,5 @@
 import React, {
+    Fragment,
     useState
 } from "react";
 import axios from "axios";
@@ -8,23 +9,25 @@ import {
 import {
     solid
 } from '@fortawesome/fontawesome-svg-core/import.macro';
-import {filesArray, uploadURL} from "../configuration/config";
+import {filesArray, uploadURL} from "./config";
 
-// types
-type UploadFile = {
-    fileName: string;
-    size: number;
-    progressPercent: number;
+/*
+UploadFile = {
+    fileName ;
+    size;
+    progressPercent ;
 };
+*/
 
-const UploadProgress: React.FunctionComponent = () => {
+const ProgressUp: React.FunctionComponent = () => {
 
-        const [progFiles, setProg] = useState < Array < UploadFile >> ([]);
+        //let [progFiles, setProg] = useState <Array<UploadFile>>([]);
+        let [progFiles, setProg] = useState([]);
         const url = uploadURL;
 
-
-        const refreshPage = async () => {
-            return await window.location.reload();
+        const clearAll = () => {
+                setProg([]);
+		console.log("clear All");
         };
 
         const uploadForm = async (fname: string, formData: FormData) => {
@@ -73,19 +76,21 @@ const UploadProgress: React.FunctionComponent = () => {
         };
 
   return (
-  <div>
+  <Fragment>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css" />
   <div className="progress-up-wrapper">
 	  <header>Progress.up file upload </header>
 	  <div className='text-center'>
-		  <button onClick={refreshPage} className="clearButton" role="button">Clear all</button>
+		  <button onClick={clearAll} className="clearButton" role="button">Clear all</button>
 	  </div>
-	  <form className="progress-up-form">
-		  <label htmlFor="inputFile" className="button">Upload</label>
+
 		  <input id="inputFile" onChange={onFileUpload} className="file-input" type="file" name="myFiles" multiple hidden></input>
+	  <form className="progress-up-form">
+		  <label htmlFor="inputFile" className="button">
 		  <FontAwesomeIcon icon={solid('cloud-upload-alt')} size='10x' />
-		  <p>Browse Files to Upload</p>
+		  <h2>Browse Files to Upload</h2>
+	</label>
 	  </form>
   </div>
 
@@ -114,8 +119,8 @@ const UploadProgress: React.FunctionComponent = () => {
   </section>
   </div>
 
- </div>
+ </Fragment>
   );
 };
 
-export default UploadProgress;
+export default ProgressUp;

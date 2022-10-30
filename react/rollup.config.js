@@ -10,7 +10,7 @@ const packageJson = require('./package.json');
 
 export default [
     {
-        input: 'src/index.ts',
+        input: 'src/index.js',
         output: [
              {
                 file:'dist/iife/bundle.js',
@@ -36,7 +36,7 @@ export default [
             external(),
             resolve(),
             commonjs(),
-            typescript({ tsconfig: './tsconfig.json' }),
+            //typescript({ tsconfig: './tsconfig.json' }),
             terser(),
 	    scss(),
 	    json()

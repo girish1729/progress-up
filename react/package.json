@@ -32,8 +32,8 @@
     "react-scripts": "^5.0.1"
   },
   "scripts": {
-    "clean": "rimraf dist",
-    "build": "npm run clean && rollup -c",
+    "clean": "rimraf build",
+    "build": "rimrad build && react-scripts build",
     "start": "react-scripts start"
   },
   "eslintConfig": {
@@ -46,10 +46,20 @@
     "@rollup/plugin-commonjs": "^20.0.0",
     "@rollup/plugin-node-resolve": "^13.0.4",
     "@rollup/plugin-typescript": "^8.2.5",
-    "@types/react": "^17.0.18",
-    "react": "^17.0.2",
+    "@types/react": "*",
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.3",
+    "babel-jest": "^21.2.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "@babel/plugin-syntax-jsx": "*",
+    "react": "*",
+    "bili": "^5.0.5",
+    "react-dom": "*",
+    "postcss": "^8.4.16",
     "rimraf": "^3.0.2",
     "rollup": "^2.56.2",
+    "rollup-plugin-jsx": "*",
     "rollup-plugin-dts": "^3.0.2",
     "rollup-plugin-json": "*",
     "rollup-plugin-peer-deps-external": "^2.2.4",

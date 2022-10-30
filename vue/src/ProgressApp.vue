@@ -1,19 +1,18 @@
 <template>
     <div class="container" style="width:600px">
-      <upload-files-progress></upload-files-progress>
+      <upload-engine></upload-engine>
       <slot></slot>
     </div>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
-import UploadFilesProgress from "@components/uploadFilesProgress.vue";
+import UploadEngine from "./UploadEngine.vue";
 
 export default defineComponent({
-  name: "ProgressApp",
-    inheritAttrs: false,
+ name: "ProgressApp",
   components: {
-    UploadFilesProgress
+    UploadEngine
   }
 });
 </script>
