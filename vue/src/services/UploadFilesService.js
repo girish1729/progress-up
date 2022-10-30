@@ -1,7 +1,6 @@
 import axios from "axios";
 import config from '../config.json';
 
-
 class UploadFilesService {
   upload(file, onUploadProgress) {
     let formData = new FormData();
@@ -17,4 +16,4 @@ class UploadFilesService {
   }
 }
 
-export default new UploadFilesService();
+export default new UploadFilesService;

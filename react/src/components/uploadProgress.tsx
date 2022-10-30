@@ -74,12 +74,12 @@ const UploadProgress: React.FunctionComponent = () => {
 
   return (
   <div>
-  <div className="wrapper">
+  <div className="progress-up-wrapper">
 	  <header>Progress.up file upload </header>
 	  <div className='text-center'>
 		  <button onClick={refreshPage} className="clearButton" role="button">Clear all</button>
 	  </div>
-	  <form>
+	  <form className="progress-up-form">
 		  <label htmlFor="inputFile" className="button">Upload</label>
 		  <input id="inputFile" onChange={onFileUpload} className="file-input" type="file" name="myFiles" multiple hidden></input>
 		  <FontAwesomeIcon icon={solid('cloud-upload-alt')} size='10x' />
@@ -87,8 +87,8 @@ const UploadProgress: React.FunctionComponent = () => {
 	  </form>
   </div>
 
-  <div id="prog" className="progress-area">
-  <section className="progress-area">
+  <div id="prog">
+  <section className="progress-up-area">
   {progFiles.length > 0
   ? (
   progFiles.map(({fileName, progressPercent, size}) => (

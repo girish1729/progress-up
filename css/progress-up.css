@@ -1,33 +1,17 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-
-body{
-  width: 900px;
-  margin: 0 auto;
-  padding: 0;
-  font-family: "Poppins", sans-serif;
-}
-
-::selection{
-  color: #fff;
-  background: #6990F2;
-}
-
-.wrapper{
+.progress-up-wrapper{
   width: 600px;
   background: #fff;
   border-radius: 5px;
   padding: 30px;
 }
 
-.wrapper header{
+.progress-up-wrapper header{
   font-size: 27px;
   font-weight: 600;
   text-align: center;
 }
 
-
-.wrapper form{
+.progress-up-wrapper form{
   height: 260px;
   display: flex;
   cursor: pointer;
@@ -39,20 +23,20 @@ body{
   border: 2px dashed #6990F2;
 }
 
-form :where(i, p){
+.progress-up-form form :where(i, p){
   color: #6990F2;
 }
 
-form i{
+.progress-up-form form i{
   font-size: 50px;
 }
 
-form p{
+.progress-up-form form p{
   margin-top: 15px;
   font-size: 16px;
 }
 
-section .row{
+.progress-up-area section .row{
   margin-bottom: 10px;
   background: #E9F0FF;
   list-style: none;
@@ -63,21 +47,21 @@ section .row{
   justify-content: space-between;
 }
 
-section .row i{
+.progress-up-area section .row i{
   color: #6990F2;
   font-size: 30px;
 }
 
-section .details span{
+.progress-up-area section .details span{
   font-size: 14px;
 }
 
-.progress-area .row .content{
+.progress-up-area .row .content{
   width: 100%;
   margin-left: 15px;
 }
 
-.progress-area .details{
+.progress-up-area .details{
   display: flex;
   align-items: center;
   display: inline-flex;
@@ -88,7 +72,7 @@ section .details span{
   width: inherit;
 }
 
-.progress-area .content .progress-bar{
+.progress-up-area .content .progress-bar{
   height: 20px;
   width: 100%;
   margin-bottom: 4px;
@@ -96,14 +80,14 @@ section .details span{
   border-radius: 5px;
 }
 
-.content .progress-bar .progress{
+.progress-up-area .progress-bar .progress{
   height: 100%;
   width: 0%;
   background: red;
   border-radius: inherit;
 }
 
-.clearButton {
+.progress-up-wrapper .clearButton {
 	line-height: 1.1;
 	padding: 0.25em 0.75em;
 	min-width: 10ch;
@@ -114,4 +98,8 @@ section .details span{
        	border-radius: 8px;
        	box-shadow: 0 3px 5px rgba(0, 0, 0, 0.18);
 	cursor: pointer;
+}
+
+.progress-up-wrapper .text-center {
+	text-align: center;
 }

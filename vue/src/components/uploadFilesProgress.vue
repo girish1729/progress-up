@@ -1,12 +1,12 @@
 <template>
  <div>
 
-  <div class="wrapper">
+  <div class="progress-up-wrapper">
      <div class='text-center'>
      <button @click="reloadPage" class="clearButton" role="button">Clear all</button>
      </div>
 
-     <form>
+     <form class='progress-up-form'>
      <input ref="fileInput"  v-on:change="uploadFiles" class="file-input" type="file" name="myFiles" multiple hidden>
      <span @click="$refs.fileInput.click()" >
      <font-awesome-icon size="10x" icon="cloud-upload-alt" />
@@ -18,7 +18,7 @@
     <div v-if="message" class="alert alert-light" role="alert">
     </div>
 
- <section class="progressArea">
+ <section class="progress-up-area">
   <div v-if="progressInfos">
       <div v-for="(progressInfo, index) in progressInfos"
         :key="index" >
@@ -44,7 +44,7 @@ progressInfo.percentage + '%' }"> </div>
 </template>
 
 <script>
-import UploadService from "../services/UploadFilesService";
+import UploadFilesService from "../services/UploadFilesService";
 
 export default {
   name: "upload-files-progress",
@@ -60,7 +60,7 @@ export default {
       this.progressInfos[idx] = { percentage: 0, fileName: file.name,
 size: file.size };
 
-      UploadService.upload(file, (event) => {
+      UploadFilesService.upload(file, (event) => {
         this.progressInfos[idx].percentage = Math.round(100 * event.loaded / event.total);
       })
         .then((response) => {
