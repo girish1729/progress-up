@@ -1,20 +1,22 @@
-<div class="progress-up-wrapper">
- <header>Progress.up file upload </header>
- <div class='text-center'>
-   <button (click)="reloadPage()" class="clearButton" role="button">Clear all</button>
- </div>
- <form class='progress-up-form' action="#">
-    <button class='btn btn-success' (click)="fileInput.click()" >
-	Browse files to upload
-    </button>
-      <input type="file" #fileInput name="myFiles" (change)="onFileUpload($event)" multiple hidden />
-	<span class="fas fa-8x fa-cloud-upload-alt"></span>
- </form>
- <section class='progress-up-area' >
 
+<div class="progress-up-wrapper">
+
+ <div class='text-center'>
+   <button (click)="clearAll()" class="clearButton" role="button">Clear all</button>
+ </div>
+
+ <form class='progress-up-form' action="#">
+      <input type="file" #fileInput (change)="onFileUpload($event)" multiple hidden />
+        <span (click)="fileInput.click()" >
+	<fa-icon [icon]="faCloudUploadAlt" size="8x"></fa-icon>
+        <h2>Browse Files to Upload</h2>
+	</span>
+ </form>
+
+ <section *ngIf="showProgress" class='progress-up-area' >
    <div *ngFor="let file of uploadFiles">
     <li class="row">
-        <span class="fas fa-file-alt"></span>
+        <fa-icon [icon]="faFileAlt"></fa-icon>
           <div class="content">
                 <div class="details">
                    <span class="name">{{file.name}} </span>
@@ -28,7 +30,7 @@
            </div>
     </li>
     </div>
-</section>
+ </section>
 
 </div>
 

@@ -4,6 +4,8 @@ import {
 import {
     UploadFileService
 } from 'src/app/services/upload-file.service';
+import { faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
+import { faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import {
     HttpEvent,
     HttpEventType,
@@ -19,9 +21,11 @@ import {
 })
 
 export class UploadFilesComponent {
-
     progress: any = {};
+    showProgress:boolean = true;
     fileLoaded = 0;
+    faFileAlt = faFileAlt;
+    faCloudUploadAlt = faCloudUploadAlt;
     uploadFiles: any = [];
 
     constructor(private uploadService: UploadFileService) {}
@@ -55,7 +59,7 @@ export class UploadFilesComponent {
         }
     }
 
-    reloadPage() {
-        location.reload();
+    clearAll() {
+        this.showProgress = false;
     }
 }
