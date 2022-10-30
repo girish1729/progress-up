@@ -33,7 +33,7 @@
   },
   "scripts": {
     "clean": "rimraf build",
-    "build": "rimrad build && react-scripts build",
+    "build": "rimraf build && react-scripts build",
     "start": "react-scripts start"
   },
   "eslintConfig": {

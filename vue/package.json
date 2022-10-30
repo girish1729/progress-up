@@ -7,7 +7,6 @@
   "author": "Girish Venkatachalam",
   "license": "MIT",
   "scripts": {
-    "clean": "rimraf dist",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --mode prod "
   },
@@ -36,7 +35,6 @@
     "babel-jest": "^21.2.0",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
-    "bili": "^5.0.5",
     "eslint": "^8.22.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
@@ -58,6 +56,5 @@
     "eslint": "*",
     "eslint-plugin-vue": "*",
     "vue-template-compiler": "*"
- 
   }
 }

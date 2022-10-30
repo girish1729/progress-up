@@ -3,4 +3,6 @@ uploads
 package-lock.json
 yarn.lock
 dist
+build
+yarn-error.log
 
