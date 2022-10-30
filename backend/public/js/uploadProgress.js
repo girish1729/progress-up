@@ -1,6 +1,6 @@
 const form = document.querySelector("form"),
     fileInput = document.querySelector(".file-input"),
-    progressArea = document.querySelector(".progress-area"),
+    progressArea = document.querySelector(".progress-up-area");
 
 form.addEventListener("click", () => {
     fileInput.click();
@@ -24,7 +24,7 @@ fileInput.onchange = ({
                        <div class="content">
                             <div class="details">
                               <span class="name">${fileName} </span>
-                              <span id="${fileName}-1" class="percent">${fileLoaded} %</span>
+                              <span id="${fileName}-1" class="percent">${fileLoaded} % </span>
                             </div>
                          <div id="${fileName}-2" class="progress-bar">
                               <div  class="progress" style="width: ${fileLoaded}%"></div>
@@ -38,6 +38,9 @@ fileInput.onchange = ({
     }
 }
 
+function clearAll() {
+	progressArea.innerHTML = '';
+}
 // file upload function
 function uploadFile(name) {
     let xhr = new XMLHttpRequest();
@@ -47,7 +50,7 @@ function uploadFile(name) {
         total
     }) => {
         let fileLoaded = Math.floor((loaded / total) * 100);
-        document.getElementById(name + '-1').innerHTML = fileLoaded;
+        document.getElementById(name + '-1').innerHTML = fileLoaded + "%";
         document.getElementById(name + '-2').innerHTML = `
              <div  class="progress" style="width: ${fileLoaded}%"></div>
 	`;

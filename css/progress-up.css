@@ -1,12 +1,17 @@
 .progress-up-wrapper{
   width: 600px;
-  background: #fff;
   border-radius: 5px;
   padding: 30px;
+  margin: 0 auto;
+  color: black;
+}
+
+.progress-up-wrapper .text-center {
+	text-align: center;
 }
 
 .progress-up-wrapper .progress-up-form {
-  height: 260px;
+  height: 190px;
   display: flex;
   cursor: pointer;
   margin: 30px 0;
@@ -17,14 +22,6 @@
   border: 2px dashed #6990F2;
 }
 
-.progress-up-form :where(i, p){
-  color: #6990F2;
-}
-
-.progress-up-form i{
-  font-size: 50px;
-}
-
 .progress-up-form p{
   margin-top: 15px;
   font-size: 16px;
@@ -32,7 +29,6 @@
 
 .progress-up-area .row{
   margin-bottom: 10px;
-  background: #E9F0FF;
   list-style: none;
   padding: 15px 20px;
   border-radius: 5px;
@@ -86,14 +82,11 @@
 	padding: 0.25em 0.75em;
 	min-width: 10ch;
 	min-height: 44px;
-	font-size: 16px;
-	background-color: blue;
-	color: #fff;
+	font-size: 1.5em;
+	background-color: gold;
        	border-radius: 8px;
        	box-shadow: 0 3px 5px rgba(0, 0, 0, 0.18);
 	cursor: pointer;
 }
 
-.progress-up-wrapper .text-center {
-	text-align: center;
-}
+
