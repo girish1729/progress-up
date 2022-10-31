@@ -14,18 +14,18 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
+    "paths": {
+      "progress-up": [
+        "dist/progress-up/progress-up",
+        "dist/progress-up"
+      ]
+    },
     "target": "es2017",
     "module": "es2020",
     "lib": [
       "es2018",
       "dom"
-    ],
-    "paths": {
-      "upl": [
-        "dist/upl/upl",
-        "dist/upl"
-      ]
-    }
+    ]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

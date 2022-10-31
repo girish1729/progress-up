@@ -6,6 +6,9 @@
   "type": "module",
   "author": "Girish Venkatachalam",
   "license": "MIT",
+  "files": [
+    "dist/js/app.js"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --mode prod "

@@ -2,8 +2,8 @@ import {
     Component,
 } from '@angular/core';
 import {
-    UploadFileService
-} from 'src/app/services/upload-file.service';
+    ProgressUpService
+} from './progress-up.service';
 import { faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
 import { faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -16,8 +16,8 @@ import {
 } from 'rxjs';
 
 @Component({
-    selector: 'app-upload-files',
-    templateUrl: './upload-files.component.html',
+  selector: 'lib-progress-up',
+    templateUrl: './progress-up.component.html',
 })
 
 export class UploadFilesComponent {
@@ -28,7 +28,7 @@ export class UploadFilesComponent {
     faCloudUploadAlt = faCloudUploadAlt;
     uploadFiles: any = [];
 
-    constructor(private uploadService: UploadFileService) {}
+    constructor(private uploadService: ProgressUpService) {}
 
     uploadOneFile(file: File) {
 

@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { UplService } from './upl.service';
+import { ProgressUpService } from './progress-up.service';
 
-describe('UplService', () => {
-  let service: UplService;
+describe('ProgressUpService', () => {
+  let service: ProgressUpService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(UplService);
+    service = TestBed.inject(ProgressUpService);
   });
 
   it('should be created', () => {

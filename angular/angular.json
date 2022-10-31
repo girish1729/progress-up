@@ -6,121 +6,23 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ang": {
-      "projectType": "application",
-      "schematics": {
-        "@schematics/angular:application": {
-          "strict": true
-        }
-      },
-      "root": "",
-      "sourceRoot": "src",
-      "prefix": "app",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:browser",
-          "options": {
-            "outputPath": "dist/ang",
-            "index": "src/index.html",
-            "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.app.json",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.css"
-            ],
-            "scripts": []
-          },
-          "configurations": {
-            "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
-                }
-              ],
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "development": {
-              "buildOptimizer": false,
-              "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "configurations": {
-            "production": {
-              "browserTarget": "ang:build:production"
-            },
-            "development": {
-              "browserTarget": "ang:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
-          "options": {
-            "browserTarget": "ang:build"
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "src/test.ts",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.css"
-            ],
-            "scripts": []
-          }
-        }
-      }
-    },
-    "upl": {
+    "progress-up": {
       "projectType": "library",
-      "root": "projects/upl",
-      "sourceRoot": "projects/upl/src",
+      "root": "projects/progress-up",
+      "sourceRoot": "projects/progress-up/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/upl/ng-package.json"
+            "project": "projects/progress-up/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/upl/tsconfig.lib.prod.json"
+              "tsConfig": "projects/progress-up/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/upl/tsconfig.lib.json"
+              "tsConfig": "projects/progress-up/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -128,13 +30,13 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/upl/src/test.ts",
-            "tsConfig": "projects/upl/tsconfig.spec.json",
-            "karmaConfig": "projects/upl/karma.conf.js"
+            "main": "projects/progress-up/src/test.ts",
+            "tsConfig": "projects/progress-up/tsconfig.spec.json",
+            "karmaConfig": "projects/progress-up/karma.conf.js"
           }
         }
       }
     }
   },
-  "defaultProject": "ang"
+  "defaultProject": "progress-up"
 }
