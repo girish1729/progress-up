@@ -20,7 +20,7 @@ import {
     templateUrl: './progress-up.component.html',
 })
 
-export class UploadFilesComponent {
+export class ProgressUpComponent {
     progress: any = {};
     showProgress:boolean = true;
     fileLoaded = 0;

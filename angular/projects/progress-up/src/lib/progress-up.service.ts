@@ -11,14 +11,14 @@ export class ProgressUpService {
   constructor(private http: HttpClient) { }
 
   config = {
-	filesArray: string,
-	uploadURL:string
+	filesArray: "mFiles",
+	uploadURL: "https://localhost:2324/uploadmultiple"
   };
   upload(file: File): Observable<HttpEvent<any>> {
     const formData: FormData = new FormData();
 
-    formData.append(config.filesArray, file);
-    const req = new HttpRequest('POST', config.uploadURL, formData, {
+    formData.append(this.config.filesArray, file);
+    const req = new HttpRequest('POST', this.config.uploadURL, formData, {
       reportProgress: true,
       responseType: 'json'
     });

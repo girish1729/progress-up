@@ -2,14 +2,13 @@
   "name": "progress-up",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^12.1.0",
-    "@angular/core": "^12.1.0"
-  },
-  "dependencies": {
-    "@angular/core": "^12.1.0",
-    "tslib": "^2.2.0",
+    "@angular/common": "*",
+    "@angular/core": "*",
     "@fortawesome/angular-fontawesome": "*",
     "@fortawesome/fontawesome-svg-core": "*",
     "@fortawesome/free-solid-svg-icons": "*"
+  },
+  "dependencies": {
+    "tslib": "*"
   }
 }
