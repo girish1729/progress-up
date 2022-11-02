@@ -16,4 +16,4 @@ class UploadFilesService {
   }
 }
 
-export default new UploadFilesService;
+export default UploadFilesService;

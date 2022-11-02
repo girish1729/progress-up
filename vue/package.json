@@ -7,7 +7,7 @@
   "author": "Girish Venkatachalam",
   "license": "MIT",
   "files": [
-    "dist/js/app.js"
+    "dist/*"
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
