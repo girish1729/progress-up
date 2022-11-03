@@ -1,0 +1,46 @@
+{
+  "name": "angular",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "*",
+    "@angular/common": "*",
+    "@angular/compiler": "*",
+    "@angular/core": "*",
+    "@angular/forms": "*",
+    "@angular/platform-browser": "*",
+    "@angular/platform-browser-dynamic": "*",
+    "@angular/router": "*",
+    "progress-up": "file:../../../progress-up/angular/dist/progress-up",
+    "rxjs": "*",
+    "tslib": "*",
+    "zone.js": "*"
+  },
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "test": "ng test",
+    "lint": "ng lint",
+    "e2e": "ng e2e"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "*",
+    "@angular/cli": "*",
+    "@angular/compiler-cli": "*",
+    "@types/jasmine": "*",
+    "@types/node": "*",
+    "codelyzer": "*",
+    "jasmine-core": "*",
+    "jasmine-spec-reporter": "*",
+    "karma": "*",
+    "karma-chrome-launcher": "*",
+    "karma-coverage": "*",
+    "karma-jasmine": "*",
+    "karma-jasmine-html-reporter": "*",
+    "protractor": "*",
+    "ts-node": "*",
+    "tslint": "*",
+    "typescript": "*"
+  }
+}
