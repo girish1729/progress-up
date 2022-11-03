@@ -4,27 +4,11 @@ import React, {
     Component
 } from "react";
 import axios from "axios";
-import {
-    FontAwesomeIcon
-} from '@fortawesome/react-fontawesome';
-import {
-    solid
-} from '@fortawesome/fontawesome-svg-core/import.macro';
 import {filesArray, uploadURL} from "./config";
 
-/*
-UploadFile = {
-    fileName ;
-    size;
-    progressPercent ;
-};
-*/
+function ProgressUp(props) {
 
-
-const ProgressUp = (props) => {
-
-        /*let [progFiles, setProg] = useState <Array<UploadFile>>([]);*/
-        let [progFiles, setProg] = useState([]);
+        let [progFiles, setProg] = useState <Array>([]);
         const url = uploadURL;
 
         const clearAll = () => {
@@ -90,7 +74,6 @@ const ProgressUp = (props) => {
 		  <input id="inputFile" onChange={onFileUpload} className="file-input" type="file" name="myFiles" multiple hidden></input>
 	  <form className="progress-up-form">
 		  <label htmlFor="inputFile" className="button">
-		  <FontAwesomeIcon icon={solid('cloud-upload-alt')} size='10x' />
 		  <h2>Browse Files to Upload</h2>
 	</label>
 	  </form>
@@ -102,7 +85,6 @@ const ProgressUp = (props) => {
   ? (
   progFiles.map(({fileName, progressPercent, size}) => (
   <li className="row" key={fileName} >
-	  <FontAwesomeIcon icon={solid('file-alt')} />
 	  <div className="content">
 		  <div className="details">
 			  <span className="name">{fileName} </span>
@@ -123,6 +105,6 @@ const ProgressUp = (props) => {
 
  </Fragment>
   );
-};
+}
 
 export default ProgressUp;

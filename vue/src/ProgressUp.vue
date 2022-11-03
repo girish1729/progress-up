@@ -6,9 +6,8 @@
      </div>
 
      <form class="progress-up-form">
-     <input ref="fileInput"  v-on:change="uploadFiles" class="file-input" type="file" name="myFiles" multiple hidden>
+     <input ref="fileInput"  v-on:change="uploadAllFiles" class="file-input" type="file" name="myFiles" multiple hidden>
      <span @click="$refs.fileInput.click()" >
-     <font-awesome-icon size="8x" icon="cloud-upload-alt" />
      <h2>Browse Files to Upload</h2>
      </span>
      </form>
@@ -19,7 +18,6 @@
       <div v-for="(progressInfo, index) in progressInfos"
         :key="index" >
        <li class="row">
-          <font-awesome-icon icon="file-alt" />
           <div class='content'>
            <div class='details'>
             <span>{{progressInfo.fileName}}</span>
@@ -40,13 +38,8 @@
 
 
 <script>
-import UploadFilesService from "./UploadFilesService";
-//import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
-import { faFileAlt } from '@fortawesome/free-solid-svg-icons';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
-library.add(faCloudUploadAlt, faFileAlt, faCheck);
+import axios from "axios";
+import config from './config.json';
 
 export default {
   name: "ProgressUp",
@@ -58,11 +51,24 @@ export default {
     };
   },
   methods: {
-    upload(idx, file) {
+  uploadFile(file, onUploadProgress) {
+    let formData = new FormData();
+
+    formData.append(config.filesArray, file);
+
+    return axios.post(config.uploadURL, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      },
+      onUploadProgress
+    });
+  },
+
+    uploadProgress(idx, file) {
       this.progressInfos[idx] = { percentage: 0, fileName: file.name,
 size: file.size };
 
-      UploadFilesService.upload(file, (event) => {
+      this.uploadFile(file, (event) => {
         this.progressInfos[idx].percentage = Math.round(100 * event.loaded / event.total);
       })
         .then((response) => {
@@ -75,12 +81,12 @@ size: file.size };
       this.progressInfos = []; 
     },
 
-    uploadFiles(event) {
+    uploadAllFiles(event) {
       this.progressInfos = []; 
       this.selectedFiles = event.target.files;
       this.message = "";
       for (let i = 0; i < this.selectedFiles.length; i++) {
-        this.upload(i, this.selectedFiles[i]);
+        this.uploadProgress(i, this.selectedFiles[i]);
       }
     }
   }
