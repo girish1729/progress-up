@@ -4,8 +4,6 @@ import {
 import {
     ProgressUpService
 } from './progress-up.service';
-import { faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
-import { faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import {
     HttpEvent,
     HttpEventType,
@@ -16,7 +14,7 @@ import {
 } from 'rxjs';
 
 @Component({
-  selector: 'lib-progress-up',
+  selector: 'progress-up',
     templateUrl: './progress-up.component.html',
 })
 
@@ -24,8 +22,6 @@ export class ProgressUpComponent {
     progress: any = {};
     showProgress:boolean = true;
     fileLoaded = 0;
-    faFileAlt = faFileAlt;
-    faCloudUploadAlt = faCloudUploadAlt;
     uploadFiles: any = [];
 
     constructor(private uploadService: ProgressUpService) {}

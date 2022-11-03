@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { ProgressUpComponent } from './progress-up.component';
-import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 
 @NgModule({
@@ -8,7 +7,6 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
     ProgressUpComponent
   ],
   imports: [
-    FontAwesomeModule
   ],
   exports: [
     ProgressUpComponent

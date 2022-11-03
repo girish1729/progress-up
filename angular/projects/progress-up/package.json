@@ -3,10 +3,7 @@
   "version": "0.0.1",
   "peerDependencies": {
     "@angular/common": "*",
-    "@angular/core": "*",
-    "@fortawesome/angular-fontawesome": "*",
-    "@fortawesome/fontawesome-svg-core": "*",
-    "@fortawesome/free-solid-svg-icons": "*"
+    "@angular/core": "*"
   },
   "dependencies": {
     "tslib": "*"

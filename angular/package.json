@@ -1,5 +1,5 @@
 {
-  "name": "ang-lib",
+  "name": "progress-up",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -18,9 +18,6 @@
     "@angular/platform-browser": "*",
     "@angular/platform-browser-dynamic": "*",
     "@angular/router": "*",
-    "@fortawesome/angular-fontawesome": "*",
-    "@fortawesome/fontawesome-svg-core": "*",
-    "@fortawesome/free-solid-svg-icons": "*",
     "rxjs": "*",
     "tslib": "*",
     "zone.js": "*"
