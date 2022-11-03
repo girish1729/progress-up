@@ -1,10 +1,9 @@
-import { Component, VERSION, ViewEncapsulation } from "@angular/core";
+import { Component } from "@angular/core";
+import { ProgressUpModule } from 'progress-up';
 
 @Component({
   selector: "my-app",
-  templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.css"],
-  encapsulation: ViewEncapsulation.None
+  templateUrl: "app.component.html"
 })
 
 export class AppComponent {

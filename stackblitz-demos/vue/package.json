@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "progress-up": "file:../../../progress-up/vue",
+    "progress-up": "file:../../vue",
     "vue": "^3.2.41"
   },
   "devDependencies": {

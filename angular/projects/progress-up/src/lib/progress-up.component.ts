@@ -14,8 +14,8 @@ import {
 } from 'rxjs';
 
 @Component({
-  selector: 'progress-up',
-    templateUrl: './progress-up.component.html',
+  selector: 'bhavana-up',
+  templateUrl: './progress-up.component.html',
 })
 
 export class ProgressUpComponent {
@@ -23,6 +23,7 @@ export class ProgressUpComponent {
     showProgress:boolean = true;
     fileLoaded = 0;
     uploadFiles: any = [];
+
 
     constructor(private uploadService: ProgressUpService) {}
 

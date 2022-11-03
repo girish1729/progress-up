@@ -2,7 +2,7 @@
   "name": "progress-up",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "main": "src/main.tsx",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

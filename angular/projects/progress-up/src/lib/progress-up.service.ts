@@ -14,6 +14,7 @@ export class ProgressUpService {
 	filesArray: "mFiles",
 	uploadURL: "https://localhost:2324/uploadmultiple"
   };
+
   upload(file: File): Observable<HttpEvent<any>> {
     const formData: FormData = new FormData();
 

@@ -8,6 +8,6 @@ import { AppComponent } from './app.component';
 @NgModule({
   imports: [BrowserModule, FormsModule, ProgressUpModule],
   declarations: [AppComponent],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

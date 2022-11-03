@@ -4,7 +4,7 @@ import ProgressUp from 'progress-up';
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
+  <div>
     <ProgressUp />
-  </React.StrictMode>
+  </div>
 )
