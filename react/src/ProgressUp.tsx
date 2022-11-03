@@ -1,6 +1,7 @@
 import React, {
     Fragment,
-    useState
+    useState,
+    Component
 } from "react";
 import axios from "axios";
 import {
@@ -19,9 +20,10 @@ UploadFile = {
 };
 */
 
-const ProgressUp: React.FunctionComponent = () => {
 
-        //let [progFiles, setProg] = useState <Array<UploadFile>>([]);
+const ProgressUp = (props) => {
+
+        /*let [progFiles, setProg] = useState <Array<UploadFile>>([]);*/
         let [progFiles, setProg] = useState([]);
         const url = uploadURL;
 
@@ -30,13 +32,13 @@ const ProgressUp: React.FunctionComponent = () => {
 		console.log("clear All");
         };
 
-        const uploadForm = async (fname: string, formData: FormData) => {
+        const uploadForm = async (fname , formData ) => {
             await axios.post(url, formData, {
                 headers: {
-                    "Content-Type": "multipart/form-data",
+                    "Content-Type": "multipart/form-data"
                 },
                 onUploadProgress: (progEvent) => {
-                    let v: number;
+                    let v ;
                     if (progEvent.total) {
                         v = (progEvent.loaded / progEvent.total) * 100;
                         console.log(v);
@@ -56,7 +58,7 @@ const ProgressUp: React.FunctionComponent = () => {
             });
         };
 
-        const onFileUpload = (e: React.ChangeEvent < HTMLInputElement > ) => {
+        const onFileUpload = (e) => {
             const files = e.target.files;
             if (files) {
                 for (let i = 0; i < files.length; i++) {
