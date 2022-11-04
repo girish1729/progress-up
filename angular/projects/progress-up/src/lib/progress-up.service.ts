@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpRequest, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { HttpClient, HttpRequest, HttpEvent } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -23,8 +23,6 @@ export class ProgressUpService {
       reportProgress: true,
       responseType: 'json'
     });
-
     return this.http.request(req);
   }
-
 }

@@ -1,25 +1,17 @@
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ProgressUpComponent } from './progress-up.component';
-import {
-    ProgressUpService
-} from './progress-up.service';
-export {
-    ProgressUpService
-} from './progress-up.service';
 
 @NgModule({
   declarations: [
     ProgressUpComponent
   ],
-  imports: [
-  ],
   exports: [
     ProgressUpComponent
   ],
-  providers: [
-    ProgressUpService
-  ]
+  imports: [
+    CommonModule
+  ],
 })
 
 export class ProgressUpModule { }
-

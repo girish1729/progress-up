@@ -1,5 +1,6 @@
 import {
     Component,
+    ViewEncapsulation
 } from '@angular/core';
 import {
     ProgressUpService
@@ -14,8 +15,48 @@ import {
 } from 'rxjs';
 
 @Component({
-  selector: 'bhavana-up',
-  templateUrl: './progress-up.component.html',
+  selector: 'progress-up',
+  template:
+`
+<div class="progress-up-wrapper">
+
+ <div class='text-center'>
+   <button (click)="clearAll()" class="clearButton" role="button">Clear all</button>
+ </div>
+
+ <form class='progress-up-form' action="#">
+      <input type="file" #fileInput (change)="onFileUpload($event)" multiple hidden />
+        <span (click)="fileInput.click()" >
+        <h2>Browse Files to Upload</h2>
+	</span>
+ </form>
+
+ <section *ngIf="showProgress" class='progress-up-area' >
+   <div *ngFor="let file of uploadFiles">
+    <li class="row">
+          <div class="content">
+                <div class="details">
+                   <span class="name">{{file.name}} </span>
+                    <span class="percent">{{progress[file.name]}} %</span>
+                 </div>
+                 <div class="progress-bar">
+                    <div class="progress" style="width: {{progress[file.name]}}%">
+		    </div>
+                 </div>
+                 <span class="size">{{file.size}} Bytes</span>
+           </div>
+    </li>
+    </div>
+ </section>
+
+</div>
+`
+, 
+styleUrls: [
+	'./progress-up.component.css'
+],
+encapsulation: ViewEncapsulation.None
+
 })
 
 export class ProgressUpComponent {
@@ -23,7 +64,6 @@ export class ProgressUpComponent {
     showProgress:boolean = true;
     fileLoaded = 0;
     uploadFiles: any = [];
-
 
     constructor(private uploadService: ProgressUpService) {}
 
