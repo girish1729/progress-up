@@ -12,14 +12,14 @@
   "dependencies": {
     "@angular-devkit/build-angular": "^14.2.8",
     "@angular/animations": "^14.2.0",
-    "@npmcli/fs": "*",
     "@angular/common": "^14.2.0",
     "@angular/compiler": "^14.2.0",
     "@angular/core": "^14.2.0",
     "@angular/forms": "^14.2.0",
     "@angular/platform-browser": "^14.2.0",
     "@angular/platform-browser-dynamic": "^14.2.0",
-    "progress-up": "0.0.1",
+    "@npmcli/fs": "*",
+    "progress-up": "/home/girish/progress-up/angular/dist/progress-up",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
