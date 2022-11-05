@@ -2,7 +2,17 @@
   "name": "progress-up",
   "private": true,
   "version": "0.0.0",
-  "main": "src/main.tsx",
+ "type": "module",
+  "files": ["dist"],
+  "main": "./dist/progress-up.umd.cjs",
+  "module": "./dist/progress-up.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/progress-up.js",
+      "require": "./dist/progress-up.umd.cjs"
+    }
+  },
+ 
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

@@ -6,9 +6,9 @@ import React, {
 import axios from "axios";
 import {filesArray, uploadURL} from "./config";
 
-function ProgressUp(props) {
+function ProgressUp(props: any) {
 
-        let [progFiles, setProg] = useState <Array>([]);
+        let [progFiles, setProg] = useState <Array<any>>([]);
         const url = uploadURL;
 
         const clearAll = () => {
@@ -16,19 +16,19 @@ function ProgressUp(props) {
 		console.log("clear All");
         };
 
-        const uploadForm = async (fname , formData ) => {
+        const uploadForm = async (fname:string , formData:FormData ) => {
             await axios.post(url, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 },
                 onUploadProgress: (progEvent) => {
-                    let v ;
+                    let v:number ;
                     if (progEvent.total) {
                         v = (progEvent.loaded / progEvent.total) * 100;
                         console.log(v);
                     }
-                    setProg((upl) => {
-                        return upl.map((p) => {
+                    setProg((upl:any) => {
+                        return upl.map((p:any) => {
                             if (p.fileName === fname) {
                                 p.progressPercent = v;
                             }
@@ -42,7 +42,7 @@ function ProgressUp(props) {
             });
         };
 
-        const onFileUpload = (e) => {
+        const onFileUpload = (e:any) => {
             const files = e.target.files;
             if (files) {
                 for (let i = 0; i < files.length; i++) {

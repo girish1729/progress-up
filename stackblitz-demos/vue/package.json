@@ -1,15 +1,14 @@
 {
-  "name": "vue",
+  "name": "progress-up-vue",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "0.0.1",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "progress-up": "file:../../vue",
+    "progress-up": "*",
     "vue": "^3.2.41"
   },
   "devDependencies": {
