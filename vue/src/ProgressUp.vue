@@ -94,5 +94,5 @@ size: file.size };
 </script>
 
 <style scoped>
-@import 'https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css';
+@import url('https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css');
 </style>
