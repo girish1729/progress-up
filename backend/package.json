@@ -16,7 +16,8 @@
     "mongodb": "^4.6.0",
     "morgan": "^1.10.0",
     "morgan-body": "^2.6.8",
-    "multer": "^1.4.4"
+    "multer": "^1.4.4",
+    "tus": "^0.1.7"
   },
   "devDependencies": {
     "del": "^3.0.0",

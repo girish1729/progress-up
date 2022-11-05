@@ -1,5 +1,6 @@
 import {
     Component,
+    Input,
     ViewEncapsulation
 } from '@angular/core';
 import {
@@ -60,6 +61,9 @@ encapsulation: ViewEncapsulation.None
 })
 
 export class ProgressUpComponent {
+    @Input('uploadURL') url:string = '';
+    @Input('filesName') fname:string = '';
+
     progress: any = {};
     showProgress:boolean = true;
     fileLoaded = 0;
@@ -69,7 +73,7 @@ export class ProgressUpComponent {
 
     uploadOneFile(file: File) {
 
-        this.uploadService.upload(file).subscribe(
+        this.uploadService.upload(this.url, this.fname, file).subscribe(
             (event: HttpEvent < any > ) => {
                 if (event.type === HttpEventType.UploadProgress) {
                     if (event.total) {

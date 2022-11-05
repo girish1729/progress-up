@@ -39,10 +39,13 @@
 
 <script>
 import axios from "axios";
-import config from './config.json';
 
 export default {
   name: "ProgressUp",
+  props: {
+    uploadURL: undefined,
+    filesName: undefined,
+  },
   data() {
     return {
       selectedFiles: undefined,
@@ -54,9 +57,9 @@ export default {
   uploadFile(file, onUploadProgress) {
     let formData = new FormData();
 
-    formData.append(config.filesArray, file);
+    formData.append(props.filesName, file);
 
-    return axios.post(config.uploadURL, formData, {
+    return axios.post(props.uploadURL, formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       },
@@ -94,5 +97,5 @@ size: file.size };
 </script>
 
 <style scoped>
-@import url('https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css');
+@import url("https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css");
 </style>

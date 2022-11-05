@@ -1,4 +1,5 @@
 node_modules
+.angular
 uploads
 package-lock.json
 yarn.lock

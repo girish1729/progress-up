@@ -4,12 +4,11 @@ import React, {
     Component
 } from "react";
 import axios from "axios";
-import {filesArray, uploadURL} from "./config";
 
 function ProgressUp(props: any) {
 
         let [progFiles, setProg] = useState <Array<any>>([]);
-        const url = uploadURL;
+        const url = props.uploadURL;
 
         const clearAll = () => {
                 setProg([]);
@@ -49,7 +48,7 @@ function ProgressUp(props: any) {
                     const formData = new FormData();
                     const fileName = files[i].name;
                     const size = files[i].size;
-                    formData.append(filesArray, files[i]);
+                    formData.append(props.filesName, files[i]);
                     progFiles.push({
                         fileName,
                         size,
