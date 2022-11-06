@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import ProgressUp from 'progress-up/vue';
+import ProgressUp from 'progress-up';
 
 export default {
   name: 'App',

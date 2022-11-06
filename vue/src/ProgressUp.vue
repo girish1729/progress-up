@@ -57,9 +57,9 @@ export default {
   uploadFile(file, onUploadProgress) {
     let formData = new FormData();
 
-    formData.append(props.filesName, file);
+    formData.append(this.filesName, file);
 
-    return axios.post(props.uploadURL, formData, {
+    return axios.post(this.uploadURL, formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       },
