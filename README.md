@@ -15,7 +15,115 @@ This uses the HTTP File API protocol to show continuous progress.
 
 [Canonical home page](https://progress-up.live)
 
-Demos will be added soon to the above page :point\_up: .
+## What is this?
+
+Demos are [here](https://progress-up.live/demo)
+
+## File structure and explanation of project
+
+
+    .
+    |-- angular
+    |   |-- angular.json
+    |   |-- package.json
+    |   |-- projects
+    |   |   `-- progress-up
+    |   |       |-- karma.conf.js
+    |   |       |-- ng-package.json
+    |   |       |-- package.json
+    |   |       |-- README.md
+    |   |       |-- src
+    |   |       |   |-- lib
+    |   |       |   |   |-- progress-up.component.css
+    |   |       |   |   |-- progress-up.component.ts
+    |   |       |   |   |-- progress-up.module.ts
+    |   |       |   |   `-- progress-up.service.ts
+    |   |       |   |-- public-api.ts
+    |   |       |   `-- test.ts
+    |   |       |-- tsconfig.lib.json
+    |   |       |-- tsconfig.lib.prod.json
+    |   |       `-- tsconfig.spec.json
+    |   `-- tsconfig.json
+    |-- backend
+    |   |-- package.json
+    |   |-- public
+    |   |   |-- index.html
+    |   |   `-- js
+    |   |       `-- uploadProgress.js
+    |   |-- server.js
+    |   `-- uploads
+    |       `-- README.md
+    |-- css
+    |   `-- progress-up.css
+    |-- images
+    |   |-- finish-upload.png
+    |   |-- progress-up-html5-upload-capture.gif
+    |   |-- progress-up-logo.svg
+    |   `-- start-upload.png
+    |-- LICENSE
+    |-- react
+    |   |-- index.html
+    |   |-- package.json
+    |   |-- src
+    |   |   |-- main.tsx
+    |   |   `-- ProgressUp.tsx
+    |   |-- tsconfig.json
+    |   |-- tsconfig.node.json
+    |   `-- vite.config.ts
+    |-- README.md
+    |-- stackblitz-demos
+    |   |-- angular
+    |   |   |-- angular.json
+    |   |   |-- package.json
+    |   |   |-- src
+    |   |   |   |-- app
+    |   |   |   |   |-- app.component.html
+    |   |   |   |   |-- app.component.ts
+    |   |   |   |   `-- app.module.ts
+    |   |   |   |-- assets
+    |   |   |   |-- environments
+    |   |   |   |   |-- environment.prod.ts
+    |   |   |   |   `-- environment.ts
+    |   |   |   |-- favicon.ico
+    |   |   |   |-- index.html
+    |   |   |   |-- main.ts
+    |   |   |   |-- polyfills.ts
+    |   |   |   |-- styles.scss
+    |   |   |   `-- test.ts
+    |   |   |-- tsconfig.app.json
+    |   |   |-- tsconfig.json
+    |   |   |-- tsconfig.spec.json
+    |   |   `-- tslint.json
+    |   |-- react
+    |   |   |-- index.html
+    |   |   |-- package.json
+    |   |   |-- src
+    |   |   |   `-- main.tsx
+    |   |   |-- tsconfig.json
+    |   |   |-- tsconfig.node.json
+    |   |   `-- vite.config.ts
+    |   `-- vue
+    |       |-- index.html
+    |       |-- package.json
+    |       |-- README.md
+    |       |-- src
+    |       |   |-- App.vue
+    |       |   `-- main.ts
+    |       |-- tsconfig.json
+    |       |-- tsconfig.node.json
+    |       `-- vite.config.ts
+    `-- vue
+        |-- index.html
+        |-- package.json
+        |-- README.md
+        |-- src
+        |   |-- main.ts
+        |   `-- ProgressUp.vue
+        |-- tsconfig.json
+        |-- tsconfig.node.json
+        `-- vite.config.ts
+    
+    25 directories, 74 files
 
 ## How to build and run as plain js
 
