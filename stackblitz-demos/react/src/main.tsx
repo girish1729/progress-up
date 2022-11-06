@@ -4,6 +4,6 @@ import ProgressUp from 'progress-up/react';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <div>
-    <ProgressUp uploadURL="http://localhost:2324/uploadmultiple" filesName="uploadFiles" />
+    <ProgressUp uploadURL="https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34" filesName="uploadFiles" />
   </div>
 )
