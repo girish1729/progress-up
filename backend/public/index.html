@@ -7,6 +7,7 @@
 indicator</title>
   <meta description="HTML5 multiple file upload progress bar plugin for
 Vue,js, React and Angular" />
+<script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 <style>
@@ -30,7 +31,7 @@ body {
    <button onClick="clearAll()" class="clearButton" role="button">Clear all</button>
  </div>
  <form class='progress-up-form' action="#">
-      <input class="file-input" type="file" name="myFiles" multiple hidden>
+      <input class="file-input" type="file" name="uploadFiles" multiple hidden>
       <i class="fas fa-8x fa-cloud-upload-alt"></i>
       <h2>Browse Files to Upload</h2>
  </form>

@@ -1,9 +1,12 @@
 const express = require('express')
+const fs = require('fs');
 const multer = require('multer');
 const morgan = require('morgan-body');
 const cors = require('cors');
 const tus = require('tus');
-const fs = require('file-system');
+
+const key = fs.readFileSync("localhost-key.pem", 'utf-8');
+const cert = fs.readFileSync("localhost.pem", 'utf-8');
 
 const app = express();
 morgan(app);
@@ -31,8 +34,13 @@ app.post('/uploadmultiple', upload.array('uploadFiles', 12), (req, res, next) =>
     res.send(files)
 })
 
-
 app.listen(2324, () => {
     console.log('Server is up on port 2324');
+});
+
+/*
+https.createServer((key, cert), app).listen(2324, () => {
+    console.log('Server is up on port 2324');
 })
+*/
 

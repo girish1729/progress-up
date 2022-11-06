@@ -41,20 +41,28 @@ fileInput.onchange = ({
 function clearAll() {
 	progressArea.innerHTML = '';
 }
-// file upload function
-function uploadFile(name) {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "/uploadmultiple");
-    xhr.upload.addEventListener("progress", ({
-        loaded,
-        total
-    }) => {
-        let fileLoaded = Math.floor((loaded / total) * 100);
+
+async function uploadFile(name) {
+    let data = new FormData(form);
+await axios.post('http://girishvenkatachalam.me:2324/uploadmultiple', data, {
+  onUploadProgress: function (e) {
+    /*{
+      loaded: number;
+      total?: number;
+      progress?: number; // in range [0..1]
+      bytes: number; // how many bytes have been transferred since the last trigger (delta)
+      estimated?: number; // estimated time in seconds
+      rate?: number; // upload speed in bytes
+      upload: true; // upload sign
+    }*/
+        let fileLoaded = parseInt(e.progress * 100);
         document.getElementById(name + '-1').innerHTML = fileLoaded + "%";
         document.getElementById(name + '-2').innerHTML = `
              <div  class="progress" style="width: ${fileLoaded}%"></div>
 	`;
-    });
-    let data = new FormData(form);
-    xhr.send(data);
+  }
+
+});  
+
 }
+
