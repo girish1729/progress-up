@@ -44,7 +44,7 @@ function clearAll() {
 
 async function uploadFile(name) {
     let data = new FormData(form);
-await axios.post('https://girishvenkatachalam.me:2324/uploadmultiple', data, {
+await axios.post('https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34', data, {
   onUploadProgress: function (e) {
     /*{
       loaded: number;
