@@ -6,8 +6,8 @@ const morgan = require('morgan-body');
 const cors = require('cors');
 const tus = require('tus');
 
-const cert = fs.readFileSync(__dirname + "/fullchain.pem", 'utf-8');
-const key = fs.readFileSync(__dirname + "/privkey.pem", 'utf-8');
+const cert = fs.readFileSync(__dirname + "/localhost.pem", 'utf-8');
+const key = fs.readFileSync(__dirname + "/localhost-key.pem", 'utf-8');
 const app = express();
 morgan(app);
 app.use(cors());
