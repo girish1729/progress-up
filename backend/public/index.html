@@ -7,8 +7,11 @@
 indicator</title>
   <meta description="HTML5 multiple file upload progress bar plugin for
 Vue,js, React and Angular" />
-<script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+<!--
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css" />
+-->
+  <link rel="stylesheet" href="css/progress-up.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 <style>
 body {
@@ -26,19 +29,23 @@ body {
 </h1>
 
 
-<div class="progress-up-wrapper">
- <div class='text-center'>
-   <button onClick="clearAll()" class="clearButton" role="button">Clear all</button>
+<div id="progress-up-wrapper">
+ <div id='menuarea'>
+   <button onClick="clearAll()" id="clearButton">Clear all</button>
+   <button onClick="uploadAll()" id="upButton">Upload all</button>
  </div>
- <form class='progress-up-form' action="#">
-      <input class="file-input" type="file" name="uploadFiles" multiple hidden>
+
+	<article id='progress-up-statsArea'></article>
+ <form id='progress-up-form' action="#">
+     <input id="fileInput" type="file" multiple hidden>
+
       <i class="fas fa-8x fa-cloud-upload-alt"></i>
-      <h2>Browse Files to Upload</h2>
+      <h2>Browse files or drag and drop to Upload  </h2>
  </form>
- <section class="progress-up-area"></section>
+ <section id="progress-up-area">
+ </section>
 </div>
 
 <script src="js/uploadProgress.js"></script>
-
 </body>
 </html>

@@ -1,16 +1,16 @@
-.progress-up-wrapper{
-  width: 600px;
+#progress-up-wrapper{
+  width: 800px;
   border-radius: 5px;
   padding: 30px;
   margin: 0 auto;
   color: black;
 }
 
-.progress-up-wrapper .text-center {
+#progress-up-wrapper #menuarea {
 	text-align: center;
 }
 
-.progress-up-wrapper .progress-up-form {
+#progress-up-wrapper #progress-up-form {
   height: 190px;
   display: flex;
   cursor: pointer;
@@ -22,12 +22,12 @@
   border: 2px dashed #6990F2;
 }
 
-.progress-up-form p{
+#progress-up-form p{
   margin-top: 15px;
   font-size: 16px;
 }
 
-.progress-up-area .row{
+#progress-up-area .row{
   margin-bottom: 10px;
   list-style: none;
   padding: 15px 20px;
@@ -37,16 +37,16 @@
   justify-content: space-between;
 }
 
-.progress-up-area .details span{
+#progress-up-area .details span{
   font-size: 1em;
 }
 
-.progress-up-area .row .content{
+#progress-up-area .row .content{
   width: 100%;
   margin-left: 15px;
 }
 
-.progress-up-area .details{
+#progress-up-area .details{
   display: flex;
   align-items: center;
   display: inline-flex;
@@ -57,7 +57,7 @@
   width: inherit;
 }
 
-.progress-up-area .content .progress-bar{
+#progress-up-area .content .progress-bar{
   height: 20px;
   width: 100%;
   margin-bottom: 4px;
@@ -65,14 +65,18 @@
   border-radius: 5px;
 }
 
-.progress-up-area .progress-bar .progress{
+#progress-up-area .progress-bar .progress{
   height: 100%;
   width: 0%;
   background: red;
   border-radius: inherit;
 }
 
-.progress-up-wrapper .clearButton {
+.row-gap {
+	row-gap: 50px;
+}
+
+#progress-up-wrapper #clearButton, #upButton {
 	line-height: 1.1;
 	padding: 0.25em 0.75em;
 	min-width: 10ch;
@@ -82,4 +86,12 @@
        	border-radius: 8px;
        	box-shadow: 0 3px 5px rgba(0, 0, 0, 0.18);
 	cursor: pointer;
+}
+
+#upButton {
+	background-color: green;
+}
+
+#uploadStats {
+  	margin-left: 20%;
 }

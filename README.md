@@ -230,6 +230,17 @@ touch](https://twitter.com/girish1729).
 
 ![Progess.up screencast](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-html5-upload-capture.gif)
 
+## Resources for file upload
+
+- [tus.io](https://tus.io)
+
+- [Express multer](http://expressjs.com/en/resources/middleware/multer.html)
+
+- [HTML5 File API](https://jenkov.com/tutorials/html5/file-api.html)
+
+- [Uploading files over HTTP
+  article](https://themightyprogrammer.dev/article/uploading-files)
+
 ## Next steps
 
 Plugins for 
