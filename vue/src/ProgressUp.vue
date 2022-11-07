@@ -6,10 +6,11 @@
      </div>
 
      <form class="progress-up-form">
-     <input ref="fileInput"  v-on:change="uploadAllFiles" class="file-input" type="file" name="myFiles" multiple hidden>
-     <span @click="$refs.fileInput.click()" >
-     <h2>Browse Files to Upload</h2>
-     </span>
+     <input id="fileInput"  v-on:change="uploadAllFiles" class="file-input" type="file" name="myFiles" multiple hidden>
+      <div @click="openFileBrowser()">
+      	<i  class="fas fa-8x fa-cloud-upload-alt"></i>
+     	<h2>Browse Files to Upload</h2>
+      </div>
      </form>
   </div>
 
@@ -18,6 +19,7 @@
       <div v-for="(progressInfo, index) in progressInfos"
         :key="index" >
        <li class="row">
+         <i class="fas fa-3x fa-file-alt"></i>
           <div class='content'>
            <div class='details'>
             <span>{{progressInfo.fileName}}</span>
@@ -54,6 +56,9 @@ export default {
     };
   },
   methods: {
+  openFileBrowser() {
+      document.getElementById("fileInput").click();
+  },
   uploadFile(file, onUploadProgress) {
     let formData = new FormData();
 
@@ -98,4 +103,5 @@ size: file.size };
 
 <style scoped>
 @import url("https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css");
 </style>

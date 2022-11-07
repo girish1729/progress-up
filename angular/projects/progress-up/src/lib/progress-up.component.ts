@@ -28,6 +28,7 @@ import {
  <form class='progress-up-form' action="#">
       <input type="file" #fileInput (change)="onFileUpload($event)" multiple hidden />
         <span (click)="fileInput.click()" >
+      <i class="fas fa-8x fa-cloud-upload-alt"></i>
         <h2>Browse Files to Upload</h2>
 	</span>
  </form>
@@ -35,6 +36,7 @@ import {
  <section *ngIf="showProgress" class='progress-up-area' >
    <div *ngFor="let file of uploadFiles">
     <li class="row">
+         <i class="fas fa-3x fa-file-alt"></i>
           <div class="content">
                 <div class="details">
                    <span class="name">{{file.name}} </span>

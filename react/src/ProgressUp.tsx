@@ -64,6 +64,7 @@ function ProgressUp(props: any) {
   <Fragment>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
   <div className="progress-up-wrapper">
 	  <header>Progress.up file upload </header>
 	  <div className='text-center'>
@@ -73,6 +74,7 @@ function ProgressUp(props: any) {
 		  <input id="inputFile" onChange={onFileUpload} className="file-input" type="file" name="myFiles" multiple hidden></input>
 	  <form className="progress-up-form">
 		  <label htmlFor="inputFile" className="button">
+      		  <i className="fas fa-8x fa-cloud-upload-alt"></i>
 		  <h2>Browse Files to Upload</h2>
 	</label>
 	  </form>
@@ -84,6 +86,7 @@ function ProgressUp(props: any) {
   ? (
   progFiles.map(({fileName, progressPercent, size}) => (
   <li className="row" key={fileName} >
+      <i className="fas fa-3x fa-file-alt"></i>
 	  <div className="content">
 		  <div className="details">
 			  <span className="name">{fileName} </span>
