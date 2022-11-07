@@ -3,6 +3,8 @@ import {
     Input,
     ViewEncapsulation
 } from '@angular/core';
+import {CdkDragDrop } from '@angular/cdk/drag-drop';
+
 import {
     ProgressUpService
 } from './progress-up.service';
@@ -27,7 +29,7 @@ import {
 
  <form class='progress-up-form' action="#">
       <input type="file" #fileInput (change)="onFileUpload($event)" multiple hidden />
-        <span (click)="fileInput.click()" >
+        <span cdkDropList   (cdkDropListDropped)="drop($event)" (click)="fileInput.click()" >
       <i class="fas fa-8x fa-cloud-upload-alt"></i>
         <h2>Browse Files to Upload</h2>
 	</span>
@@ -100,6 +102,9 @@ export class ProgressUpComponent {
                 this.uploadFiles.push(file);
             }
         }
+    }
+
+   drop(event: CdkDragDrop<string[]>) {
     }
 
     clearAll() {

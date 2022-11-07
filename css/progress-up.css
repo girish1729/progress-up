@@ -76,7 +76,7 @@
 	row-gap: 50px;
 }
 
-#progress-up-wrapper #clearButton, #upButton {
+#saveConfig, #testEP, #clearButton, #upButton {
 	line-height: 1.1;
 	padding: 0.25em 0.75em;
 	min-width: 10ch;
@@ -90,6 +90,14 @@
 
 #upButton {
 	background-color: green;
+}
+
+#saveConfig {
+	background-color: blue;
+}
+
+#testEP {
+	background-color: red;
 }
 
 #uploadStats {

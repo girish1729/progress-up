@@ -20,7 +20,7 @@ body {
 }
 </style>
 </head>
-<body>
+<body onload="initBackendConfig()">
 
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 
@@ -35,9 +35,54 @@ body {
    <button onClick="uploadAll()" id="upButton">Upload all</button>
  </div>
 
-	<article id='progress-up-statsArea'></article>
+	<details id='progress-up-statsArea'></article>
+      	<summary>File upload Backend config</summary>
+	<article id='config'>
+	  <p>
+	   <label for='uploadURL'>POST endpoint URL</label>
+     		<input id="uploadURL" type="text" size=100 />
+	  </p>
+	  <p>
+	   <label for='filesName'>Name of </label>
+     		<input id="filesName" type="text" />
+	  </p>
+	  <p>
+	   <label for='progress-up-auth'>Auth</label>
+     		<input id="progress-up-auth" type="checkbox" />
+	  </p>
+	  <p>
+	   <label for='progress-up-authtype'>Auth type</label>
+     		<select id="progress-up-authtype">
+			<option>Basic</option>
+			<option>Digest</option>
+		</select>
+	  </p>
+	  <p>
+	   <label for='progress-up-username'>Username</label>
+     		<input id="progress-up-username" type="text" />
+	  </p>
+	  <p>
+	   <label for='progress-up-pass'>Password</label>
+     		<input id="progress-up-pass" type="password" />
+	  </p>
+	  <p>
+           <button onClick="saveConfig()" id="saveConfig">Save</button>
+           <button onClick="testEndpoint()" id="testEP">Test backend</button>
+	  </p>
+	</details>
+
+
+      	<h2>Progress indicator type</h2>
+   	<label for='progress-up-indicator'>Progress indicator</label>
+     		<select (onChange="setIndicator()") id="progress-up-indicator">
+			<option default>Horizontal bar</option>
+			<option>Ring</option>
+			<option>Circle</option>
+			<option>Vertical bar</option>
+		</select>
+	 
  <form id='progress-up-form' action="#">
-     <input id="fileInput" type="file" multiple hidden>
+     <input id="fileInput" name="uploadFiles" type="file" multiple hidden>
 
       <i class="fas fa-8x fa-cloud-upload-alt"></i>
       <h2>Browse files or drag and drop to Upload  </h2>

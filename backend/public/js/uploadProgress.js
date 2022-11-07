@@ -1,13 +1,24 @@
 /* XXX Globals */
+
+var progType = 'hbar';
+/* XXX these are backend variables */
 var uploadURL = 'https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34';
 uploadURL = 'https://localhost:2324/uploadmultiple';
+var filesName = "uploadFiles";
+var authEnabled = false;
+var authType = "Basic";
+var user = '';
+var pass = '';
 
+/* XXX Internal variables */
 var uploadFileList = [];
 var totalfiles = 0;
 var totalsize = 0;
 var totaltime = 0;
 var startUploadts = 0;
 var endUploadts = 0;
+
+
 
 const uplform = document.getElementById("progress-up-form");
 uplform.addEventListener("dragover", dragOver, false);
@@ -25,6 +36,75 @@ uplform.addEventListener("click", () => {
 fileInput.onchange = ({
     target
 }) => fileSelectFinish(target);
+
+/* XXX functions */
+function initBackendConfig() {
+  document.getElementById("uploadURL").value = uploadURL;
+  document.getElementById("filesName").value = filesName;
+	
+}
+
+function saveConfig() {
+
+  uploadURL = document.getElementById("uploadURL").value;
+  filesName = document.getElementById("filesName").value;
+  authEnabled = document.getElementById("progress-up-auth").value;
+  authType = document.getElementById("progress-up-authtype").value;
+  user = document.getElementById("progress-up-username").value;
+  pass = document.getElementById("progress-up-pass").value;
+  console.log(uploadURL, filesName, authEnabled, authType, user, pass);
+}
+
+function testResult(resp) {
+	if(resp.status === 200) {
+		alert("Test succeeded");
+	} else {
+		alert("Test failed, try again");
+	}
+}
+
+async function testUpload(event) {
+    console.log("Uploading using HTML5 File API...");
+    let testForm = new FormData();
+
+const blob = new Blob(['Test upload DELETE'], { type: 'plain/text' });
+testForm.append(filesName, blob, 'progress-up-test.txt');
+    await axios.post(uploadURL, testForm)
+	.then((resp) => { testResult(resp)});
+}
+
+function testEP() {
+
+  uploadURL = document.getElementById("uploadURL").value;
+  filesName = document.getElementById("filesName").value;
+  authEnabled = document.getElementById("progress-up-auth").value;
+  authType = document.getElementById("progress-up-authtype").value;
+  user = document.getElementById("progress-up-username").value;
+  pass = document.getElementById("progress-up-pass").value;
+
+  testUpload();
+}
+
+function setIndicator() {
+  var prog = document.getElementById("progress-up-indicator").value;
+  switch(progType) {
+	case 'Horizontal bar':
+		progType = 'hbar';
+		break;
+	case 'Vertical bar':
+		progType = 'vbar';
+		break;
+	case 'Ring':
+		progType = 'ring';
+		break;
+	case 'Circle':
+		progType = 'circle';
+		break;
+	default:
+
+  }
+
+}
 
 function clearAll() {
     progressArea.innerHTML = '';
@@ -122,8 +202,8 @@ function uploadAll() {
 }
 
 async function uploadOneFile(name, idx) {
-    let data = new FormData(uplform);
-    await axios.post(uploadURL, data, {
+    let uplFormData = new FormData(uplform);
+    await axios.post(uploadURL, uplFormData, {
         onUploadProgress: function(e) {
             /*{
               loaded: number;
