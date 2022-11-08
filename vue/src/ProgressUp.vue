@@ -6,8 +6,8 @@
      </div>
 
      <form class="progress-up-form">
-     <input id="fileInput"  v-on:change="uploadAllFiles" class="file-input" type="file" name="myFiles" multiple hidden>
-      <div @click="openFileBrowser()">
+     <input id="fileInput"  v-on:change="onChange" class="file-input" type="file" name="myFiles" multiple hidden>
+      <div @dragover="dragover" @drop="drop" @click="openFileBrowser()">
       	<i  class="fas fa-8x fa-cloud-upload-alt"></i>
      	<h2>Browse Files to Upload</h2>
       </div>
@@ -50,12 +50,18 @@ export default {
   },
   data() {
     return {
-      selectedFiles: undefined,
+      Files: undefined,
       progressInfos: [],
       message: ""
     };
   },
   methods: {
+  dragover(evt) {
+	evt.preventDefault();
+  },
+  drop(evt) {
+	this.Files = evt.DataTransfer.files;
+  },
   openFileBrowser() {
       document.getElementById("fileInput").click();
   },
@@ -88,13 +94,16 @@ size: file.size };
     clearAll() {
       this.progressInfos = []; 
     },
+    onChange(event) {
+      this.Files = event.target.files;
+      uploadAllFiles(this.Files);
+    },
 
-    uploadAllFiles(event) {
+    uploadAllFiles(files) {
       this.progressInfos = []; 
-      this.selectedFiles = event.target.files;
       this.message = "";
-      for (let i = 0; i < this.selectedFiles.length; i++) {
-        this.uploadProgress(i, this.selectedFiles[i]);
+      for (let i = 0; i < files.length; i++) {
+        this.uploadProgress(i, files[i]);
       }
     }
   }

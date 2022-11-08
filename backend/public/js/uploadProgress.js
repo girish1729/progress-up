@@ -39,92 +39,96 @@ fileInput.onchange = ({
 
 /* XXX functions */
 function initBackendConfig() {
-  document.getElementById("uploadURL").value = uploadURL;
-  document.getElementById("filesName").value = filesName;
-	
+    document.getElementById("uploadURL").value = uploadURL;
+    document.getElementById("filesName").value = filesName;
+
 }
 
 function saveConfig() {
 
-  uploadURL = document.getElementById("uploadURL").value;
-  filesName = document.getElementById("filesName").value;
-  authEnabled = document.getElementById("progress-up-auth").value;
-  authType = document.getElementById("progress-up-authtype").value;
-  user = document.getElementById("progress-up-username").value;
-  pass = document.getElementById("progress-up-pass").value;
-  console.log(uploadURL, filesName, authEnabled, authType, user, pass);
+    uploadURL = document.getElementById("uploadURL").value;
+    filesName = document.getElementById("filesName").value;
+    authEnabled = document.getElementById("progress-up-auth").value;
+    authType = document.getElementById("progress-up-authtype").value;
+    user = document.getElementById("progress-up-username").value;
+    pass = document.getElementById("progress-up-pass").value;
+    console.log(uploadURL, filesName, authEnabled, authType, user, pass);
 }
 
 function testResult(resp) {
-	if(resp.status === 200) {
-		alert("Test succeeded");
-	} else {
-		alert("Test failed, try again");
-		alert(resp.statusText)
-	}
+    if (resp.status === 200) {
+        alert("Test succeeded");
+    } else {
+        alert("Test failed, try again");
+        alert(resp.statusText)
+    }
 }
 
 async function testUpload(event) {
     console.log("Uploading using HTML5 File API...");
     let testForm = new FormData();
 
-const blob = new Blob(['Test upload DELETE'], { type: 'plain/text' });
-testForm.append(filesName, blob, 'progress-up-test.txt');
+    const blob = new Blob(['Test upload DELETE'], {
+        type: 'plain/text'
+    });
+    testForm.append(filesName, blob, 'progress-up-test.txt');
     await axios.post(uploadURL, testForm)
-	.then((resp) => { testResult(resp)});
+        .then((resp) => {
+            testResult(resp)
+        });
 }
 
 function testEP() {
 
-  uploadURL = document.getElementById("uploadURL").value;
-  filesName = document.getElementById("filesName").value;
-  authEnabled = document.getElementById("progress-up-auth").value;
-  authType = document.getElementById("progress-up-authtype").value;
-  user = document.getElementById("progress-up-username").value;
-  pass = document.getElementById("progress-up-pass").value;
+    uploadURL = document.getElementById("uploadURL").value;
+    filesName = document.getElementById("filesName").value;
+    authEnabled = document.getElementById("progress-up-auth").value;
+    authType = document.getElementById("progress-up-authtype").value;
+    user = document.getElementById("progress-up-username").value;
+    pass = document.getElementById("progress-up-pass").value;
 
-  testUpload();
+    testUpload();
 }
 
 function setIndicator() {
-  var prog = document.getElementById("progress-up-indicator").value;
-  switch(progType) {
-	case 'Horizontal bar':
-		progType = 'hbar';
-		break;
-	case 'Vertical bar':
-		progType = 'vbar';
-		break;
-	case 'Ring':
-		progType = 'ring';
-		break;
-	case 'Circle':
-		progType = 'circle';
-		break;
-	default:
+    var prog = document.getElementById("progress-up-indicator").value;
+    switch (progType) {
+        case 'Horizontal bar':
+            progType = 'hbar';
+            break;
+        case 'Vertical bar':
+            progType = 'vbar';
+            break;
+        case 'Ring':
+            progType = 'ring';
+            break;
+        case 'Circle':
+            progType = 'circle';
+            break;
+        default:
 
-  }
+    }
 
 }
 
 function enableUploadButton() {
-upBut = document.getElementById("upButton");
- upBut.disabled = false;
+    upBut = document.getElementById("upButton");
+    upBut.disabled = false;
 }
 
 function clearAll() {
     progressArea.innerHTML = '';
     statsArea.innerHTML = '';
-uploadFileList = [];
-totalfiles = 0;
-totalsize = 0;
-totaltime = 0;
-startUploadts = 0;
-endUploadts = 0;
+    uploadFileList = [];
+    totalfiles = 0;
+    totalsize = 0;
+    totaltime = 0;
+    startUploadts = 0;
+    endUploadts = 0;
 
-upBut = document.getElementById("upButton");
- upBut.disabled = true;
- console.log("Cleared");
+    upBut = document.getElementById("upButton");
+    upBut.disabled = true;
+    console.log("Cleared");
 }
 
 function dragOver(evt) {
@@ -150,18 +154,18 @@ function fileSelectFinish(target) {
 }
 
 function setupUpload() {
-        var progressHTML = [];  
-        for (var i = 0, f; f = uploadFileList[i]; i++) {  
-            let ts = f.lastModifiedDate.toLocaleDateString();   
-            let fileName = f.name;
-            let fileLoaded = 0;
-            let size = f.size;
-            let mime = f.type;
+    var progressHTML = [];
+    for (var i = 0, f; f = uploadFileList[i]; i++) {
+        let ts = f.lastModifiedDate.toLocaleDateString();
+        let fileName = f.name;
+        let fileLoaded = 0;
+        let size = f.size;
+        let mime = f.type;
 
-	    totalfiles += 1;
-	    totalsize += size;
-            progressHTML.push(
-                `<li class="row">
+        totalfiles += 1;
+        totalsize += size;
+        progressHTML.push(
+            `<li class="row">
                        <i class="fas fa-2x fa-file-alt"></i>
                        <div class="content">
                             <div class="details">
@@ -181,17 +185,17 @@ function setupUpload() {
 			    </span>
                          </div>
 		 </li>`);
- 
-       }  
-        progressArea.innerHTML = '<ul>' + progressHTML.join('') + '</ul>';  
-	enableUploadButton();
+
+    }
+    progressArea.innerHTML = '<ul>' + progressHTML.join('') + '</ul>';
+    enableUploadButton();
 }
 
 function spitStatistics(idx) {
-        if(idx == uploadFileList.length - 1) {
-	endUploadts = Date.now();	
-	totaltime = `${endUploadts - startUploadts}`;
-	statsArea.innerHTML = `
+    if (idx == uploadFileList.length - 1) {
+        endUploadts = Date.now();
+        totaltime = `${endUploadts - startUploadts}`;
+        statsArea.innerHTML = `
 	<div id="uploadStats">
 		<h2>${totalfiles} files uploaded
 			<span class='row-gap'></span>
@@ -200,11 +204,11 @@ function spitStatistics(idx) {
 		in ${totaltime} milliseconds</h2>
 	</div>
 	`;
-	}
+    }
 }
 
 function uploadAll() {
-   console.log("Starting upload...");
+    console.log("Starting upload...");
     startUploadts = Date.now();
     for (i = 0; i < uploadFileList.length; i++) {
         f = uploadFileList[i].name;
@@ -231,7 +235,9 @@ async function uploadOneFile(name, idx) {
              <div  class="progress" style="width: ${fileLoaded}%"></div>
 	`;
         }
-    }).then((resp) => { spitStatistics(idx)});
+    }).then((resp) => {
+        spitStatistics(idx)
+    });
 }
 
 /* XXX Not used */
@@ -264,27 +270,27 @@ reader.onprogress = function(progressEvent) {
         progressEvent.loaded + "(" + percentLoaded + "%)");
 }
 
-function showThumbnails() {  
-        // Loop through the FileList and render image files as thumbnails.  
-        for (var i = 0, f; f = uploadFileList[i]; i++) {  
-            // Only process image files.  
-            if (!f.type.match('image.*')) {  
-                continue;  
-            }  
-            var reader = new FileReader();  
-            // Closure to capture the file information.  
-            reader.onload = (function (theFile) {  
-                return function (e) {  
-                    // Render thumbnail.  
-                    var span = document.createElement('span');  
-                    span.innerHTML = ['<img class="thumb" src="', 
-			e.target.result,  
-                        '" title="', theFile.name, '"/>'].join('');  
-                    document.getElementById('list').insertBefore(span, null);  
-                };  
-            })(f);  
-            // Read in the image file as a data URL.  
-            reader.readAsDataURL(f);  
-        }  
-}  
-
+function showThumbnails() {
+    // Loop through the FileList and render image files as thumbnails.  
+    for (var i = 0, f; f = uploadFileList[i]; i++) {
+        // Only process image files.  
+        if (!f.type.match('image.*')) {
+            continue;
+        }
+        var reader = new FileReader();
+        // Closure to capture the file information.  
+        reader.onload = (function(theFile) {
+            return function(e) {
+                // Render thumbnail.  
+                var span = document.createElement('span');
+                span.innerHTML = ['<img class="thumb" src="',
+                    e.target.result,
+                    '" title="', theFile.name, '"/>'
+                ].join('');
+                document.getElementById('list').insertBefore(span, null);
+            };
+        })(f);
+        // Read in the image file as a data URL.  
+        reader.readAsDataURL(f);
+    }
+}

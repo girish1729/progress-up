@@ -3,6 +3,7 @@ import React, {
     useState,
     Component
 } from "react";
+import Dropzone from 'react-dropzone';
 import axios from "axios";
 
 function ProgressUp(props: any) {
@@ -40,10 +41,20 @@ function ProgressUp(props: any) {
                 console.log("All files uploaded");
             });
         };
-
-        const onFileUpload = (e:any) => {
+        const onDrop = (e:any) => {
+            const files = e.DataTransfer.files;
+            if (files) {
+		onFileUpload(files);
+	    }
+	}
+        const onChange = (e:any) => {
             const files = e.target.files;
             if (files) {
+		onFileUpload(files);
+	    }
+	}
+
+        const onFileUpload = (files) => {
                 for (let i = 0; i < files.length; i++) {
                     const formData = new FormData();
                     const fileName = files[i].name;
@@ -55,7 +66,6 @@ function ProgressUp(props: any) {
                         progressPercent: 0
                     });
                     uploadForm(fileName, formData);
-                }
                 setProg(progFiles);
             }
         };
@@ -71,12 +81,14 @@ function ProgressUp(props: any) {
 		  <button onClick={clearAll} className="clearButton" role="button">Clear all</button>
 	  </div>
 
-		  <input id="inputFile" onChange={onFileUpload} className="file-input" type="file" name="myFiles" multiple hidden></input>
+		  <input id="inputFile" onChange={onChange} className="file-input" type="file" name="myFiles" multiple hidden></input>
 	  <form className="progress-up-form">
+	    <Dropzone onDrop={onDrop} >
 		  <label htmlFor="inputFile" className="button">
       		  <i className="fas fa-8x fa-cloud-upload-alt"></i>
 		  <h2>Browse Files to Upload</h2>
-	</label>
+		  </label>
+	    </Dropzone>
 	  </form>
   </div>
 

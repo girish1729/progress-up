@@ -3,7 +3,6 @@ import {
     Input,
     ViewEncapsulation
 } from '@angular/core';
-import {CdkDragDrop } from '@angular/cdk/drag-drop';
 
 import {
     ProgressUpService
@@ -28,11 +27,11 @@ import {
  </div>
 
  <form class='progress-up-form' action="#">
-      <input type="file" #fileInput (change)="onFileUpload($event)" multiple hidden />
-        <span cdkDropList   (cdkDropListDropped)="drop($event)" (click)="fileInput.click()" >
+      <input type="file" #fileInput (change)="onChange($event)" multiple hidden />
+        <div (dragover)="onDragOver($event)" (drop)="onDropSuccess($event)" (click)="fileInput.click()" >
       <i class="fas fa-8x fa-cloud-upload-alt"></i>
         <h2>Browse Files to Upload</h2>
-	</span>
+	</div>
  </form>
 
  <section *ngIf="showProgress" class='progress-up-area' >
@@ -93,8 +92,11 @@ export class ProgressUpComponent {
             });
     }
 
-    onFileUpload(event: any) {
-        let files = (event.target as HTMLInputElement).files;
+ onChange(event:any) {
+	this.onFileUpload(event.target.files);
+}
+    onFileUpload(files:FileList) {
+        //let files = (event.target as HTMLInputElement).files;
         if (files) {
             for (let i = 0; i < files.length; i++) {
                 let file = files[i];
@@ -104,9 +106,15 @@ export class ProgressUpComponent {
         }
     }
 
-   drop(event: CdkDragDrop<string[]>) {
-    }
+onDragOver(event:any) {
+    event.preventDefault();
+}
 
+// From drag and drop
+onDropSuccess(event:any) {
+    event.preventDefault();
+    this.onFileUpload(event.dataTransfer.files);
+}
     clearAll() {
         this.showProgress = false;
     }

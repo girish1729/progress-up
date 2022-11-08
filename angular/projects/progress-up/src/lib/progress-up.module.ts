@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressUpComponent } from './progress-up.component';
-import {DragDropModule} from '@angular/cdk/drag-drop';
 
 
 @NgModule({
@@ -12,8 +11,7 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
     ProgressUpComponent
   ],
   imports: [
-    CommonModule,
-    DragDropModule
+    CommonModule
   ],
 })
 
