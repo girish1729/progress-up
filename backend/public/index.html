@@ -7,22 +7,14 @@
 indicator</title>
   <meta description="HTML5 multiple file upload progress bar plugin for
 Vue,js, React and Angular" />
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 <link rel="stylesheet" type="text/css" href="assets/loading-bar.min.css"/>
 <script type="text/javascript" src="assets/loading-bar.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
 <!--
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css" />
 -->
-  <link rel="stylesheet" href="css/output.css" />
-  <link rel="stylesheet" href="css/progress-up.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
-<style>
-body {
-	margin: 0 auto;
-	width: 960px;
-}
-</style>
+  <link rel="stylesheet" href="progress-up.css" />
 </head>
 <body onload="initBackendConfig()">
 
@@ -32,109 +24,155 @@ body {
    HTML5 Multiple File Upload with Progress Bar 
 </h1>
 
+<div class="flex justify-center">
+<button onClick="clearAll()" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+ Reset upload form
+</button>
 
-<div id="progress-up-wrapper">
- <div id='menuarea'>
-   <button onClick="clearAll()" id="clearButton">Clear all</button>
-   <button onClick="uploadAll()" id="upButton" disabled="disabled"
-role="button">Upload all</button>
- </div>
+<button onClick="uploadAll()" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+ Begin Uploading files
+</button>
 
-	<details id='progress-up-statsArea'></article>
-      	<summary>File upload Backend config</summary>
-	<article id='config'>
-	  <p>
-	   <label for='uploadURL'>POST endpoint URL</label>
-     		<input id="uploadURL" type="text" size=100 />
-	  </p>
-	  <p>
-	   <label for='filesName'>Name of </label>
-     		<input id="filesName" type="text" />
-	  </p>
-	  <p>
-	   <label for='progress-up-auth'>Auth</label>
-     		<input id="progress-up-auth" type="checkbox" />
-	  </p>
-	  <p>
-	   <label for='progress-up-authtype'>Auth type</label>
-     		<select id="progress-up-authtype">
-			<option>Basic</option>
-			<option>Digest</option>
-		</select>
-	  </p>
-	  <p>
-	   <label for='progress-up-username'>Username</label>
-     		<input id="progress-up-username" type="text" />
-	  </p>
-	  <p>
-	   <label for='progress-up-pass'>Password</label>
-     		<input id="progress-up-pass" type="password" />
-	  </p>
-	  <p>
-           <button onClick="saveConfig()" id="saveConfig">Save</button>
-           <button onClick="testEndpoint()" id="testEP">Test backend</button>
-	  </p>
-	</details>
+</div>
 
+<div class="flex justify-center">
+  <details id='progress-up-statsArea'>
+     <summary>File upload config</summary>
+   <form class="w-full max-w-lg">
+     <div class="flex flex-wrap -mx-3 mb-6">
+       <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+         <label class="block uppercase tracking-wide text-gray-700 text-xs
+   font-bold mb-2" for="grid-post-endpoint">
+          POST endpoint  
+         </label>
+         <input class="appearance-none block w-full bg-gray-200
+   text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
+   focus:outline-none focus:bg-white" id="grid-post-endpoint" type="text"
+   placeholder="URL to post">
+         <p class="text-red-500 text-xs italic">Please fill out this field.</p>
+       </div>
+   
+       <div class="w-full md:w-1/2 px-3">
+         <label class="block uppercase tracking-wide text-gray-700 text-xs
+   font-bold mb-2" for="grid-files-name">
+   	Name of files input field
+         </label>
+         <input class="appearance-none block w-full bg-gray-200
+   text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight
+   focus:outline-none focus:bg-white focus:border-gray-500"
+   id="grid-files-name" type="text" placeholder="Name of files input field">
+       </div>
+      </div>
+   
+     <div class="flex flex-wrap -mx-3 mb-6">
+       <div class="w-full px-3">
+       <label class="md:w-2/3 block text-gray-500 font-bold">
+         <span class="text-sm">
+           HTTP Auth required?
+         </span>
+         <input class="mr-2 leading-tight" type="checkbox">
+       </label>
+      </div>
+     </div>
+   
+     <div class="flex flex-wrap -mx-3 mb-6">
+       <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+         <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-state">
+           Auth type
+         </label>
+         <div class="relative">
+           <select class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state">
+             <option>HTTP basic auth</option>
+             <option>HTTP digest auth</option>
+           </select>
+    
+           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+             <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+           </div>
+         </div>
+       </div>
+   
+       <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+         <label class="block uppercase tracking-wide text-gray-700 text-xs
+   font-bold mb-2" for="grid-username">
+          Username  
+         </label>
+         <input class="appearance-none block w-full bg-gray-200
+   text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
+   focus:outline-none focus:bg-white" id="grid-username" type="text"
+   placeholder="username">
+         <p class="text-red-500 text-xs italic">Please fill out this field.</p>
+       </div>
+   
+       <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+         <label class="block uppercase tracking-wide text-gray-700 text-xs
+   font-bold mb-2" for="grid-pass">
+   	Password
+         </label>
+         <input class="appearance-none block w-full bg-gray-200
+   text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight
+   focus:outline-none focus:bg-white focus:border-gray-500"
+   id="grid-pass" type="password" placeholder="Password">
+       </div>
+      </div>
+   
+     <div class="flex flex-wrap -mx-3 mb-6">
+       <div class="w-full px-3">
+         <label class="block uppercase tracking-wide text-gray-700 text-xs
+   font-bold mb-2" for="grid-progress-indicator">
+           Progress indicator type
+         </label>
+         <div class="relative">
+           <select (onChange="setIndicator()" class="block appearance-none w-full bg-gray-200 border
+   border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight
+   focus:outline-none focus:bg-white focus:border-gray-500"
+   id="grid-progress-indicator">
+   			<option default>Horizontal bar</option>
+   			<option>Ring</option>
+   			<option>Circle</option>
+   			<option>Vertical bar</option>
+           </select>
+           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+             <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+           </div>
+         </div>
+       </div>
+      </div>
+   
+   <button onClick="saveConfig()" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+    Save
+   </button>
+   
+   <button onClick="testEndpoint()" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+    Test file upload
+   </button>
+   </form>
+</details>
+</div>
 
-      	<h2>Progress indicator type</h2>
-   	<label for='progress-up-indicator'>Progress indicator</label>
-     		<select (onChange="setIndicator()") id="progress-up-indicator">
-			<option default>Horizontal bar</option>
-			<option>Ring</option>
-			<option>Circle</option>
-			<option>Vertical bar</option>
-		</select>
-	 
- <form id='progress-up-form' action="#">
-     <input id="fileInput" name="uploadFiles" type="file" multiple hidden>
-
-      <i class="fas fa-8x fa-cloud-upload-alt"></i>
-      <h2>Browse files or drag and drop to Upload  </h2>
- </form>
- <section id="progress-up-area">
- </section>
+<div class="flex justify-center">
+  <div class="block rounded-lg shadow-lg bg-white max-w-sm text-center">
+    <div class="py-3 px-6 border-b border-gray-300">
+     <form id='progress-up-form'>
+       <input id="fileInput" name="uploadFiles" type="file" multiple hidden>
+       <i class="fas fa-5x fa-cloud-upload-alt"></i>
+     </form>
+    </div>
+    <div class="p-6">
+      <h2 class="text-gray-900 text-xl font-medium mb-2"> Drop files here</h2>
+      <p class="text-gray-700 text-base mb-4">
+        Select files to upload 
+      </p>
+    </div>
+    <div class="py-3 px-6 border-t border-gray-300 text-gray-600">
+      Progress-up
+    </div>
+  </div>
+  <section id="progress-up-area"> </section>
 </div>
 
 
-  <div className="relative w-96 m-3 cursor-pointer border-2 shadow-lg rounded-xl items-center">
-      <div className="flex h-28 bg-blue-700 rounded-xl items-center justify-center">
-        <h1 className="absolute mx-auto text-center right text-2xl text-white">
-          Image goes here
-        </h1>
-      </div>
-
-      <div className="p-2 border-b-2">
-        <h6>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Facilis
-          beatae nulla, atque et sunt ad voluptatum quidem impedit numquam quia?
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Facilis
-          beatae nulla, atque et sunt ad voluptatum quidem impedit numquam quia?
-        </h6>
-      </div>
-
-      <div className="flex flex-wrap items-center m-2">
-        <span className=" border border-blue-300 rounded-2xl px-2 my-1 mx-1">
-          #React
-        </span>
-        <span className=" border border-blue-300 rounded-2xl px-2 my-1 mx-1">
-          #Redux
-        </span>
-        <span className=" border border-blue-300 rounded-2xl px-2 my-1 mx-1">
-          #Javascript
-        </span>
-      </div>
-
-      <div className="flex flex-wrap items-center rounded-b-xl border-t-2 bg-white">
-        <button className="border rounded-2xl bg-blue-600 text-white shadow-sm p-1 px-2 m-2">
-          Go to Project
-        </button>
-        <button className="border-2 border-blue-600 rounded-2xl text-blue-600 shadow-sm p-1 px-2 m-2">
-          Github
-        </button>
-      </div>
-    </div>
-
+<!--
 <div class="ldBar" data-value="50">
 </div>
 
@@ -193,6 +231,7 @@ data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"
   data-value="35"
   data-preset="circle"
 ></div>
+-->
 
 
 

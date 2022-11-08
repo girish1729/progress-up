@@ -39,8 +39,8 @@ fileInput.onchange = ({
 
 /* XXX functions */
 function initBackendConfig() {
-    document.getElementById("uploadURL").value = uploadURL;
-    document.getElementById("filesName").value = filesName;
+    //document.getElementById("uploadURL").value = uploadURL;
+    //document.getElementById("filesName").value = filesName;
 
 }
 
