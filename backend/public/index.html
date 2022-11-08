@@ -29,14 +29,17 @@ Vue,js, React and Angular" />
  Reset upload form
 </button>
 
-<button onClick="uploadAll()" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+<button id="upButton" onClick="uploadAll()" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
  Begin Uploading files
 </button>
-
 </div>
 
 <div class="flex justify-center">
-  <details id='progress-up-statsArea'>
+	<div id='progress-up-statsArea'></div>
+</div>
+
+<div class="flex justify-center">
+  <details >
      <summary>File upload config</summary>
    <form class="w-full max-w-lg">
      <div class="flex flex-wrap -mx-3 mb-6">
@@ -168,73 +171,37 @@ Vue,js, React and Angular" />
       Progress-up
     </div>
   </div>
+</div>
+
+<div class="flex justify-center">
   <section id="progress-up-area"> </section>
 </div>
 
-
-<!--
+<hr/>
+<br/>
+<br/>
 <div class="ldBar" data-value="50">
 </div>
 
-<div
-  class="ldBar label-center"
-  data-value="80"
-  data-preset="circle"
-></div>
+<div class="flex justify-center">
+<div class="ldBar label-center" data-value="80" data-preset="circle" ></div>
 
-<div
-  class="ldBar label-center"
-  data-value="35"
-  data-preset="line"
-></div>
+<div class="ldBar label-center" data-value="35" data-preset="line" ></div>
 
-<div
-  class="ldBar label-center"
-  data-value="80"
-  data-preset="fan"
-></div>
+<div class="ldBar label-center" data-value="80" data-preset="fan" ></div>
 
-<div
-  class="ldBar label-center"
-  data-value="35"
-  data-img-size="100,100"
-  data-preset="bubble"
-></div>
+<div class="ldBar label-center" data-value="35" data-img-size="100,100" data-preset="bubble" ></div>
 
-<div
-  class="ldBar label-center"
-  data-value="35"
-data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"
-  data-preset="rainbow"
-></div>
+<div class="ldBar label-center" data-value="35" data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)" data-preset="rainbow" ></div>
 
-<div
-  class="ldBar label-center"
-  data-value="35"
-  data-preset="energy"
-></div>
+<div class="ldBar label-center" data-value="35" data-preset="energy" ></div>
 
-<div
-  class="ldBar label-center"
-  data-value="35"
-  data-preset="stripe"
-></div>
+<div class="ldBar label-center" data-value="35" data-preset="stripe" ></div>
 
-<div
-  class="ldBar label-center"
-  data-value="35"
-  data-preset="text"
-></div>
+<div class="ldBar label-center" data-value="35" data-preset="text" ></div>
 
-<div
-  class="ldBar label-center"
-  data-value="35"
-  data-preset="circle"
-></div>
--->
-
-
-
+<div class="ldBar label-center" data-value="35" data-preset="circle" ></div>
+</div>
 
 <script src="js/uploadProgress.js"></script>
 </body>

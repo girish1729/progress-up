@@ -157,34 +157,25 @@ function setupUpload() {
     var progressHTML = [];
     for (var i = 0, f; f = uploadFileList[i]; i++) {
         let ts = f.lastModifiedDate.toLocaleDateString();
-        let fileName = f.name;
-        let fileLoaded = 0;
+        let name = f.name;
+        let fileLoaded = 20;
         let size = f.size;
         let mime = f.type;
 
         totalfiles += 1;
         totalsize += size;
         progressHTML.push(
-            `<li class="row">
-                       <i class="fas fa-2x fa-file-alt"></i>
-                       <div class="content">
-                            <div class="details">
-                              <span class="name">Name:: ${fileName}</span>
-				<span class="row-gap"></span>
-                              <span class="ts">Date:: ${ts}</span>
-				<span class="row-gap"></span>
-                              <span class="mime">Type:: ${mime}</span>
-				<span class="row-gap"></span>
-                              <span class="size">Size:: ${size} Bytes</span>
-				<span class="row-gap"></span>
-                        </div>
-                        <span id="${fileName}-1" class="percent">
-				${fileLoaded} % </span>
-                         <div id="${fileName}-2" class="progress-bar">
-                            <span class="progress" style="width: ${fileLoaded}%">
-			    </span>
-                         </div>
-		 </li>`);
+          `<li class="row">
+
+<div class="ldBar label-center" data-value="35" data-preset="stripe" ></div>
+             <i class="fas fa-2x fa-file-alt"></i>
+               <div class="ldBar" data-preset="circle" data-value="20"></div>
+               <span class="name">Name:: ${name}</span>
+               <span class="ts">Date:: ${ts}</span>
+               <span class="mime">Type:: ${mime}</span>
+               <span class="size">Size:: ${size} Bytes</span>
+	       <div data-preset="line" id="${name}-progress" class="ldBar" data-value="${fileLoaded}"> </div>
+	   </li>`);
 
     }
     progressArea.innerHTML = '<ul>' + progressHTML.join('') + '</ul>';
@@ -205,6 +196,8 @@ function spitStatistics(idx) {
 	</div>
 	`;
     }
+    upBut.disabled = true;
+    upBut.setAttribute('value', "Uploaded");
 }
 
 function uploadAll() {
@@ -230,10 +223,8 @@ async function uploadOneFile(name, idx) {
               upload: true; // upload sign
             }*/
             let fileLoaded = parseInt(e.progress * 100);
-            document.getElementById(name + '-1').innerHTML = fileLoaded + "%";
-            document.getElementById(name + '-2').innerHTML = `
-             <div  class="progress" style="width: ${fileLoaded}%"></div>
-	`;
+            document.getElementById(name + '-progress')
+		.setAttribute("data-value", fileLoaded)
         }
     }).then((resp) => {
         spitStatistics(idx)
