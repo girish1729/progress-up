@@ -1,6 +1,8 @@
 /* XXX Globals */
 
-var progType = 'hbar';
+var preset = "stripe";
+var extra = '';
+
 /* XXX these are backend variables */
 var uploadURL = 'https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34';
 uploadURL = 'https://localhost:2324/uploadmultiple';
@@ -17,7 +19,6 @@ var totalsize = 0;
 var totaltime = 0;
 var startUploadts = 0;
 var endUploadts = 0;
-
 
 
 const uplform = document.getElementById("progress-up-form");
@@ -38,10 +39,10 @@ fileInput.onchange = ({
 }) => fileSelectFinish(target);
 
 /* XXX functions */
-function initBackendConfig() {
-    //document.getElementById("uploadURL").value = uploadURL;
-    //document.getElementById("filesName").value = filesName;
-
+function initApp() {
+    document.getElementById("uploadURL").value = uploadURL;
+    document.getElementById("filesName").value = filesName;
+    testProgress();
 }
 
 function saveConfig() {
@@ -92,28 +93,43 @@ function testEP() {
 
 function setIndicator() {
     var prog = document.getElementById("progress-up-indicator").value;
+
     switch (progType) {
-        case 'Horizontal bar':
-            progType = 'hbar';
+        case "line":
+            preset = progType;
             break;
-        case 'Vertical bar':
-            progType = 'vbar';
+        case "fan":
+            preset = progType;
             break;
-        case 'Ring':
-            progType = 'ring';
+        case "bubble":
+            preset = progType;
+            extra = 'data-img-size="100,100"';
             break;
-        case 'Circle':
-            progType = 'circle';
+        case "rainbow":
+            preset = progType;
+            extra = 'data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"';
+            break;
+        case "energy":
+            preset = progType;
+            break;
+        case "stripe":
+            preset = progType;
+            break;
+        case "text":
+            preset = progType;
+            break;
+        case "circle":
+            preset = progType;
             break;
         default:
-
+            break;
     }
-
 }
 
 function enableUploadButton() {
     upBut = document.getElementById("upButton");
-    upBut.disabled = false;
+    upBut.removeAttribute('disabled');
+    upBut.classList.remove('opacity-60');
 }
 
 function clearAll() {
@@ -158,14 +174,17 @@ function setupUpload() {
     for (var i = 0, f; f = uploadFileList[i]; i++) {
         let ts = f.lastModifiedDate.toLocaleDateString();
         let name = f.name;
-        let fileLoaded = 20;
+        let per = 20;
         let size = f.size;
         let mime = f.type;
 
         totalfiles += 1;
         totalsize += size;
+
+        var progString = `<div class="ldBar label-center" ${extra} data-value="${per}" data-preset="${preset}" ></div>`;
         progressHTML.push(
-          `<li class="row">
+            `<li class="row">
+		${progString}
 
 <div class="ldBar label-center" data-value="35" data-preset="stripe" ></div>
              <i class="fas fa-2x fa-file-alt"></i>
@@ -174,7 +193,7 @@ function setupUpload() {
                <span class="ts">Date:: ${ts}</span>
                <span class="mime">Type:: ${mime}</span>
                <span class="size">Size:: ${size} Bytes</span>
-	       <div data-preset="line" id="${name}-progress" class="ldBar" data-value="${fileLoaded}"> </div>
+	       <div data-preset="line" id="${name}-progress" class="ldBar" data-value="${per}"> </div>
 	   </li>`);
 
     }
@@ -224,7 +243,7 @@ async function uploadOneFile(name, idx) {
             }*/
             let fileLoaded = parseInt(e.progress * 100);
             document.getElementById(name + '-progress')
-		.setAttribute("data-value", fileLoaded)
+                .setAttribute("data-value", fileLoaded)
         }
     }).then((resp) => {
         spitStatistics(idx)
@@ -284,4 +303,32 @@ function showThumbnails() {
         // Read in the image file as a data URL.  
         reader.readAsDataURL(f);
     }
+}
+
+allTypes = [
+	"line", 
+	"fan",
+	"energy",
+	"bubble",
+	"rainbow",
+	"stripe",
+	"text",
+	"circle"
+];
+
+function testProgress() {
+	progIndicator = [];
+	per = 25;
+const showall = document.getElementById("showall");
+	for(i=0; i < allTypes.length;i++) {
+		type = allTypes[i];
+		progIndicator.push(`
+	<li>
+        <div class="ldBar label-center" data-value="${per}"
+data-preset="${type}" >
+	</div>
+	</li>`);
+		
+	}
+    showall.innerHTML = '<ul>' + progIndicator.join('') + '</ul>';
 }

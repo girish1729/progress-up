@@ -15,7 +15,7 @@
   "scripts": {
     "watch": "npm-watch",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "postcss styles.css -o css/progress-up.css",
+    "build": "postcss styles.css -o public/progress-up.css",
     "dev": "concurrently \"npm run build && live-server public --port=8080\" \"npm run watch\"",
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
