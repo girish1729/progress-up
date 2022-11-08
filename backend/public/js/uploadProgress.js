@@ -60,6 +60,7 @@ function testResult(resp) {
 		alert("Test succeeded");
 	} else {
 		alert("Test failed, try again");
+		alert(resp.statusText)
 	}
 }
 
@@ -106,6 +107,11 @@ function setIndicator() {
 
 }
 
+function enableUploadButton() {
+upBut = document.getElementById("upButton");
+ upBut.disabled = false;
+}
+
 function clearAll() {
     progressArea.innerHTML = '';
     statsArea.innerHTML = '';
@@ -116,6 +122,9 @@ totaltime = 0;
 startUploadts = 0;
 endUploadts = 0;
 
+upBut = document.getElementById("upButton");
+ upBut.disabled = true;
+ console.log("Cleared");
 }
 
 function dragOver(evt) {
@@ -175,6 +184,7 @@ function setupUpload() {
  
        }  
         progressArea.innerHTML = '<ul>' + progressHTML.join('') + '</ul>';  
+	enableUploadButton();
 }
 
 function spitStatistics(idx) {
@@ -194,6 +204,7 @@ function spitStatistics(idx) {
 }
 
 function uploadAll() {
+   console.log("Starting upload...");
     startUploadts = Date.now();
     for (i = 0; i < uploadFileList.length; i++) {
         f = uploadFileList[i].name;

@@ -7,10 +7,14 @@
 indicator</title>
   <meta description="HTML5 multiple file upload progress bar plugin for
 Vue,js, React and Angular" />
+
+<link rel="stylesheet" type="text/css" href="assets/loading-bar.min.css"/>
+<script type="text/javascript" src="assets/loading-bar.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
 <!--
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css" />
 -->
+  <link rel="stylesheet" href="css/output.css" />
   <link rel="stylesheet" href="css/progress-up.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 <style>
@@ -32,7 +36,8 @@ body {
 <div id="progress-up-wrapper">
  <div id='menuarea'>
    <button onClick="clearAll()" id="clearButton">Clear all</button>
-   <button onClick="uploadAll()" id="upButton">Upload all</button>
+   <button onClick="uploadAll()" id="upButton" disabled="disabled"
+role="button">Upload all</button>
  </div>
 
 	<details id='progress-up-statsArea'></article>
@@ -90,6 +95,107 @@ body {
  <section id="progress-up-area">
  </section>
 </div>
+
+
+  <div className="relative w-96 m-3 cursor-pointer border-2 shadow-lg rounded-xl items-center">
+      <div className="flex h-28 bg-blue-700 rounded-xl items-center justify-center">
+        <h1 className="absolute mx-auto text-center right text-2xl text-white">
+          Image goes here
+        </h1>
+      </div>
+
+      <div className="p-2 border-b-2">
+        <h6>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Facilis
+          beatae nulla, atque et sunt ad voluptatum quidem impedit numquam quia?
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Facilis
+          beatae nulla, atque et sunt ad voluptatum quidem impedit numquam quia?
+        </h6>
+      </div>
+
+      <div className="flex flex-wrap items-center m-2">
+        <span className=" border border-blue-300 rounded-2xl px-2 my-1 mx-1">
+          #React
+        </span>
+        <span className=" border border-blue-300 rounded-2xl px-2 my-1 mx-1">
+          #Redux
+        </span>
+        <span className=" border border-blue-300 rounded-2xl px-2 my-1 mx-1">
+          #Javascript
+        </span>
+      </div>
+
+      <div className="flex flex-wrap items-center rounded-b-xl border-t-2 bg-white">
+        <button className="border rounded-2xl bg-blue-600 text-white shadow-sm p-1 px-2 m-2">
+          Go to Project
+        </button>
+        <button className="border-2 border-blue-600 rounded-2xl text-blue-600 shadow-sm p-1 px-2 m-2">
+          Github
+        </button>
+      </div>
+    </div>
+
+<div class="ldBar" data-value="50">
+</div>
+
+<div
+  class="ldBar label-center"
+  data-value="80"
+  data-preset="circle"
+></div>
+
+<div
+  class="ldBar label-center"
+  data-value="35"
+  data-preset="line"
+></div>
+
+<div
+  class="ldBar label-center"
+  data-value="80"
+  data-preset="fan"
+></div>
+
+<div
+  class="ldBar label-center"
+  data-value="35"
+  data-img-size="100,100"
+  data-preset="bubble"
+></div>
+
+<div
+  class="ldBar label-center"
+  data-value="35"
+data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"
+  data-preset="rainbow"
+></div>
+
+<div
+  class="ldBar label-center"
+  data-value="35"
+  data-preset="energy"
+></div>
+
+<div
+  class="ldBar label-center"
+  data-value="35"
+  data-preset="stripe"
+></div>
+
+<div
+  class="ldBar label-center"
+  data-value="35"
+  data-preset="text"
+></div>
+
+<div
+  class="ldBar label-center"
+  data-value="35"
+  data-preset="circle"
+></div>
+
+
+
 
 <script src="js/uploadProgress.js"></script>
 </body>
