@@ -10,6 +10,9 @@ Vue,js, React and Angular" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 <link rel="stylesheet" type="text/css" href="assets/loading-bar.css"/>
 <script type="text/javascript" src="assets/loading-bar.js"></script>
+
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+<script src="https://unpkg.com/create-file-list"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
 <!--
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/girish1729/progress-up/css/progress-up.css" />
@@ -26,21 +29,19 @@ Vue,js, React and Angular" />
 
 <!-- XXX tabs -->
 
-<div class="rounded border w-1/2 mx-auto mt-4">
+<div class="bg-white p7 rounded w-9/12 mx-auto">
   <!-- Tabs -->
   <ul id="tabs" class="inline-flex pt-2 px-1 w-full border-b">
     <li class="bg-white px-4 text-gray-800 font-semibold py-2 rounded-t
 border-t border-r border-l -mb-px"><a id="default-tab"
 href="#first">File upload</a></li>
+    <li class="px-4 text-gray-800 font-semibold py-2 rounded-t"><a href="#second">Setup</a></li>
+    <li class="px-4 text-gray-800 font-semibold py-2 rounded-t"><a href="#third">Statistics</a></li>
     <li class="px-4 text-gray-800 font-semibold py-2 rounded-t"><a
-href="#second">Setup</a></li>
-    <li class="px-4 text-gray-800 font-semibold py-2 rounded-t"><a
-href="#third">Statistics</a></li>
+href="#fourth">Help</a></li>
   </ul>
 
-  <!-- Tab Contents -->
-<div id="tab-contents">
-  <div id="first" class="p-4">
+<!--
 	<h2> File upload area </h2>
 	<div id='progress-up-statsArea'></div>
 	<form id='progress-up-form'>
@@ -52,6 +53,94 @@ href="#third">Statistics</a></li>
 	<p class="text-gray-700 text-base mb-4">
 	   Select files to upload 
 	</p>
+-->
+
+
+  <!-- Tab Contents -->
+<div id="tab-contents">
+
+ <div id="first" class="p-4">
+<!-- XXX drag drop -->
+
+	<!-- component -->
+	<div class="bg-white p7 rounded w-9/12 mx-auto">
+	<div x-data="dataFileDnD()" class="relative flex flex-col p-4 text-gray-400 border border-gray-200 rounded">
+	    <div x-ref="dnd"
+	        class="relative flex flex-col text-gray-400 border border-gray-200 border-dashed rounded cursor-pointer">
+	        <input accept="*" type="file" multiple
+	            class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
+	            @change="addFiles($event)"
+	            @dragover="$refs.dnd.classList.add('border-blue-400'); $refs.dnd.classList.add('ring-4'); $refs.dnd.classList.add('ring-inset');"
+	            @dragleave="$refs.dnd.classList.remove('border-blue-400'); $refs.dnd.classList.remove('ring-4'); $refs.dnd.classList.remove('ring-inset');"
+	            @drop="$refs.dnd.classList.remove('border-blue-400'); $refs.dnd.classList.remove('ring-4'); $refs.dnd.classList.remove('ring-inset');"
+	            title="" />
+	
+	        <div class="flex flex-col items-center justify-center py-10 text-center">
+	            <svg class="w-6 h-6 mr-1 text-current-50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+	                stroke="currentColor">
+	                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+	                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+	            </svg>
+	            <p class="m-0">Drag your files here or click in this area.</p>
+	        </div>
+	    </div>
+	
+	    <template x-if="files.length > 0">
+	        <div class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-6" @drop.prevent="drop($event)"
+	            @dragover.prevent="$event.dataTransfer.dropEffect = 'move'">
+	            <template x-for="(_, index) in Array.from({ length: files.length })">
+	                <div class="relative flex flex-col items-center overflow-hidden text-center bg-gray-100 border rounded cursor-move select-none"
+	                    style="padding-top: 100%;" @dragstart="dragstart($event)" @dragend="fileDragging = null"
+	                    :class="{'border-blue-600': fileDragging == index}" draggable="true" :data-index="index">
+	                    <button class="absolute top-0 right-0 z-50 p-1 bg-white rounded-bl focus:outline-none" type="button" @click="remove(index)">
+	                        <svg class="w-4 h-4 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none"
+	                            viewBox="0 0 24 24" stroke="currentColor">
+	                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+	                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+	                        </svg>
+	                    </button>
+	                    <template x-if="files[index].type.includes('audio/')">
+	                        <svg class="absolute w-12 h-12 text-gray-400 transform top-1/2 -translate-y-2/3"
+	                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+	                                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+	                        </svg>
+	                    </template>
+	                    <template x-if="files[index].type.includes('application/') || files[index].type === ''">
+	                        <svg class="absolute w-12 h-12 text-gray-400 transform top-1/2 -translate-y-2/3"
+	                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+	                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+	                        </svg>
+	                    </template>
+	                    <template x-if="files[index].type.includes('image/')">
+	                        <img class="absolute inset-0 z-0 object-cover w-full h-full border-4 border-white preview"
+	                            x-bind:src="loadFile(files[index])" />
+	                    </template>
+	                    <template x-if="files[index].type.includes('video/')">
+	                        <video
+	                            class="absolute inset-0 object-cover w-full h-full border-4 border-white pointer-events-none preview">
+	                            <fileDragging x-bind:src="loadFile(files[index])" type="video/mp4">
+	                        </video>
+	                    </template>
+	
+	                    <div class="absolute bottom-0 left-0 right-0 flex flex-col p-2 text-xs bg-white bg-opacity-50">
+	                        <span class="w-full font-bold text-gray-900 truncate"
+	                            x-text="files[index].name">Loading</span>
+	                        <span class="text-xs text-gray-900" x-text="humanFileSize(files[index].size)">...</span>
+	                    </div>
+	
+	                    <div class="absolute inset-0 z-40 transition-colors duration-300" @dragenter="dragenter($event)"
+	                        @dragleave="fileDropping = null"
+	                        :class="{'bg-blue-200 bg-opacity-80': fileDropping == index && fileDragging != index}">
+	                    </div>
+	                </div>
+	            </template>
+	        </div>
+	    </template>
+	</div>
+	</div>
+
 
 	<button id="upButton" onClick="uploadAll()" class="inline-block px-6
 	py-2.5 bg-blue-400 text-white font-medium text-xs leading-tight
@@ -64,7 +153,7 @@ href="#third">Statistics</a></li>
 	<button type="button" onClick="clearAll()" class="inline-block px-6 py-2.5 bg-yellow-500 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
 	 Reset form
 	</button>
-	
+ 	
   	<section id="progress-up-area"> </section>
   </div>
 
@@ -223,6 +312,113 @@ href="#third">Statistics</a></li>
 	</div>
 
    </div>
+
+<!-- Fourth tab -->
+  <div id="fourth" class="hidden p-4">
+
+	<div class="flex flex-col">
+	  <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+	    <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
+	      <div class="overflow-hidden">
+	        <table class="min-w-full">
+	          <thead class="bg-white border-b">
+	            <tr>
+	              <th scope="col" class="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+	               Param
+	              </th>
+	              <th scope="col" class="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+	                Type
+	              </th>
+	              <th scope="col" class="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+	                Description
+	              </th>
+	            </tr>
+	          </thead>
+	          <tbody>
+
+	            <tr class="bg-gray-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-gray-900">uploadURL</td>
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"> String </td>
+	              <td class="text-sm text-gray-900 font-light px-6
+py-4 whitespace-nowrap"> The absolute/relative path of HTTP POST
+endpoint </td>
+		   </tr>
+
+
+	            <tr class="bg-gray-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-gray-900">filesName</td>
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"> String </td>
+	              <td class="text-sm text-gray-900 font-light px-6
+py-4 whitespace-nowrap"> The name of files configured in backend </td>
+		   </tr>
+
+	            <tr class="bg-gray-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-gray-900">HTTP auth </td>
+	              <td class="text-sm text-gray-900 font-light px-6
+py-4 whitespace-nowrap"> Checkbox </td>
+	              <td class="text-sm text-gray-900 font-light px-6
+py-4 whitespace-nowrap"> Enable it if your backend requires auth</td>
+		   </tr>
+
+	            <tr class="bg-gray-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-gray-900">HTTP auth type</td>
+	              <td class="text-sm text-gray-900 font-light px-6
+py-4 whitespace-nowrap"> Select option </td>
+	              <td class="text-sm text-gray-900 font-light px-6
+py-4 whitespace-nowrap"> Choose one of Digest/Basic HTTP auth </td>
+		   </tr>
+
+	            <tr class="bg-gray-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-gray-900">Auth username</td>
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"> String </td>
+	              <td class="text-sm text-gray-900 font-light px-6
+py-4 whitespace-nowrap"> Username configured in backend for auth </td>
+		   </tr>
+
+	            <tr class="bg-gray-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-gray-900">Password</td>
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"> String </td>
+	              <td class="text-sm text-gray-900 font-light px-6
+py-4 whitespace-nowrap"> Password configured in backend for auth </td>
+		   </tr>
+
+	            <tr class="bg-gray-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-gray-900">Progress Indicator</td>
+	              <td class="text-sm text-gray-900 font-light px-6
+py-4 whitespace-nowrap"> Select option</td>
+	              <td class="text-sm text-gray-900 font-light px-6
+py-4 whitespace-nowrap"> See below for possible options </td>
+		   </tr>
+
+		   </tbody>
+	        </table>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<img src="images/progress-types.png" alt="Progress-up types" />
+
+	<p>
+	In addition to the above configuration options, there is also
+the ability to perform a test Upload to validate the endpoint.
+	</p>
+	<p>
+	Remember that the configuration is active only for the session.
+	These are not saved anywhere.
+	</p>
+	<p>
+	There is also statistics for upload and profiling available.
+	</p>
+
+  </div>
 
 </div>
 

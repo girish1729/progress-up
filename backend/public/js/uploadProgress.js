@@ -235,10 +235,10 @@ function saveConfig() {
 
     uploadURL = document.getElementById("uploadURL").value;
     filesName = document.getElementById("filesName").value;
+    authEnabled = document.getElementById("progress-up-authenable").value;
     authType = document.getElementById("progress-up-authtype").value;
     user = document.getElementById("progress-up-username").value;
     pass = document.getElementById("progress-up-pass").value;
-    authEnabled = document.getElementById("progress-up-authenable").value;
 
     console.log(uploadURL, filesName, authEnabled, authType, user, pass);
 }
@@ -314,6 +314,71 @@ function populateStats() {
     statsTableDOM.innerHTML = statsTable.join('');
 }
 
+/* XXX ---------------------------------- XXX */
+
+/* XXX third party file upload - yet to integrate */
+
+function dataFileDnD() {
+    return {
+        files: [],
+        fileDragging: null,
+        fileDropping: null,
+        humanFileSize(size) {
+            const i = Math.floor(Math.log(size) / Math.log(1024));
+            return (
+                (size / Math.pow(1024, i)).toFixed(2) * 1 +
+                " " +
+                ["B", "kB", "MB", "GB", "TB"][i]
+            );
+        },
+        remove(index) {
+            let files = [...this.files];
+            files.splice(index, 1);
+
+            this.files = createFileList(files);
+        },
+        drop(e) {
+            let removed, add;
+            let files = [...this.files];
+
+            removed = files.splice(this.fileDragging, 1);
+            files.splice(this.fileDropping, 0, ...removed);
+
+            this.files = createFileList(files);
+
+            this.fileDropping = null;
+            this.fileDragging = null;
+        },
+        dragenter(e) {
+            let targetElem = e.target.closest("[draggable]");
+
+            this.fileDropping = targetElem.getAttribute("data-index");
+        },
+        dragstart(e) {
+            this.fileDragging = e.target
+                .closest("[draggable]")
+                .getAttribute("data-index");
+            e.dataTransfer.effectAllowed = "move";
+        },
+        loadFile(file) {
+            const preview = document.querySelectorAll(".preview");
+            const blobUrl = URL.createObjectURL(file);
+
+            preview.forEach(elem => {
+                elem.onload = () => {
+                    URL.revokeObjectURL(elem.src); // free memory
+                };
+            });
+
+            return blobUrl;
+        },
+        addFiles(e) {
+            const files = createFileList([...this.files], [...e.target.files]);
+            this.files = files;
+            this.form.formData.files = [...files];
+        }
+    };
+}
 /* XXX ---------------------------------- XXX */
 
 /* XXX Not used */
