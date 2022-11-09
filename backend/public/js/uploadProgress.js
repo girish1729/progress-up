@@ -91,27 +91,83 @@ function fileSelectFinish(target) {
     setupUpload();
 }
 
+function humanFileSize(size) {
+            const i = Math.floor(Math.log(size) / Math.log(1024));
+            return (
+                (size / Math.pow(1024, i)).toFixed(2) * 1 +
+                " " +
+                ["B", "kB", "MB", "GB", "TB"][i]
+            );
+}
+
+function showThumbnails() {
+    // Loop through the FileList and render image files as thumbnails.  
+    for (var i = 0, f; f = uploadFileList[i]; i++) {
+        // Only process image files.  
+        if (!f.type.match('image.*')) {
+            continue;
+        }
+        var reader = new FileReader();
+        // Closure to capture the file information.  
+        reader.onload = (function(theFile) {
+            return function(e) {
+                // Render thumbnail.  
+                var span = document.createElement('span');
+                span.innerHTML = [
+		'<img width="100px" height="100px" class="thumb" src="',
+                    e.target.result,
+                    '" title="', theFile.name, 
+		'" class="py-4 pl-4 aspect-square" />'
+                ].join('');
+                document.getElementById(theFile.name).insertBefore(span, null);
+            };
+        })(f);
+        // Read in the image file as a data URL.  
+        reader.readAsDataURL(f);
+    }
+}
+
 function setupUpload() {
     var progressHTML = [];
     for (var i = 0; i < uploadFileList.length; i++) {
         let f = uploadFileList[i];
         let ts = f.lastModifiedDate.toLocaleDateString();
         let name = f.name;
-        let size = f.size;
+        let size = humanFileSize(f.size);
         let mime = f.type;
         let id = 'a' + i;
         totalfiles += 1;
         totalsize += size;
 
         progressHTML.push(
-            `<li class="row">
-             <i class="fas fa-2x fa-file-alt"></i>
-               <span class="name">Name:: ${name}</span>
-               <span class="ts">Date:: ${ts}</span>
-               <span class="mime">Type:: ${mime}</span>
-               <span class="size">Size:: ${size} Bytes</span>
-	       <div class='ldBar' id="${id}" ></div>
-	   </li>`);
+`
+<section class="rounded-md border border-neutral-500 bg-white hover:bg-neutral-600 transition-colors text-black-100 flex flex-row items-start cursor-pointer">
+
+<span onClick="delItem(${i})">
+<i class="fa fa-trash" aria-hidden="true"></i>
+</span>
+
+<p id="${name}" class="text-xl font-light leading-relaxed mt-6 mb-4 text-gray-800">
+Name: ${name}
+</p>
+<p class="text-xl font-light leading-relaxed mt-6 mb-4 text-gray-800">
+Date: ${ts}
+</p>
+<p class="text-xl font-light leading-relaxed mt-6 mb-4 text-gray-800">
+Type: ${mime}
+</p>
+<p class="text-xl font-light leading-relaxed mt-6 mb-4 text-gray-800">
+Size: ${size} 
+</p>
+
+<div class="py-3 px-6 border-t border-gray-300 text-gray-600">
+	<div class='ldBar' id="${id}" ></div>
+</div>
+
+</section>
+`);
+
+
     }
     progressArea.innerHTML = '<ul>' + progressHTML.join('') + '</ul>';
 
@@ -123,7 +179,15 @@ function setupUpload() {
         bar.set(0);
         progressBars.push(bar);
     }
+    showThumbnails();
     enableUploadButton();
+}
+
+function delItem(index) {
+	let list = [...uploadFileList];
+	list.splice(index, 1);
+	uploadFileList = list;
+	console.log(uploadFileList);	
 }
 
 function uploadAll() {
@@ -160,11 +224,12 @@ function spitStatistics(idx) {
     if (idx == uploadFileList.length - 1) {
         endUploadts = Date.now();
         totaltime = `${endUploadts - startUploadts}`;
+	totalsize = humanFileSize(totalsize);
         statsArea.innerHTML = `
 	<div id="uploadStats">
 		<h2>${totalfiles} files uploaded
 			<span class='row-gap'></span>
-		${totalsize} bytes sent
+		${totalsize} sent
 			<span class='row-gap'></span>
 		in ${totaltime} milliseconds</h2>
 	</div>
@@ -176,7 +241,7 @@ function spitStatistics(idx) {
         var status = totalfiles == tot ?
             '<i class="fa fa-check" style="font-size:48px;color:green"></i>' :
             '<i class="fa fa-times" style="font-size:48px;color:red"></i>';
-        var details = `${totalfiles}/${tot} files size ${totalsize} bytes sent in
+        var details = `${totalfiles}/${tot} files size ${totalsize} sent in
 ${totaltime} ms`;
 
         var id = statsTable.length + 1;
@@ -307,7 +372,7 @@ function setIndicator() {
     }
 }
 
-/* XXX Setup tab functions */
+/* XXX Statistics tab functions */
 
 function populateStats() {
     statsTableDOM = document.getElementById("progress-up-statsTable");
@@ -317,6 +382,10 @@ function populateStats() {
 /* XXX ---------------------------------- XXX */
 
 /* XXX third party file upload - yet to integrate */
+/* XXX ---------------------------------- XXX */
+
+/* XXX Not used */
+
 
 function dataFileDnD() {
     return {
@@ -379,9 +448,7 @@ function dataFileDnD() {
         }
     };
 }
-/* XXX ---------------------------------- XXX */
 
-/* XXX Not used */
 function upload(event) {
     console.log("Uploading using HTML5 File API...");
     let data = new FormData(uplform);
@@ -407,27 +474,3 @@ reader.onprogress = function(progressEvent) {
         progressEvent.loaded + "(" + percentLoaded + "%)");
 }
 
-function showThumbnails() {
-    // Loop through the FileList and render image files as thumbnails.  
-    for (var i = 0, f; f = uploadFileList[i]; i++) {
-        // Only process image files.  
-        if (!f.type.match('image.*')) {
-            continue;
-        }
-        var reader = new FileReader();
-        // Closure to capture the file information.  
-        reader.onload = (function(theFile) {
-            return function(e) {
-                // Render thumbnail.  
-                var span = document.createElement('span');
-                span.innerHTML = ['<img class="thumb" src="',
-                    e.target.result,
-                    '" title="', theFile.name, '"/>'
-                ].join('');
-                document.getElementById('list').insertBefore(span, null);
-            };
-        })(f);
-        // Read in the image file as a data URL.  
-        reader.readAsDataURL(f);
-    }
-}
