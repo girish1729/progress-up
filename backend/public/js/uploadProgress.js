@@ -1,25 +1,36 @@
-/* XXX Globals */
+/* tabs for tailwind */
+let tabsContainer = document.querySelector("#tabs");
+let tabTogglers = tabsContainer.querySelectorAll("#tabs a");
+tabTogglers.forEach(function(toggler) {
+    toggler.addEventListener("click", function(e) {
+        e.preventDefault();
+        let tabName = this.getAttribute("href");
+        let tabContents = document.querySelector("#tab-contents");
+        for (let i = 0; i < tabContents.children.length; i++) {
+            tabTogglers[i].parentElement.classList.remove("border-t", "border-r", "border-l", "-mb-px", "bg-white");
+            tabContents.children[i].classList.remove("hidden");
+            if ("#" + tabContents.children[i].id === tabName) {
+                continue;
+            }
+            tabContents.children[i].classList.add("hidden");
+        }
+        e.target.parentElement.classList.add("border-t", "border-r", "border-l", "-mb-px", "bg-white");
+    });
+});
 
-var preset = "stripe";
-var extra = '';
-
-/* XXX these are backend variables */
-var uploadURL = 'https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34';
-uploadURL = 'https://localhost:2324/uploadmultiple';
-var filesName = "uploadFiles";
-var authEnabled = false;
-var authType = "Basic";
-var user = '';
-var pass = '';
+/* XXX File upload tab functions */
 
 /* XXX Internal variables */
 var uploadFileList = [];
+/* stats variables */
+
+var progressBars = [];
+var statsTable = [];
 var totalfiles = 0;
 var totalsize = 0;
 var totaltime = 0;
 var startUploadts = 0;
 var endUploadts = 0;
-
 
 const uplform = document.getElementById("progress-up-form");
 uplform.addEventListener("dragover", dragOver, false);
@@ -38,11 +49,186 @@ fileInput.onchange = ({
     target
 }) => fileSelectFinish(target);
 
-/* XXX functions */
+function enableUploadButton() {
+    upBut = document.getElementById("upButton");
+    upBut.removeAttribute('disabled');
+    upBut.classList.remove('opacity-60');
+}
+
+function clearAll() {
+    progressArea.innerHTML = '';
+    statsArea.innerHTML = '';
+    uploadFileList = [];
+    progressBars = [];
+    totalfiles = 0;
+    totalsize = 0;
+    totaltime = 0;
+    startUploadts = 0;
+    endUploadts = 0;
+
+    upBut = document.getElementById("upButton");
+    upBut.disabled = true;
+    console.log("Cleared");
+}
+
+function dragOver(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = 'copy';
+}
+
+function drop(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    var dropFiles = event.dataTransfer.files;
+    uploadFileList = dropFiles;
+    setupUpload();
+}
+
+function fileSelectFinish(target) {
+    let selectedFiles = target.files;
+    uploadFileList = selectedFiles;
+    setupUpload();
+}
+
+function setupUpload() {
+    var progressHTML = [];
+    for (var i = 0; i < uploadFileList.length; i++) {
+        let f = uploadFileList[i];
+        let ts = f.lastModifiedDate.toLocaleDateString();
+        let name = f.name;
+        let size = f.size;
+        let mime = f.type;
+        let id = 'a' + i;
+        totalfiles += 1;
+        totalsize += size;
+
+        progressHTML.push(
+            `<li class="row">
+             <i class="fas fa-2x fa-file-alt"></i>
+               <span class="name">Name:: ${name}</span>
+               <span class="ts">Date:: ${ts}</span>
+               <span class="mime">Type:: ${mime}</span>
+               <span class="size">Size:: ${size} Bytes</span>
+	       <div class='ldBar' id="${id}" ></div>
+	   </li>`);
+    }
+    progressArea.innerHTML = '<ul>' + progressHTML.join('') + '</ul>';
+
+    for (var i = 0; i < uploadFileList.length; i++) {
+        var selector = '#a' + i;
+        var bar = new ldBar(selector, {
+            preset: preset
+        });
+        bar.set(0);
+        progressBars.push(bar);
+    }
+    enableUploadButton();
+}
+
+function uploadAll() {
+    console.log("Starting upload...");
+    startUploadts = Date.now();
+    for (i = 0; i < uploadFileList.length; i++) {
+        f = uploadFileList[i].name;
+        uploadOneFile(f, i);
+    }
+}
+
+async function uploadOneFile(name, idx) {
+    let uplFormData = new FormData(uplform);
+    await axios.post(uploadURL, uplFormData, {
+        onUploadProgress: function(e) {
+            /*{
+              loaded: number;
+              total?: number;
+              progress?: number; // in range [0..1]
+              bytes: number; // how many bytes have been transferred since the last trigger (delta)
+              estimated?: number; // estimated time in seconds
+              rate?: number; // upload speed in bytes
+              upload: true; // upload sign
+            }*/
+            let perc = parseInt(e.progress * 100);
+            progressBars[idx].set(perc);
+        }
+    }).then((resp) => {
+        spitStatistics(idx)
+    });
+}
+
+function spitStatistics(idx) {
+    if (idx == uploadFileList.length - 1) {
+        endUploadts = Date.now();
+        totaltime = `${endUploadts - startUploadts}`;
+        statsArea.innerHTML = `
+	<div id="uploadStats">
+		<h2>${totalfiles} files uploaded
+			<span class='row-gap'></span>
+		${totalsize} bytes sent
+			<span class='row-gap'></span>
+		in ${totaltime} milliseconds</h2>
+	</div>
+	`;
+
+
+        var ts = new Date().toLocaleString();
+        var tot = uploadFileList.length;
+        var status = totalfiles == tot ?
+            '<i class="fa fa-check" style="font-size:48px;color:green"></i>' :
+            '<i class="fa fa-times" style="font-size:48px;color:red"></i>';
+        var details = `${totalfiles}/${tot} files size ${totalsize} bytes sent in
+${totaltime} ms`;
+
+        var id = statsTable.length + 1;
+        statsTable.push(`
+
+	            <tr class="bg-gray-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-gray-900">${id}</td>
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+			   ${ts}
+	              </td>
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+			   ${status}
+	              </td>
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+			   ${details}
+	              </td>
+	            </tr>
+    `);
+
+        upBut.setAttribute('disabled', true);
+        upBut.classList.add('opacity-60');
+        populateStats();
+        progressBars = [];
+        totalfiles = 0;
+        totalsize = 0;
+        totaltime = 0;
+        startUploadts = 0;
+        endUploadts = 0;
+    }
+}
+
+/* XXX Setup tab functions */
+
+/* XXX Globals */
+
+var preset = "line";
+var extra = '';
+
+/* XXX these are backend variables */
+var uploadURL = 'https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34';
+uploadURL = 'https://localhost:2324/uploadmultiple';
+var filesName = "uploadFiles";
+var authEnabled = false;
+var authType = "Basic";
+var user = '';
+var pass = '';
+
+
 function initApp() {
     document.getElementById("uploadURL").value = uploadURL;
     document.getElementById("filesName").value = filesName;
-    testProgress();
 }
 
 function saveConfig() {
@@ -92,8 +278,9 @@ function testEP() {
 }
 
 function setIndicator() {
-    var prog = document.getElementById("progress-up-indicator").value;
-
+    var progType = document.getElementById("progType").value;
+    console.log(progType);
+    progType = progType.toLowerCase()
     switch (progType) {
         case "line":
             preset = progType;
@@ -126,132 +313,16 @@ function setIndicator() {
     }
 }
 
-function enableUploadButton() {
-    upBut = document.getElementById("upButton");
-    upBut.removeAttribute('disabled');
-    upBut.classList.remove('opacity-60');
+/* XXX Setup tab functions */
+
+function populateStats() {
+    statsTableDOM = document.getElementById("progress-up-statsTable");
+    statsTableDOM.innerHTML = statsTable.join('');
 }
 
-function clearAll() {
-    progressArea.innerHTML = '';
-    statsArea.innerHTML = '';
-    uploadFileList = [];
-    totalfiles = 0;
-    totalsize = 0;
-    totaltime = 0;
-    startUploadts = 0;
-    endUploadts = 0;
-
-    upBut = document.getElementById("upButton");
-    upBut.disabled = true;
-    console.log("Cleared");
-}
-
-function dragOver(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
-    evt.dataTransfer.dropEffect = 'copy';
-}
-
-function drop(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
-    var dropFiles = event.dataTransfer.files;
-    console.log("Files dropped:: " + dropFiles);
-    uploadFileList = dropFiles;
-    setupUpload();
-}
-
-function fileSelectFinish(target) {
-    let selectedFiles = target.files;
-    console.log("Files selected:: " + selectedFiles);
-    uploadFileList = selectedFiles;
-    setupUpload();
-}
-
-function setupUpload() {
-    var progressHTML = [];
-    for (var i = 0, f; f = uploadFileList[i]; i++) {
-        let ts = f.lastModifiedDate.toLocaleDateString();
-        let name = f.name;
-        let per = 20;
-        let size = f.size;
-        let mime = f.type;
-
-        totalfiles += 1;
-        totalsize += size;
-
-        var progString = `<div class="ldBar label-center" ${extra} data-value="${per}" data-preset="${preset}" ></div>`;
-        progressHTML.push(
-            `<li class="row">
-		${progString}
-
-<div class="ldBar label-center" data-value="35" data-preset="stripe" ></div>
-             <i class="fas fa-2x fa-file-alt"></i>
-               <div class="ldBar" data-preset="circle" data-value="20"></div>
-               <span class="name">Name:: ${name}</span>
-               <span class="ts">Date:: ${ts}</span>
-               <span class="mime">Type:: ${mime}</span>
-               <span class="size">Size:: ${size} Bytes</span>
-	       <div data-preset="line" id="${name}-progress" class="ldBar" data-value="${per}"> </div>
-	   </li>`);
-
-    }
-    progressArea.innerHTML = '<ul>' + progressHTML.join('') + '</ul>';
-    enableUploadButton();
-}
-
-function spitStatistics(idx) {
-    if (idx == uploadFileList.length - 1) {
-        endUploadts = Date.now();
-        totaltime = `${endUploadts - startUploadts}`;
-        statsArea.innerHTML = `
-	<div id="uploadStats">
-		<h2>${totalfiles} files uploaded
-			<span class='row-gap'></span>
-		${totalsize} bytes sent
-			<span class='row-gap'></span>
-		in ${totaltime} milliseconds</h2>
-	</div>
-	`;
-    }
-    upBut.disabled = true;
-    upBut.setAttribute('value', "Uploaded");
-}
-
-function uploadAll() {
-    console.log("Starting upload...");
-    startUploadts = Date.now();
-    for (i = 0; i < uploadFileList.length; i++) {
-        f = uploadFileList[i].name;
-        uploadOneFile(f, i);
-    }
-}
-
-async function uploadOneFile(name, idx) {
-    let uplFormData = new FormData(uplform);
-    await axios.post(uploadURL, uplFormData, {
-        onUploadProgress: function(e) {
-            /*{
-              loaded: number;
-              total?: number;
-              progress?: number; // in range [0..1]
-              bytes: number; // how many bytes have been transferred since the last trigger (delta)
-              estimated?: number; // estimated time in seconds
-              rate?: number; // upload speed in bytes
-              upload: true; // upload sign
-            }*/
-            let fileLoaded = parseInt(e.progress * 100);
-            document.getElementById(name + '-progress')
-                .setAttribute("data-value", fileLoaded)
-        }
-    }).then((resp) => {
-        spitStatistics(idx)
-    });
-}
+/* XXX ---------------------------------- XXX */
 
 /* XXX Not used */
-
 function upload(event) {
     console.log("Uploading using HTML5 File API...");
     let data = new FormData(uplform);
@@ -272,9 +343,6 @@ reader.onprogress = function(progressEvent) {
             progressEvent.loaded * 100) / progressEvent.total);
 
         document.getElementById(name + '-1').innerHTML = fileLoaded + "%";
-        document.getElementById(name + '-2').innerHTML = `
-             <div  class="progress" style="width: ${fileLoaded}%"></div>
-	`;
     }
     console.log("total: " + progressEvent.total + ", loaded: " +
         progressEvent.loaded + "(" + percentLoaded + "%)");
@@ -303,32 +371,4 @@ function showThumbnails() {
         // Read in the image file as a data URL.  
         reader.readAsDataURL(f);
     }
-}
-
-allTypes = [
-	"line", 
-	"fan",
-	"energy",
-	"bubble",
-	"rainbow",
-	"stripe",
-	"text",
-	"circle"
-];
-
-function testProgress() {
-	progIndicator = [];
-	per = 25;
-const showall = document.getElementById("showall");
-	for(i=0; i < allTypes.length;i++) {
-		type = allTypes[i];
-		progIndicator.push(`
-	<li>
-        <div class="ldBar label-center" data-value="${per}"
-data-preset="${type}" >
-	</div>
-	</li>`);
-		
-	}
-    showall.innerHTML = '<ul>' + progIndicator.join('') + '</ul>';
 }
