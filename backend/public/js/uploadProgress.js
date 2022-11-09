@@ -235,10 +235,11 @@ function saveConfig() {
 
     uploadURL = document.getElementById("uploadURL").value;
     filesName = document.getElementById("filesName").value;
-    authEnabled = document.getElementById("progress-up-auth").value;
     authType = document.getElementById("progress-up-authtype").value;
     user = document.getElementById("progress-up-username").value;
     pass = document.getElementById("progress-up-pass").value;
+    authEnabled = document.getElementById("progress-up-authenable").value;
+
     console.log(uploadURL, filesName, authEnabled, authType, user, pass);
 }
 
@@ -266,14 +267,7 @@ async function testUpload(event) {
 }
 
 function testEP() {
-
-    uploadURL = document.getElementById("uploadURL").value;
-    filesName = document.getElementById("filesName").value;
-    authEnabled = document.getElementById("progress-up-auth").value;
-    authType = document.getElementById("progress-up-authtype").value;
-    user = document.getElementById("progress-up-username").value;
-    pass = document.getElementById("progress-up-pass").value;
-
+    saveConfig();
     testUpload();
 }
 
