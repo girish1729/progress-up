@@ -109,7 +109,7 @@ src="icons/upload/file-submit.svg" alt="progress-up file submit icon" />
 	         <input id='progress-up-uploadURL' class="appearance-none block w-full bg-gray-200
 	   text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	   focus:outline-none focus:bg-white" id="grid-post-endpoint" type="text"
-	   placeholder="URL to post">
+	   placeholder="URL to post [cross origin or absolute URL needs CORS]">
 	         <p class="text-red-500 text-xs italic">Please fill out this field.</p>
 	       </div>
 	   
@@ -256,11 +256,11 @@ src="icons/upload/file-submit.svg" alt="progress-up file submit icon" />
 
 <!-- Fourth tab -->
   <div id="fourth" class="hidden p-4">
+    <div class="flex flex-col">
+      <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+	 <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
+	    <div class="overflow-hidden">
 
-	<div class="flex flex-col">
-	  <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
-	    <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
-	      <div class="overflow-hidden">
 	        <table class="min-w-full">
 	          <thead class="bg-white border-b">
 	            <tr>
@@ -337,7 +337,6 @@ py-4 whitespace-nowrap"> Select option</td>
 	              <td class="text-sm text-gray-900 font-light px-6
 py-4 whitespace-nowrap"> See below for possible options </td>
 		   </tr>
-
 		   </tbody>
 	        </table>
 	      </div>
@@ -347,17 +346,20 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 
 	<img src="images/progress-types.png" alt="Progress-up types" />
 
-	<p>
-	In addition to the above configuration options, there is also
-the ability to perform a test Upload to validate the endpoint.
-	</p>
-	<p>
+<ul class='marker:text-green list-outside list-disc ml-6'>
+  <li> There is also the ability to perform a test Upload to validate the endpoint.  </li>
+  <li>
 	Remember that the configuration is active only for the session.
-	These are not saved anywhere.
-	</p>
-	<p>
+  </li>
+
+  <li>
 	There is also statistics for upload and profiling available.
-	</p>
+  </li>
+  <li>
+	If using absolute URL please ensure <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS is enabled</a>.
+  </li>
+</ul>
+
 
   </div>
 

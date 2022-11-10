@@ -5,6 +5,8 @@ const multer = require('multer');
 const morgan = require('morgan-body');
 const cors = require('cors');
 const tus = require('tus');
+const bodyParser = require('body-parser');
+const basicAuth = require('express-basic-auth');
 
 const cert = fs.readFileSync(__dirname + "/localhost.pem", 'utf-8');
 const key = fs.readFileSync(__dirname + "/localhost-key.pem", 'utf-8');
@@ -13,6 +15,18 @@ morgan(app);
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname + "/public"));
+
+/*
+app.use(basicAuth({
+    users: { 'admin': 'supersecret' }
+}))
+*/
+
+
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({ 
+    extended: true
+}));
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {

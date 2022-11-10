@@ -11,37 +11,39 @@
       "extensions": "html"
     }
   },
- 
   "scripts": {
     "watch": "npm-watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "postcss styles.css -o public/progress-up.css",
     "dev": "concurrently \"npm run build && live-server public --port=8080\" \"npm run watch\"",
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dig": "node dig.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "autoprefixer": "^10.2.4",
-    "postcss-cli": "^8.3.1",
-    "tailwindcss": "^3.1.4",
+    "basic-auth-connect": "^1.0.0",
     "cors": "^2.8.5",
     "express": "^4.18.1",
+    "express-basic-auth": "^1.2.1",
     "file-system": "^2.2.2",
+    "http-auth": "^4.2.0",
+    "http-auth-connect": "^1.0.6",
     "mongodb": "^4.6.0",
     "morgan": "^1.10.0",
     "morgan-body": "^2.6.8",
     "multer": "^1.4.4",
+    "postcss-cli": "^8.3.1",
     "tailwindcss": "^3.2.2",
     "tus": "^0.1.7"
   },
   "devDependencies": {
     "concurrently": "^7.2.2",
-    "npm-watch": "^0.11.0",
     "del": "^3.0.0",
     "express": "^4.16.4",
     "lokijs": "^1.5.5",
-    "multer": "^1.4.1"
+    "multer": "^1.4.1",
+    "npm-watch": "^0.11.0"
   }
 }
