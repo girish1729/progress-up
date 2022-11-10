@@ -20,6 +20,25 @@ tabTogglers.forEach(function(toggler) {
 
 /* XXX File upload tab functions */
 
+var fileTypeIcons = {
+  "video": "avi.svg",
+  "css": "css.svg",
+  "csv": "csv.svg",
+  "eps": "eps.svg",
+  "excel": "excel.svg",
+  "html": "html.svg",
+  "movie": "mov.svg",
+  "mp3" : "mp3.svg",
+  "other": "other.svg",
+  "pdf" : "pdf.svg",
+  "ppt": "ppt.svg",
+  "rar" : "rar.svg",
+  "text" : "txt.svg",
+  "audio": "wav.svg",
+  "word": "word.svg",
+  "zip": "zip.svg"
+};
+
 /* XXX Internal variables */
 var uploadFileList = [];
 /* stats variables */
@@ -32,13 +51,13 @@ var totaltime = 0;
 var startUploadts = 0;
 var endUploadts = 0;
 
-const uplform = document.getElementById("progress-up-form");
+const uplform = document.querySelector("#progress-up-form form");
 uplform.addEventListener("dragover", dragOver, false);
 uplform.addEventListener("drop", drop, false);
 
-fileInput = document.getElementById("fileInput");
-progressArea = document.getElementById("progress-up-area");
-statsArea = document.getElementById("progress-up-statsArea");
+const fileInput = document.getElementById("progress-up-fileInput");
+const progressArea = document.getElementById("progress-up-progressArea");
+const statsArea = document.getElementById("progress-up-statsArea");
 progressArea.innerHTML = "";
 
 uplform.addEventListener("click", () => {
@@ -100,13 +119,28 @@ function humanFileSize(size) {
             );
 }
 
+function setIconImage(name, type) {
+	type = type.split('/')[0];
+	console.log(type);
+        var span = document.createElement('span');
+	var fileIcon = fileTypeIcons[type];
+	if(fileIcon == undefined) {
+		fileIcon = "file.svg";
+	}
+                span.innerHTML = [
+		'<img width="100px" height="100px" class="thumb" src="',
+                    'icons/filetypes/' + fileIcon,
+                    '" title="', name, 
+		'" class="py-4 pl-4 aspect-square" />'
+                ].join('');
+                document.getElementById(name).insertBefore(span, null);
+}
+
 function showThumbnails() {
-    // Loop through the FileList and render image files as thumbnails.  
     for (var i = 0, f; f = uploadFileList[i]; i++) {
-        // Only process image files.  
         if (!f.type.match('image.*')) {
-            continue;
-        }
+		setIconImage(f.name, f.type);
+        } else {
         var reader = new FileReader();
         // Closure to capture the file information.  
         reader.onload = (function(theFile) {
@@ -124,6 +158,7 @@ function showThumbnails() {
         })(f);
         // Read in the image file as a data URL.  
         reader.readAsDataURL(f);
+	}
     }
 }
 
@@ -133,19 +168,15 @@ function setupUpload() {
         let f = uploadFileList[i];
         let ts = f.lastModifiedDate.toLocaleDateString();
         let name = f.name;
+        totalsize += f.size;
         let size = humanFileSize(f.size);
         let mime = f.type;
         let id = 'a' + i;
         totalfiles += 1;
-        totalsize += size;
 
         progressHTML.push(
 `
-<section class="rounded-md border border-neutral-500 bg-white hover:bg-neutral-600 transition-colors text-black-100 flex flex-row items-start cursor-pointer">
-
-<span onClick="delItem(${i})">
-<i class="fa fa-trash" aria-hidden="true"></i>
-</span>
+<section id="${i}-section" class="rounded-md border border-neutral-500 bg-white hover:bg-neutral-600 transition-colors text-black-100 flex flex-row items-start cursor-pointer">
 
 <p id="${name}" class="text-xl font-light leading-relaxed mt-6 mb-4 text-gray-800">
 Name: ${name}
@@ -164,6 +195,9 @@ Size: ${size}
 	<div class='ldBar' id="${id}" ></div>
 </div>
 
+<span onClick="delItem(${i})">
+<img src="icons/misc/trash-icon.svg" />
+</span>
 </section>
 `);
 
@@ -187,7 +221,9 @@ function delItem(index) {
 	let list = [...uploadFileList];
 	list.splice(index, 1);
 	uploadFileList = list;
-	console.log(uploadFileList);	
+	el = document.getElementById(index + '-section');
+	el.remove();
+
 }
 
 function uploadAll() {
@@ -217,6 +253,9 @@ async function uploadOneFile(name, idx) {
         }
     }).then((resp) => {
         spitStatistics(idx)
+    }).catch((error) => {
+	alert("Upload failed. Please check endpoint in Setup");
+	alert(error);
     });
 }
 
@@ -239,8 +278,8 @@ function spitStatistics(idx) {
         var ts = new Date().toLocaleString();
         var tot = uploadFileList.length;
         var status = totalfiles == tot ?
-            '<i class="fa fa-check" style="font-size:48px;color:green"></i>' :
-            '<i class="fa fa-times" style="font-size:48px;color:red"></i>';
+            '<img src="icons/misc/success-icon.svg" >' :
+            '<img src="icons/misc/failure-icon.svg" >' ;
         var details = `${totalfiles}/${tot} files size ${totalsize} sent in
 ${totaltime} ms`;
 
@@ -292,29 +331,20 @@ var pass = '';
 
 
 function initApp() {
-    document.getElementById("uploadURL").value = uploadURL;
-    document.getElementById("filesName").value = filesName;
+    document.getElementById("progress-up-uploadURL").value = uploadURL;
+    document.getElementById("progress-up-filesName").value = filesName;
 }
 
 function saveConfig() {
 
-    uploadURL = document.getElementById("uploadURL").value;
-    filesName = document.getElementById("filesName").value;
+    uploadURL = document.getElementById("progress-up-uploadURL").value;
+    filesName = document.getElementById("progress-up-filesName").value;
     authEnabled = document.getElementById("progress-up-authenable").value;
     authType = document.getElementById("progress-up-authtype").value;
     user = document.getElementById("progress-up-username").value;
     pass = document.getElementById("progress-up-pass").value;
 
     console.log(uploadURL, filesName, authEnabled, authType, user, pass);
-}
-
-function testResult(resp) {
-    if (resp.status === 200) {
-        alert("Test succeeded");
-    } else {
-        alert("Test failed, try again");
-        alert(resp.statusText)
-    }
 }
 
 async function testUpload(event) {
@@ -327,8 +357,11 @@ async function testUpload(event) {
     testForm.append(filesName, blob, 'progress-up-test.txt');
     await axios.post(uploadURL, testForm)
         .then((resp) => {
-            testResult(resp)
-        });
+            alert("Test succeeded");
+    }).catch((error) => {
+	alert("Upload failed. Please check endpoint in Setup");
+	alert(error);
+	});
 }
 
 function testEP() {
@@ -337,7 +370,7 @@ function testEP() {
 }
 
 function setIndicator() {
-    var progType = document.getElementById("progType").value;
+    var progType = document.getElementById("progress-up-indicator").value;
     console.log(progType);
     progType = progType.toLowerCase()
     switch (progType) {

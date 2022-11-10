@@ -7,7 +7,6 @@
 indicator</title>
   <meta description="HTML5 multiple file upload progress bar plugin for
 Vue,js, React and Angular" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 <link rel="stylesheet" type="text/css" href="assets/loading-bar.css"/>
 <script type="text/javascript" src="assets/loading-bar.js"></script>
 
@@ -37,24 +36,11 @@ border-t border-r border-l -mb-px"><a id="default-tab"
 href="#first">File upload</a></li>
     <li class="px-4 text-gray-800 font-semibold py-2 rounded-t"><a href="#second">Setup</a></li>
     <li class="px-4 text-gray-800 font-semibold py-2 rounded-t"><a href="#third">Statistics</a></li>
+	<div id="${all[i]}"></div>
+  </li>
     <li class="px-4 text-gray-800 font-semibold py-2 rounded-t"><a
 href="#fourth">Help</a></li>
   </ul>
-
-<!--
-	<h2> File upload area </h2>
-	<div id='progress-up-statsArea'></div>
-	<form id='progress-up-form'>
-	       <input id="fileInput" name="uploadFiles" type="file" multiple hidden>
-	  <i class="fas fa-5x fa-cloud-upload-alt"></i>
-	</form>
-
-	<h2 class="text-gray-900 text-xl font-medium mb-2"> Drop files here</h2>
-	<p class="text-gray-700 text-base mb-4">
-	   Select files to upload 
-	</p>
--->
-
 
   <!-- Tab Contents -->
 <div id="tab-contents">
@@ -63,17 +49,15 @@ href="#fourth">Help</a></li>
 <!-- XXX drag drop -->
 	<div id='progress-up-statsArea'></div>
 
-	<div class="bg-white p-4 rounded mx-auto">
-    	  <div 
-        class="text-blue-400 border border-blue-400 border-dashed rounded cursor-pointer">
- 
-	<form id='progress-up-form'>
-	       <input id="fileInput" name="uploadFiles" type="file" multiple hidden>
-	  <i class="fas fa-5x fa-cloud-upload-alt"></i>
-	</form>
-
-	<h2 class="text-gray-900 text-xl font-medium mb-2"> Drop files
-here or click to select</h2>
+	<div id='progress-up-form' class="bg-white p-4 rounded mx-auto">
+    	  <div class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
+	   <form class='flex justify-center'>
+		<img width="100" height="100"
+src="icons/upload/file-submit.svg" alt="progress-up file submit icon" />
+	       <input id="progress-up-fileInput" name="uploadFiles" type="file" multiple hidden>
+	   </form>
+	   <h2 class="flex justify-center text-gray-500 text-xl font-medium mb-2"> 
+	     Drop files or click to select</h2>
 	  </div>
 	</div>
 
@@ -90,7 +74,7 @@ here or click to select</h2>
 	 Reset form
 	</button>
  	
-  	<section id="progress-up-area"> </section>
+  	<section id="progress-up-progressArea"> </section>
 
   </div>
 
@@ -105,7 +89,7 @@ here or click to select</h2>
 	   font-bold mb-2" for="grid-post-endpoint">
 	          POST endpoint  
 	         </label>
-	         <input id='uploadURL' class="appearance-none block w-full bg-gray-200
+	         <input id='progress-up-uploadURL' class="appearance-none block w-full bg-gray-200
 	   text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	   focus:outline-none focus:bg-white" id="grid-post-endpoint" type="text"
 	   placeholder="URL to post">
@@ -114,10 +98,10 @@ here or click to select</h2>
 	   
 	       <div class="w-full md:w-1/2 px-3">
 	         <label class="block uppercase tracking-wide text-gray-700 text-xs
-	   font-bold mb-2" for="grid-files-name">
+	   font-bold mb-2" for="progress-up-filesName">
 	   	Name of files input field
 	         </label>
-	         <input id='filesName' class="appearance-none block w-full bg-gray-200
+	         <input id='progress-up-filesName' class="appearance-none block w-full bg-gray-200
 	   text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	   focus:outline-none focus:bg-white focus:border-gray-500"
 	   id="grid-files-name" type="text" placeholder="Name of files input field">
@@ -127,11 +111,11 @@ here or click to select</h2>
 	     <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
 	         <label class="block uppercase tracking-wide text-gray-700 text-xs
-	   font-bold mb-2" for="progress-indicator">
+	   font-bold mb-2" for="progress-up-indicator">
 	           Progress indicator type
 	         </label>
 	         <div class="relative">
-	           <select id='progType' onChange="setIndicator()" class="block appearance-none w-full bg-gray-200 border
+	           <select id='progress-up-indicator' onChange="setIndicator()" class="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-white focus:border-gray-500"
 	   >
