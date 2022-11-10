@@ -21,22 +21,22 @@ tabTogglers.forEach(function(toggler) {
 /* XXX File upload tab functions */
 
 var fileTypeIcons = {
-  "video": "avi.svg",
-  "css": "css.svg",
-  "csv": "csv.svg",
-  "eps": "eps.svg",
-  "excel": "excel.svg",
-  "html": "html.svg",
-  "movie": "mov.svg",
-  "mp3" : "mp3.svg",
-  "other": "other.svg",
-  "pdf" : "pdf.svg",
-  "ppt": "ppt.svg",
-  "rar" : "rar.svg",
-  "text" : "txt.svg",
-  "audio": "wav.svg",
-  "word": "word.svg",
-  "zip": "zip.svg"
+    "video": "avi.svg",
+    "css": "css.svg",
+    "csv": "csv.svg",
+    "eps": "eps.svg",
+    "excel": "excel.svg",
+    "html": "html.svg",
+    "movie": "mov.svg",
+    "mp3": "mp3.svg",
+    "other": "other.svg",
+    "pdf": "pdf.svg",
+    "ppt": "ppt.svg",
+    "rar": "rar.svg",
+    "text": "txt.svg",
+    "audio": "wav.svg",
+    "word": "word.svg",
+    "zip": "zip.svg"
 };
 
 /* XXX Internal variables */
@@ -111,54 +111,53 @@ function fileSelectFinish(target) {
 }
 
 function humanFileSize(size) {
-            const i = Math.floor(Math.log(size) / Math.log(1024));
-            return (
-                (size / Math.pow(1024, i)).toFixed(2) * 1 +
-                " " +
-                ["B", "kB", "MB", "GB", "TB"][i]
-            );
+    const i = Math.floor(Math.log(size) / Math.log(1024));
+    return (
+        (size / Math.pow(1024, i)).toFixed(2) * 1 +
+        " " + ["B", "kB", "MB", "GB", "TB"][i]
+    );
 }
 
 function setIconImage(name, type) {
-	type = type.split('/')[0];
-	console.log(type);
-        var span = document.createElement('span');
-	var fileIcon = fileTypeIcons[type];
-	if(fileIcon == undefined) {
-		fileIcon = "file.svg";
-	}
-                span.innerHTML = [
-		'<img width="100px" height="100px" class="thumb" src="',
-                    'icons/filetypes/' + fileIcon,
-                    '" title="', name, 
-		'" class="py-4 pl-4 aspect-square" />'
-                ].join('');
-                document.getElementById(name).insertBefore(span, null);
+    type = type.split('/')[0];
+    console.log(type);
+    var span = document.createElement('span');
+    var fileIcon = fileTypeIcons[type];
+    if (fileIcon == undefined) {
+        fileIcon = "file.svg";
+    }
+    span.innerHTML = [
+        '<img width="100px" height="100px" class="thumb" src="',
+        'icons/filetypes/' + fileIcon,
+        '" title="', name,
+        '" class="py-4 pl-4 aspect-square" />'
+    ].join('');
+    document.getElementById(name).insertBefore(span, null);
 }
 
 function showThumbnails() {
     for (var i = 0, f; f = uploadFileList[i]; i++) {
         if (!f.type.match('image.*')) {
-		setIconImage(f.name, f.type);
+            setIconImage(f.name, f.type);
         } else {
-        var reader = new FileReader();
-        // Closure to capture the file information.  
-        reader.onload = (function(theFile) {
-            return function(e) {
-                // Render thumbnail.  
-                var span = document.createElement('span');
-                span.innerHTML = [
-		'<img width="100px" height="100px" class="thumb" src="',
-                    e.target.result,
-                    '" title="', theFile.name, 
-		'" class="py-4 pl-4 aspect-square" />'
-                ].join('');
-                document.getElementById(theFile.name).insertBefore(span, null);
-            };
-        })(f);
-        // Read in the image file as a data URL.  
-        reader.readAsDataURL(f);
-	}
+            var reader = new FileReader();
+            // Closure to capture the file information.  
+            reader.onload = (function(theFile) {
+                return function(e) {
+                    // Render thumbnail.  
+                    var span = document.createElement('span');
+                    span.innerHTML = [
+                        '<img width="100px" height="100px" class="thumb" src="',
+                        e.target.result,
+                        '" title="', theFile.name,
+                        '" class="py-4 pl-4 aspect-square" />'
+                    ].join('');
+                    document.getElementById(theFile.name).insertBefore(span, null);
+                };
+            })(f);
+            // Read in the image file as a data URL.  
+            reader.readAsDataURL(f);
+        }
     }
 }
 
@@ -175,7 +174,7 @@ function setupUpload() {
         totalfiles += 1;
 
         progressHTML.push(
-`
+            `
 <section id="${i}-section" class="rounded-md border border-neutral-500 bg-white hover:bg-neutral-600 transition-colors text-black-100 flex flex-row items-start cursor-pointer">
 
 <p id="${name}" class="text-xl font-light leading-relaxed mt-6 mb-4 text-gray-800">
@@ -218,11 +217,11 @@ Size: ${size}
 }
 
 function delItem(index) {
-	let list = [...uploadFileList];
-	list.splice(index, 1);
-	uploadFileList = list;
-	el = document.getElementById(index + '-section');
-	el.remove();
+    let list = [...uploadFileList];
+    list.splice(index, 1);
+    uploadFileList = list;
+    el = document.getElementById(index + '-section');
+    el.remove();
 
 }
 
@@ -254,8 +253,8 @@ async function uploadOneFile(name, idx) {
     }).then((resp) => {
         spitStatistics(idx)
     }).catch((error) => {
-	alert("Upload failed. Please check endpoint in Setup");
-	alert(error);
+        alert("Upload failed. Please check endpoint in Setup");
+        alert(error);
     });
 }
 
@@ -263,7 +262,7 @@ function spitStatistics(idx) {
     if (idx == uploadFileList.length - 1) {
         endUploadts = Date.now();
         totaltime = `${endUploadts - startUploadts}`;
-	totalsize = humanFileSize(totalsize);
+        totalsize = humanFileSize(totalsize);
         statsArea.innerHTML = `
 	<div id="uploadStats">
 		<h2>${totalfiles} files uploaded
@@ -279,7 +278,7 @@ function spitStatistics(idx) {
         var tot = uploadFileList.length;
         var status = totalfiles == tot ?
             '<img src="icons/misc/success-icon.svg" >' :
-            '<img src="icons/misc/failure-icon.svg" >' ;
+            '<img src="icons/misc/failure-icon.svg" >';
         var details = `${totalfiles}/${tot} files size ${totalsize} sent in
 ${totaltime} ms`;
 
@@ -330,6 +329,12 @@ var user = '';
 var pass = '';
 
 
+
+function toggleAuthQ(val) {
+    const authSection = document.querySelector("#progress-up-authsection");
+    authSection.classList.toggle("hidden");
+}
+
 function initApp() {
     document.getElementById("progress-up-uploadURL").value = uploadURL;
     document.getElementById("progress-up-filesName").value = filesName;
@@ -358,10 +363,10 @@ async function testUpload(event) {
     await axios.post(uploadURL, testForm)
         .then((resp) => {
             alert("Test succeeded");
-    }).catch((error) => {
-	alert("Upload failed. Please check endpoint in Setup");
-	alert(error);
-	});
+        }).catch((error) => {
+            alert("Upload failed. Please check endpoint in Setup");
+            alert(error);
+        });
 }
 
 function testEP() {
@@ -429,8 +434,7 @@ function dataFileDnD() {
             const i = Math.floor(Math.log(size) / Math.log(1024));
             return (
                 (size / Math.pow(1024, i)).toFixed(2) * 1 +
-                " " +
-                ["B", "kB", "MB", "GB", "TB"][i]
+                " " + ["B", "kB", "MB", "GB", "TB"][i]
             );
         },
         remove(index) {
@@ -506,4 +510,3 @@ reader.onprogress = function(progressEvent) {
     console.log("total: " + progressEvent.total + ", loaded: " +
         progressEvent.loaded + "(" + percentLoaded + "%)");
 }
-

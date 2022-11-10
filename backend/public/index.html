@@ -7,6 +7,7 @@
 indicator</title>
   <meta description="HTML5 multiple file upload progress bar plugin for
 Vue,js, React and Angular" />
+
 <link rel="stylesheet" type="text/css" href="assets/loading-bar.css"/>
 <script type="text/javascript" src="assets/loading-bar.js"></script>
 
@@ -19,7 +20,23 @@ Vue,js, React and Angular" />
   <link rel="stylesheet" href="progress-up.css" />
 </head>
 
-<body onload="initApp()">
+<body class="dark:bg-gray-800 dark:text-gray-200"  onload="initApp()">
+
+<!-- Dark mode controls -->
+
+<div class="flex justify-end items-center space-x-2 mx-auto relative">
+  <div class="w-14 h-8">
+
+  <label for="dark-mode" class="w-full h-full  rounded-full p-1 flex justify-between cursor-pointer">
+
+    <span class="hidden dark:inline">&#127774;</span>
+    <span class="inline dark:hidden">&#127769; </span>
+  </label>
+
+  <input type="checkbox" id="dark-mode" class='hidden' onchange="document.documentElement.classList.toggle('dark')" />
+</div>
+</div>
+
 
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 
@@ -135,8 +152,6 @@ src="icons/upload/file-submit.svg" alt="progress-up file submit icon" />
 	       </div>
 	      </div>
 	
-	    <details>
-		<summary> HTTP auth section </summary>
 
 	     <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
@@ -144,52 +159,53 @@ src="icons/upload/file-submit.svg" alt="progress-up file submit icon" />
 	         <span class="text-sm">
 	           HTTP Auth required?
 	         </span>
-	         <input id='progress-up-authenable' class="mr-2 leading-tight" type="checkbox">
+	         <input onChange="toggleAuthQ(this)" id='progress-up-authenable' class="mr-2 leading-tight" type="checkbox">
 	       </label>
 	      </div>
 	     </div>
 	   
-	     <div class="flex flex-wrap -mx-3 mb-6">
-	       <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-	         <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-state">
-	           Auth type
-	         </label>
-	         <div class="relative">
-	           <select id='progress-up-authtype' class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state">
-	             <option>HTTP basic auth</option>
-	             <option>HTTP digest auth</option>
-	           </select>
-	    
-	           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-	             <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-	           </div>
+             <div id='progress-up-authsection' class="hidden">
+	        <div class="flex flex-wrap -mx-3 mb-6">
+	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+	            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-state">
+	              Auth type
+	            </label>
+	            <div class="relative">
+	              <select id='progress-up-authtype' class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state">
+	                <option>HTTP basic auth</option>
+	                <option>HTTP digest auth</option>
+	              </select>
+	       
+	              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+	                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+	              </div>
+	            </div>
+	          </div>
+	      
+	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+	            <label class="block uppercase tracking-wide text-gray-700 text-xs
+	      font-bold mb-2" for="grid-username">
+	             Username  
+	            </label>
+	            <input id='progress-up-username' class="appearance-none block w-full bg-gray-200
+	      text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
+	      focus:outline-none focus:bg-white" id="grid-username" type="text"
+	      placeholder="username">
+	            <p class="text-red-500 text-xs italic">Please fill out this field.</p>
+	          </div>
+	      
+	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+	            <label class="block uppercase tracking-wide text-gray-700 text-xs
+	      font-bold mb-2" for="grid-pass">
+	      	Password
+	            </label>
+	            <input id='progress-up-pass' class="appearance-none block w-full bg-gray-200
+	      text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight
+	      focus:outline-none focus:bg-white focus:border-gray-500"
+	      id="grid-pass" type="password" placeholder="Password">
+	          </div>
 	         </div>
-	       </div>
-	   
-	       <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-	         <label class="block uppercase tracking-wide text-gray-700 text-xs
-	   font-bold mb-2" for="grid-username">
-	          Username  
-	         </label>
-	         <input id='progress-up-username' class="appearance-none block w-full bg-gray-200
-	   text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
-	   focus:outline-none focus:bg-white" id="grid-username" type="text"
-	   placeholder="username">
-	         <p class="text-red-500 text-xs italic">Please fill out this field.</p>
-	       </div>
-	   
-	       <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-	         <label class="block uppercase tracking-wide text-gray-700 text-xs
-	   font-bold mb-2" for="grid-pass">
-	   	Password
-	         </label>
-	         <input id='progress-up-pass' class="appearance-none block w-full bg-gray-200
-	   text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight
-	   focus:outline-none focus:bg-white focus:border-gray-500"
-	   id="grid-pass" type="password" placeholder="Password">
-	       </div>
-	      </div>
- 	   </details>
+ 	   </div>
 	   
 	   <button type="button" onClick="saveConfig()" class="inline-block px-6
 	py-2.5 bg-red-600 text-white font-medium text-xs leading-tight uppercase
