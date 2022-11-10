@@ -238,15 +238,18 @@ async function uploadOneFile(name, idx) {
     let uplFormData = new FormData(uplform);
     let options = {};
 
-   if(authEnabled) {
-	var username = 'user';
-var password = 'password';
-var basicAuth = 'Basic ' + btoa(username + ':' + password);
-   options = { headers: { 'Authorization': + basicAuth }};
-   }
+    if (authEnabled) {
+        var username = 'user';
+        var password = 'password';
+        var basicAuth = 'Basic ' + btoa(username + ':' + password);
+        options = {
+            headers: {
+                'Authorization': +basicAuth
+            }
+        };
+    }
 
-    await axios.post(uploadURL, uplFormData, options,
-      {
+    await axios.post(uploadURL, uplFormData, options, {
         onUploadProgress: function(e) {
             /*{
               loaded: number;
@@ -370,21 +373,25 @@ async function testUpload(event) {
         type: 'plain/text'
     });
     testForm.append(filesName, blob, 'progress-up-test.txt');
-   let options = {};
-   if(authEnabled) {
-	var username = 'user';
-var password = 'password';
-var basicAuth = 'Basic ' + btoa(username + ':' + password);
-   options = { headers: { 'Authorization': + basicAuth } };
-   }
+    let options = {};
+    if (authEnabled) {
+        var username = 'user';
+        var password = 'password';
+        var basicAuth = 'Basic ' + btoa(username + ':' + password);
+        options = {
+            headers: {
+                'Authorization': +basicAuth
+            }
+        };
+    }
 
     await axios.post(uploadURL, testForm, options).then((resp) => {
-            alert("Test succeeded");
-        }).catch((error) => {
-            alert("Upload failed. Please check endpoint in Setup");
-            alert(error);
-        });
- }
+        alert("Test succeeded");
+    }).catch((error) => {
+        alert("Upload failed. Please check endpoint in Setup");
+        alert(error);
+    });
+}
 
 function testEP() {
     saveConfig();
