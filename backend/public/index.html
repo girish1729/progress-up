@@ -27,7 +27,7 @@ Vue,js, React and Angular" />
 <div class="flex justify-end items-center space-x-2 mx-auto relative">
   <div class="w-14 h-8">
 
-  <label for="dark-mode" class="w-full h-full  rounded-full p-1 flex justify-between cursor-pointer">
+  <label for="dark-mode" class="w-full h-full rounded-full p-1 flex justify-between cursor-pointer">
 
     <span class="hidden dark:inline">&#127774;</span>
     <span class="inline dark:hidden">&#127769; </span>
@@ -44,19 +44,26 @@ Vue,js, React and Angular" />
 </h2>
 
 <!-- XXX tabs -->
-
 <div class="bg-light p7 rounded w-9/12 mx-auto">
   <!-- Tabs -->
   <ul id="tabs" class="inline-flex pt-2 px-1 w-full border-b">
-    <li class="bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t
-border-t border-r border-l -mb-px"><a id="default-tab"
-href="#first">File upload</a></li>
-    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t"><a href="#second">Setup</a></li>
-    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t"><a href="#third">Statistics</a></li>
-	<div id="${all[i]}"></div>
-  </li>
-    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t"><a
-href="#fourth">Help</a></li>
+
+    <li class="bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px">
+	<a id="default-tab" href="#first">File upload</a>
+    </li>
+
+    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
+	<a href="#second">Setup</a>
+    </li> 
+
+    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
+	<a href="#third">Statistics</a>
+    </li>
+
+    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
+	<a href="#fourth">Help</a>
+    </li>
+
   </ul>
 
   <!-- Tab Contents -->
@@ -68,8 +75,8 @@ href="#fourth">Help</a></li>
 
 	<div id='progress-up-form' class="bg-light p-4 rounded mx-auto">
     	  <div class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
-	   <form class='flex justify-center'>
-		<img width="100" height="100"
+	   <form class='flex p-8  justify-center'>
+		<img class="stroke-white dark:bg-white" width="100" height="100"
 src="icons/upload/file-submit.svg" alt="progress-up file submit icon" />
 	       <input id="progress-up-fileInput" name="uploadFiles" type="file" multiple hidden>
 	   </form>
@@ -92,7 +99,6 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	 Reset form
 	</button>
  	
-  	<section id="progress-up-progressArea"> </section>
 
   </div>
 
@@ -351,24 +357,62 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 
 	<img src="images/progress-types.png" alt="Progress-up types" />
 
-<ul class='marker:text-green list-outside list-disc ml-6'>
-  <li> There is also the ability to perform a test Upload to validate the endpoint.  </li>
-  <li>
-	Remember that the configuration is active only for the session.
-  </li>
-
-  <li>
-	There is also statistics for upload and profiling available.
-  </li>
-  <li>
-	If using absolute URL please ensure <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS is enabled</a>.
-  </li>
-</ul>
-
-
+       <ul class='marker:text-green list-outside'>
+         <li> There is also the ability to perform a test Upload to validate the endpoint.  </li>
+         <li>
+       	Remember that the configuration is active only for the session.
+         </li>
+       
+         <li>
+       	There is also statistics for upload and profiling available.
+         </li>
+         <li>
+       	If using absolute URL please ensure <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS is enabled</a>.
+         </li>
+       </ul>
   </div>
 
 </div>
+<!-- XXX tabs -->
+
+<hr/>
+
+<div id="progress-up-progressArea"> </div>
+
+<!--
+<section id="${id}-section" class="m-4 rounded-[12px] border-dark-500
+bg-yellow-100 transition-colors text-light-100 dark:text-white flex flex-row items-start  relative">
+ <div class="py-3 px-6 border-gray-300 text-gray-600 ">
+
+  <div onClick="delItem(${i})" title="Delete" class="absolute cursor-pointer top-0 right-0 mt-2 mr-2" >
+	<img  width="25" height="25" src="icons/misc/trash-icon.svg" />
+  </div>
+
+    <img width="100px" height="100px" src="icons/filetypes/file.svg"
+         class="absolute mt-2 top-0 left-0" />
+
+  <span id="${name}"></span>
+
+      <ul class='mx-10 px-10'>
+      	    <li  class="text-xl font-light leading-relaxed text-gray-800">
+      	    Name: ${name}
+      	    </li>
+      	    <li class="text-xl font-light leading-relaxed text-gray-800">
+      	    Date: ${ts}
+      	    </li>
+      	    <li class="text-xl font-light leading-relaxed text-gray-800">
+      	    Type: ${mime}
+      	    </li>
+      	    <li class="text-xl font-light leading-relaxed text-gray-800">
+      	    Size: ${size} 
+      	    </li>
+      </ul>
+
+      <div class='ldBar absolute bottom-0 right-0 my-8' id="${id}" ></div>
+  </div>
+</section>
+-->
+
 
 <script src="js/uploadProgress.js"></script>
 </body>

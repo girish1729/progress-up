@@ -58,7 +58,6 @@ uplform.addEventListener("drop", drop, false);
 const fileInput = document.getElementById("progress-up-fileInput");
 const progressArea = document.getElementById("progress-up-progressArea");
 const statsArea = document.getElementById("progress-up-statsArea");
-progressArea.innerHTML = "";
 
 uplform.addEventListener("click", () => {
     fileInput.click();
@@ -127,10 +126,10 @@ function setIconImage(name, type) {
         fileIcon = "file.svg";
     }
     span.innerHTML = [
-        '<img width="100px" height="100px" class="thumb" src="',
+        '<img width="70px" height="70px" src="',
         'icons/filetypes/' + fileIcon,
         '" title="', name,
-        '" class="py-4 pl-4 aspect-square" />'
+        '" class="absolute mt-2 top-0 left-0" />'
     ].join('');
     document.getElementById(name).insertBefore(span, null);
 }
@@ -147,10 +146,10 @@ function showThumbnails() {
                     // Render thumbnail.  
                     var span = document.createElement('span');
                     span.innerHTML = [
-                        '<img width="100px" height="100px" class="thumb" src="',
+                        '<img width="70px" height="70px" class="absolute top-0 left-0 thumb" src="',
                         e.target.result,
                         '" title="', theFile.name,
-                        '" class="py-4 pl-4 aspect-square" />'
+        		'" class="absolute mt-2 top-0 left-0" />'
                     ].join('');
                     document.getElementById(theFile.name).insertBefore(span, null);
                 };
@@ -175,34 +174,41 @@ function setupUpload() {
 
         progressHTML.push(
             `
-<section id="${i}-section" class="rounded-md border border-neutral-500 bg-white hover:bg-neutral-600 transition-colors text-black-100 flex flex-row items-start cursor-pointer">
 
-<p id="${name}" class="text-xl font-light leading-relaxed mt-6 mb-4 text-gray-800">
-Name: ${name}
-</p>
-<p class="text-xl font-light leading-relaxed mt-6 mb-4 text-gray-800">
-Date: ${ts}
-</p>
-<p class="text-xl font-light leading-relaxed mt-6 mb-4 text-gray-800">
-Type: ${mime}
-</p>
-<p class="text-xl font-light leading-relaxed mt-6 mb-4 text-gray-800">
-Size: ${size} 
-</p>
+<section id="${id}-section" class="m-4 rounded-[12px] border-dark-500
+bg-yellow-100 transition-colors text-light-100 dark:text-white flex flex-row items-start  relative">
+ <div class="py-3 px-6 border-gray-300 text-gray-600 ">
 
-<div class="py-3 px-6 border-t border-gray-300 text-gray-600">
-	<div class='ldBar' id="${id}" ></div>
-</div>
+  <div onClick="delItem(${i})" title="Delete" class="absolute cursor-pointer top-0 right-0 mt-2 mr-2" >
+	<img  width="25" height="25" src="icons/misc/trash-icon.svg" />
+  </div>
 
-<span onClick="delItem(${i})">
-<img src="icons/misc/trash-icon.svg" />
-</span>
+  <span id="${name}"></span>
+
+      <ul class='mx-10 px-10'>
+      	    <li  class="text-xl font-light leading-relaxed text-gray-800">
+      	    Name: ${name}
+      	    </li>
+      	    <li class="text-xl font-light leading-relaxed text-gray-800">
+      	    Date: ${ts}
+      	    </li>
+      	    <li class="text-xl font-light leading-relaxed text-gray-800">
+      	    Type: ${mime}
+      	    </li>
+      	    <li class="text-xl font-light leading-relaxed text-gray-800">
+      	    Size: ${size} 
+      	    </li>
+      </ul>
+
+      <div class='ldBar absolute bottom-0 right-0 my-8' id="${id}" ></div>
+  </div>
 </section>
+
 `);
 
 
     }
-    progressArea.innerHTML = '<ul>' + progressHTML.join('') + '</ul>';
+    progressArea.innerHTML = progressHTML.join('');
 
     for (var i = 0; i < uploadFileList.length; i++) {
         var selector = '#a' + i;
@@ -220,7 +226,7 @@ function delItem(index) {
     let list = [...uploadFileList];
     list.splice(index, 1);
     uploadFileList = list;
-    el = document.getElementById(index + '-section');
+    el = document.getElementById('a' + index + '-section');
     el.remove();
 
 }
@@ -236,20 +242,7 @@ function uploadAll() {
 
 async function uploadOneFile(name, idx) {
     let uplFormData = new FormData(uplform);
-    let options = {};
-
-    if (authEnabled) {
-        var username = 'user';
-        var password = 'password';
-        var basicAuth = 'Basic ' + btoa(username + ':' + password);
-        options = {
-            headers: {
-                'Authorization': +basicAuth
-            }
-        };
-    }
-
-    await axios.post(uploadURL, uplFormData, options, {
+    let options = {
         onUploadProgress: function(e) {
             /*{
               loaded: number;
@@ -263,7 +256,17 @@ async function uploadOneFile(name, idx) {
             let perc = parseInt(e.progress * 100);
             progressBars[idx].set(perc);
         }
-    }).then((resp) => {
+    };
+
+    if (authEnabled) {
+        var username = 'user';
+        var password = 'password';
+        var basicAuth = 'Basic ' + btoa(username + ':' + password);
+        options['headers'] =  {
+                'Authorization': +basicAuth
+         };
+    }
+    await axios.post(uploadURL, uplFormData, options).then((resp) => {
         spitStatistics(idx)
     }).catch((error) => {
         alert("Upload failed. Please check endpoint in Setup");
@@ -277,8 +280,8 @@ function spitStatistics(idx) {
         totaltime = `${endUploadts - startUploadts}`;
         totalsize = humanFileSize(totalsize);
         statsArea.innerHTML = `
-	<div id="uploadStats">
-		<h2>${totalfiles} files uploaded
+	<div id="uploadStats" >
+		<h2 class="text-5xl leading-tight border-b " >${totalfiles} file(s) uploaded
 			<span class='row-gap'></span>
 		${totalsize} sent
 			<span class='row-gap'></span>
