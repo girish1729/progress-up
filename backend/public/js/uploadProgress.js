@@ -58,6 +58,7 @@ uplform.addEventListener("drop", drop, false);
 const fileInput = document.getElementById("progress-up-fileInput");
 const progressArea = document.getElementById("progress-up-progressArea");
 const statsArea = document.getElementById("progress-up-statsArea");
+const configSummary = document.getElementById("progress-up-configSummary");
 
 uplform.addEventListener("click", () => {
     fileInput.click();
@@ -76,6 +77,8 @@ function enableUploadButton() {
 function clearAll() {
     progressArea.innerHTML = '';
     statsArea.innerHTML = '';
+    configSummary.innerHTML = '';
+    uploadFileList = [];
     uploadFileList = [];
     progressBars = [];
     totalfiles = 0;
@@ -243,47 +246,19 @@ function delItem(index) {
 
 }
 
-function uploadAll() {
-    console.log("Starting upload...");
-    startUploadts = Date.now();
-    for (i = 0; i < uploadFileList.length; i++) {
-        f = uploadFileList[i].name;
-        uploadOneFile(f, i);
-    }
-}
-
-async function uploadOneFile(name, idx) {
-    let uplFormData = new FormData(uplform);
-    let options = {
-        onUploadProgress: function(e) {
-            /*{
-              loaded: number;
-              total?: number;
-              progress?: number; // in range [0..1]
-              bytes: number; // how many bytes have been transferred since the last trigger (delta)
-              estimated?: number; // estimated time in seconds
-              rate?: number; // upload speed in bytes
-              upload: true; // upload sign
-            }*/
-            let perc = parseInt(e.progress * 100);
-            progressBars[idx].set(perc);
-        }
-    };
-
-    if (authEnabled) {
-        var username = 'user';
-        var password = 'password';
-        var basicAuth = 'Basic ' + btoa(username + ':' + password);
-        options['headers'] =  {
-                'Authorization': +basicAuth
-         };
-    }
-    await axios.post(uploadURL, uplFormData, options).then((resp) => {
-        spitStatistics(idx)
-    }).catch((error) => {
-        alert("Upload failed. Please check endpoint in Setup");
-        alert(error);
-    });
+function dumpConfigSummary() {
+configSummary.innerHTML = `
+	<div id="config">
+		<h2 class="leading-tight pb-2">
+			&#128202; Progress type <span
+class='text-sm'>${preset}</span>  
+			 &#128228; Upload URL <span
+class='text-sm'>${uploadURL}</span> 
+		&#128218; FilesName <span
+class='text-sm'>${filesName}</span>
+		</h2>
+	</div>
+	`;
 }
 
 function spitStatistics(idx) {
@@ -292,12 +267,9 @@ function spitStatistics(idx) {
         totaltime = `${endUploadts - startUploadts}`;
         totalsize = humanFileSize(totalsize);
         statsArea.innerHTML = `
-	<div id="uploadStats" >
-		<h2 class="text-5xl leading-tight border-b " >${totalfiles} file(s) uploaded
-			<span class='row-gap'></span>
-		${totalsize} sent
-			<span class='row-gap'></span>
-		in ${totaltime} milliseconds</h2>
+	<div id="uploadStats">
+	<h2 class="text-5xl leading-tight border-b">
+		${totalfiles} file(s) uploaded ${totalsize} sent in ${totaltime} milliseconds</h2>
 	</div>
 	`;
 
@@ -340,6 +312,50 @@ font-medium text-gray-900">${id}</td>
     }
 }
 
+
+async function uploadOneFile(name, idx) {
+    let uplFormData = new FormData(uplform);
+    let options = {
+        onUploadProgress: function(e) {
+            /*{
+              loaded: number;
+              total?: number;
+              progress?: number; // in range [0..1]
+              bytes: number; // how many bytes have been transferred since the last trigger (delta)
+              estimated?: number; // estimated time in seconds
+              rate?: number; // upload speed in bytes
+              upload: true; // upload sign
+            }*/
+            let perc = parseInt(e.progress * 100);
+            progressBars[idx].set(perc);
+        }
+    };
+
+    if (authEnabled) {
+        var username = 'user';
+        var password = 'password';
+        var basicAuth = 'Basic ' + btoa(username + ':' + password);
+        options['headers'] =  {
+                'Authorization': +basicAuth
+         };
+    }
+    await axios.post(uploadURL, uplFormData, options).then((resp) => {
+        spitStatistics(idx)
+    }).catch((error) => {
+        alert("Upload failed. Please check endpoint in Setup");
+        alert(error);
+    });
+}
+
+function uploadAll() {
+    console.log("Starting upload...");
+    startUploadts = Date.now();
+    for (i = 0; i < uploadFileList.length; i++) {
+        f = uploadFileList[i].name;
+        uploadOneFile(f, i);
+    }
+}
+
 /* XXX Setup tab functions */
 
 /* XXX Globals */
@@ -366,6 +382,7 @@ function toggleAuthQ(val) {
 function initApp() {
     document.getElementById("progress-up-uploadURL").value = uploadURL;
     document.getElementById("progress-up-filesName").value = filesName;
+    dumpConfigSummary();
 }
 
 function saveConfig() {
@@ -378,6 +395,7 @@ function saveConfig() {
     pass = document.getElementById("progress-up-pass").value;
 
     console.log(uploadURL, filesName, authEnabled, authType, user, pass);
+    dumpConfigSummary();
 }
 
 async function testUpload(event) {
@@ -447,6 +465,7 @@ function setIndicator() {
         default:
             break;
     }
+    dumpConfigSummary();
 }
 
 /* XXX Statistics tab functions */
