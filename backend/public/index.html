@@ -23,7 +23,6 @@ Vue,js, React and Angular" />
 <body class="dark:bg-gray-800 dark:text-white"  onload="initApp()">
 
 <!-- Dark mode controls -->
-
 <div class="flex justify-end items-center space-x-2 mx-auto relative">
   <div class="w-14 h-8">
 
@@ -36,7 +35,6 @@ Vue,js, React and Angular" />
   <input type="checkbox" id="dark-mode" class='hidden' onchange="document.documentElement.classList.toggle('dark')" />
 </div>
 </div>
-
 
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 
@@ -91,7 +89,7 @@ src="icons/upload/file-submit.svg" alt="progress-up file submit icon" />
 	uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg
 	focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0
 	active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out
-	opacity-60" disabled>Begin Uploading files
+	opacity-20" disabled>Begin Uploading files
 	</button>
 	
 	<button type="button" onClick="clearAll()" class="inline-block
@@ -378,41 +376,6 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 <hr/>
 
 <div id="progress-up-progressArea"> </div>
-
-<!--
-<section id="${id}-section" class="m-4 rounded-[12px] border-dark-500
-bg-yellow-100 transition-colors text-light-100 dark:text-white flex flex-row items-start  relative">
- <div class="py-3 px-6 border-gray-300 text-gray-600 ">
-
-  <div onClick="delItem(${i})" title="Delete" class="absolute cursor-pointer top-0 right-0 mt-2 mr-2" >
-	<img  width="25" height="25" src="icons/misc/trash-icon.svg" />
-  </div>
-
-    <img width="100px" height="100px" src="icons/filetypes/file.svg"
-         class="absolute mt-2 top-0 left-0" />
-
-  <span id="${name}"></span>
-
-      <ul class='mx-10 px-10'>
-      	    <li  class="text-xl font-light leading-relaxed text-gray-800">
-      	    Name: ${name}
-      	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800">
-      	    Date: ${ts}
-      	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800">
-      	    Type: ${mime}
-      	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800">
-      	    Size: ${size} 
-      	    </li>
-      </ul>
-
-      <div class='ldBar absolute bottom-0 right-0 my-8' id="${id}" ></div>
-  </div>
-</section>
--->
-
 
 <script src="js/uploadProgress.js"></script>
 </body>

@@ -70,7 +70,7 @@ fileInput.onchange = ({
 function enableUploadButton() {
     upBut = document.getElementById("upButton");
     upBut.removeAttribute('disabled');
-    upBut.classList.remove('opacity-60');
+    upBut.classList.remove('opacity-20');
 }
 
 function clearAll() {
@@ -120,18 +120,18 @@ function humanFileSize(size) {
 function setIconImage(name, type) {
     type = type.split('/')[0];
     console.log(type);
-    var span = document.createElement('span');
     var fileIcon = fileTypeIcons[type];
     if (fileIcon == undefined) {
         fileIcon = "file.svg";
     }
-    span.innerHTML = [
-        '<img width="70px" height="70px" src="',
+    var icon = [
+        '<img width="125" height="125" src="',
         'icons/filetypes/' + fileIcon,
         '" title="', name,
-        '" class="absolute mt-2 top-0 left-0" />'
+        '" alt="', name,
+        '" class="h-9 w-9" />'
     ].join('');
-    document.getElementById(name).insertBefore(span, null);
+    document.getElementById(name).innerHTML = icon;
 }
 
 function showThumbnails() {
@@ -143,18 +143,16 @@ function showThumbnails() {
             // Closure to capture the file information.  
             reader.onload = (function(theFile) {
                 return function(e) {
-                    // Render thumbnail.  
-                    var span = document.createElement('span');
-                    span.innerHTML = [
-                        '<img width="70px" height="70px" class="absolute top-0 left-0 thumb" src="',
+                    var thumb = [
+                        '<img width="125" height="125" src="',
                         e.target.result,
                         '" title="', theFile.name,
-        		'" class="absolute mt-2 top-0 left-0" />'
+        		'" alt="', theFile.name,
+        		'" class="w-12 h-12" />'
                     ].join('');
-                    document.getElementById(theFile.name).insertBefore(span, null);
+		    document.getElementById(theFile.name).innerHTML = thumb;
                 };
             })(f);
-            // Read in the image file as a data URL.  
             reader.readAsDataURL(f);
         }
     }
@@ -174,36 +172,50 @@ function setupUpload() {
 
         progressHTML.push(
             `
+<section id="${id}-section" class="m-4 p-4 mt-4 mb-4 transition-colors
+text-light-100 dark:text-white mx-auto">
+ <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
+border-gray-300 text-gray-600 dark:text-white relative">
 
-<section id="${id}-section" class="m-4 rounded-[12px] border-dark-500
-bg-yellow-100 transition-colors text-light-100 dark:text-white flex flex-row items-start  relative">
- <div class="py-3 px-6 border-gray-300 text-gray-600 ">
-
-  <div onClick="delItem(${i})" title="Delete" class="absolute cursor-pointer top-0 right-0 mt-2 mr-2" >
-	<img  width="25" height="25" src="icons/misc/trash-icon.svg" />
+  <div  onClick="delItem(${i})" title="Delete" class="absolute
+cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
+	<img width="25" height="25" src="icons/misc/trash-icon.svg" />
   </div>
 
-  <span id="${name}"></span>
-
-      <ul class='mx-10 px-10'>
-      	    <li  class="text-xl font-light leading-relaxed text-gray-800">
+   <div class="flex flex-wrap -mx-2 mb-8">
+      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+         <div class="h-12 text-sm text-grey-dark flex items-left
+justify-left">
+		<div id="${name}"></div>
+         </div>
+      </div>
+      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+         <div class="h-12 text-sm text-grey-dark flex items-left
+justify-left">
+      <ul>
+      	    <li  class="text-xl font-light leading-relaxed text-gray-800
+dark:text-white">
       	    Name: ${name}
       	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800">
+      	    <li class="text-xl font-light leading-relaxed text-gray-800
+dark:text-white">
       	    Date: ${ts}
       	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800">
+      	    <li class="text-xl font-light leading-relaxed text-gray-800
+dark:text-white">
       	    Type: ${mime}
       	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800">
+      	    <li class="text-xl font-light leading-relaxed text-gray-800
+dark:text-white">
       	    Size: ${size} 
       	    </li>
       </ul>
+   </div>
 
-      <div class='ldBar absolute bottom-0 right-0 my-8' id="${id}" ></div>
+      	<div class='ldBar bottom-0 right-0 pb-8' id="${id}" ></div>
+
   </div>
 </section>
-
 `);
 
 
@@ -317,7 +329,7 @@ font-medium text-gray-900">${id}</td>
     `);
 
         upBut.setAttribute('disabled', true);
-        upBut.classList.add('opacity-60');
+        upBut.classList.add('opacity-20');
         populateStats();
         progressBars = [];
         totalfiles = 0;
