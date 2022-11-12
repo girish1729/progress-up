@@ -1,20 +1,4 @@
 <template>
- <div>
-
-<!-- Dark mode controls -->
-<div class="flex justify-end items-center space-x-2 mx-auto relative">
-
-  <div class="w-14 h-8">
-
-  <label for="dark-mode" class="w-full h-full rounded-full p-1 flex justify-between cursor-pointer">
-
-    <span class="hidden dark:inline">&#127774;</span>
-    <span class="inline dark:hidden">&#127769; </span>
-  </label>
-
-  <input type="checkbox" id="dark-mode" class='hidden' onchange="document.documentElement.classList.toggle('dark')" />
-</div>
-</div>
 
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 
@@ -41,7 +25,6 @@
     <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
 	<a href="#fourth">Help</a>
     </li>
-
   </ul>
 
   <!-- Tab Contents -->
@@ -87,7 +70,6 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	 Reset form
 	</button>
  	
-
   </div>
 
 <!-- Second tab -->
@@ -245,19 +227,23 @@ px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-ti
 	          </thead>
 	          <tbody id="progress-up-statsTable">
 
+      <div v-for="(stat, index) in statsTable"
+        :key="index" >
+
 	            <tr class="bg-gray-100 border-b">
 	              <td class="px-6 py-4 whitespace-nowrap text-sm
-font-medium text-gray-900">{{id}}</td>
+font-medium text-gray-900">{{stat.id}}</td>
 	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-			   {{ts}}
+			   {{stat.ts}}
 	              </td>
 	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-			   {{status}}
+			   {{stat.status}}
 	              </td>
 	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-			   {{details}}
+			   {{stat.details}}
 	              </td>
 	            </tr>
+	</div>
 
 		   </tbody>
 	        </table>
@@ -265,7 +251,6 @@ font-medium text-gray-900">{{id}}</td>
 	    </div>
 	  </div>
 	</div>
-
    </div>
 
 <!-- Fourth tab -->
@@ -278,6 +263,7 @@ font-medium text-gray-900">{{id}}</td>
 	        <table class="min-w-full">
 	          <thead class="bg-light border-b">
 	            <tr>
+
 	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
 	               Param
 	              </th>
@@ -376,52 +362,38 @@ py-4 whitespace-nowrap"> See below for possible options </td>
        </ul>
   </div>
 
+  </div>
 </div>
 <!-- XXX tabs -->
-
-<!--
-       <li class="row">
-         <i class="fas fa-3x fa-file-alt"></i>
-          <div class='content'>
-           <div class='details'>
-            <span>{{progressInfo.fileName}}</span>
-            <span class='percent'> {{progressInfo.percentage}} %</span>
-           </div>
-           <div class='progress-bar'>
-                <div class="progress" :style="{ width: progressInfo.percentage + '%' }"> </div>
-            </div>
-            <span class="size">{{progressInfo.size}} Bytes</span>
-          </div>
-       </li>
--->
-
 
 <div id="progress-up-progressArea"> 
   <div v-if="progressInfos">
       <div v-for="(progressInfo, index) in progressInfos"
         :key="index" >
 
-<section :id={{id}}-section" class="m-4 p-4 mt-4 mb-4 transition-colors
+<section :id="`${id}-section`" class="m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white mx-auto">
  <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
 border-gray-300 text-gray-600 dark:text-white relative">
 
-  <div  v-on:click="delItem({{i}})" title="Delete" class="absolute
+  <div  v-on:click="`delItem(${i})`" title="Delete" class="absolute
 cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
 	<img width="25" height="25" src="https://raw.githubusercontent.com/girish1729/progress-up/tree/main/backend/public/icons/misc/trash-icon.svg" />
   </div>
 
-   <div class="flex flex-wrap -mx-2 mb-8">
+  <div class="flex flex-wrap -mx-2 mb-8">
+      <!--first col -->
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div class="h-12 text-sm text-grey-dark flex items-left
 justify-left">
-		<div id="{{progressInfo.name}}"></div>
+		<div :id="`${progressInfo.name}`"></div>
          </div>
       </div>
+
+      <!--second col -->
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
-         <div class="h-12 text-sm text-grey-dark flex items-left
-justify-left">
-      <ul>
+        <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
+          <ul>
       	    <li  class="text-xl font-light leading-relaxed text-gray-800
 dark:text-white">
       	    Name: {{progressInfo.name}}
@@ -438,10 +410,12 @@ dark:text-white">
 dark:text-white">
       	    Size: {{progressInfo.size}} 
       	    </li>
-      </ul>
-   </div>
+          </ul>
+        </div>
+       </div>
+  </div>
+      <div class='ldBar bottom-0 right-0 pb-8' :id="id" ></div>
 
-      	<div class='ldBar bottom-0 right-0 pb-8' id="{{id}}" ></div>
 
   </div>
 </section>
@@ -450,7 +424,8 @@ dark:text-white">
     </div>
   </div>
 
- </div>
+
+
 </template>
 
 
