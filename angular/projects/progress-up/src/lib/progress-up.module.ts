@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressUpComponent } from './progress-up.component';
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -11,7 +12,8 @@ import { ProgressUpComponent } from './progress-up.component';
     ProgressUpComponent
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    FormsModule
   ],
 })
 

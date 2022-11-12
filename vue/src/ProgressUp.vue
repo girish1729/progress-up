@@ -445,7 +445,7 @@ dark:text-white">
 
 <script>
 import axios from "axios";
-//import LoadingBar from "./assets/loading-bar.js";
+import LoadingBar from "./assets/loading-bar.js";
 
 
 export default {
@@ -555,7 +555,6 @@ populateStats() {
 },
 
 
-/*
 setupUpload() {
     var progressHTML = [];
     for (var i = 0; i < uploadFileList.length; i++) {
@@ -580,7 +579,6 @@ setupUpload() {
     showThumbnails();
     enableUploadButton();
 },
-*/
 
 delItem(index) {
     let list = [...uploadFileList];
@@ -591,7 +589,6 @@ delItem(index) {
 
 },
 
-/*
 spitStatistics(idx) {
     if (idx == uploadFileList.length - 1) {
         endUploadts = Date.now();
@@ -619,7 +616,6 @@ ${totaltime} ms`;
         endUploadts = 0;
     }
 },
-*/
 
 async uploadOneFile(name, idx) {
     let uplFormData = new FormData(uplform);
@@ -646,7 +642,6 @@ async uploadOneFile(name, idx) {
     });
 },
 
-/*
 uploadAll() {
     console.log("Starting upload...");
     startUploadts = Date.now();
@@ -656,7 +651,6 @@ uploadAll() {
     }
 },
 
-*/
 toggleAuthQ(val) {
     const authSection = document.querySelector("#progress-up-authsection");
     authSection.classList.toggle("hidden");
