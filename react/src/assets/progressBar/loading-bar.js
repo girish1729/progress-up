@@ -88,20 +88,13 @@ presets = {
     "bbox": "10 10 80 80"
   }
 };
-
-function import$(obj, src){
-  var own = {}.hasOwnProperty;
-  for (var key in src) if (own.call(src, key)) obj[key] = src[key];
-  return obj;
-}
 simpleStr = function(arr){
   return arr.join('');
 };
 wrap = function(content){
   return "data:image/svg+xml;base64," + btoa(content);
 };
-
-export const LoadingBar = (() => {
+(function(){
   var make, handler, ldBar;
   make = {
     head: function(viewBox){
@@ -799,4 +792,8 @@ export const LoadingBar = (() => {
     return results$;
   }, false);
 })();
-export default LoadingBar;
+function import$(obj, src){
+  var own = {}.hasOwnProperty;
+  for (var key in src) if (own.call(src, key)) obj[key] = src[key];
+  return obj;
+}

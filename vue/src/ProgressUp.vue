@@ -617,8 +617,9 @@ ${totaltime} ms`;
     }
 },
 
-async uploadOneFile(name, idx) {
-    let uplFormData = new FormData(uplform);
+async uploadOneFile(file, idx) {
+    let uplFormData = new FormData();
+    formData.append(filesName, file);
     let options = {
         onUploadProgress: function(e) {
             let perc = parseInt(e.progress * 100);
