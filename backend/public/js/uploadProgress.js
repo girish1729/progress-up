@@ -176,26 +176,22 @@ function setupUpload() {
         progressHTML.push(
             `
 <section id="${id}-section" class="m-4 p-4 mt-4 mb-4 transition-colors
-text-light-100 dark:text-white mx-auto">
- <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
-border-gray-300 text-gray-600 dark:text-white relative">
+text-light-100 dark:text-white">
+ <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
 
-  <div  onClick="delItem(${i})" title="Delete" class="absolute
-cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
-	<img width="25" height="25" src="icons/misc/trash-icon.svg" />
-  </div>
+    <div  onClick="delItem(${i})" title="Delete" class="absolute cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
+          <img width="25" height="25" src="icons/misc/trash-icon.svg" />
+    </div>
 
-   <div class="flex flex-wrap -mx-2 mb-8">
+    <div class="flex flex-wrap -mx-2 mb-8">
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
-         <div class="h-12 text-sm text-grey-dark flex items-left
-justify-left">
+         <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
 		<div id="${name}"></div>
          </div>
       </div>
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
-         <div class="h-12 text-sm text-grey-dark flex items-left
-justify-left">
-      <ul>
+        <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
+         <ul>
       	    <li  class="text-xl font-light leading-relaxed text-gray-800
 dark:text-white">
       	    Name: ${name}
@@ -212,12 +208,18 @@ dark:text-white">
 dark:text-white">
       	    Size: ${size} 
       	    </li>
-      </ul>
-   </div>
+         </ul>
+        </div>
+       </div>
 
-      	<div class='ldBar bottom-0 right-0 pb-8' id="${id}" ></div>
+      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+         <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
+    		<div class='ldBar' id="${id}" ></div>
+         </div>
+      </div>
+    </div>
 
-  </div>
+ </div>
 </section>
 `);
 
