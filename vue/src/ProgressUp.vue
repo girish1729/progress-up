@@ -100,7 +100,7 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	   text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	   focus:outline-none focus:bg-light" type="text"
 	   placeholder="URL to post [cross origin or absolute URL needs CORS]">
-	         <p class="text-red-500 text-xs italic">Please fill out this field.</p>
+	         <p class="text-red-500 text-xs italic">Please fill out field.</p>
 	       </div>
 	   
 	       <div class="w-full md:w-1/2 px-3">
@@ -150,12 +150,12 @@ v-on:change="setIndicator()" class="block appearance-none w-full bg-gray-200 bor
 	         <span class="text-sm">
 	           HTTP Auth required?
 	         </span>
-	         <input v-on:change="toggleAuthQ(this)" id='progress-up-authenable' class="mr-2 leading-tight" type="checkbox">
+	         <input v-on:change="toggleAuthQ(" id='authEnabled' class="mr-2 leading-tight" type="checkbox">
 	       </label>
 	      </div>
 	     </div>
 	   
-             <div id='progress-up-authsection' class="hidden">
+             <div v-if="authEnabled" id='progress-up-authsection' class="hidden">
 	        <div class="flex flex-wrap -mx-3 mb-6">
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
 	            <label class="block uppercase tracking-wide
@@ -185,7 +185,7 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 	      text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	      focus:outline-none focus:bg-light"  type="text"
 	      placeholder="username">
-	            <p class="text-red-500 text-xs italic">Please fill out this field.</p>
+	            <p class="text-red-500 text-xs italic">Please fill out field.</p>
 	          </div>
 	      
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
@@ -240,7 +240,6 @@ px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-ti
 	          </thead>
 	          <tbody id="progress-up-statsTable">
 
-<!--
      <div v-for="(stat, index) in statsTable" :key="index" >
 
 	            <tr class="bg-gray-100 border-b">
@@ -257,7 +256,6 @@ font-medium text-gray-900">{{stat.id}}</td>
 	              </td>
 	            </tr>
 	</div>
--->
 
 		   </tbody>
 	        </table>
@@ -381,64 +379,56 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 <!-- XXX tabs -->
 
 <div id="progress-up-progressArea"> 
-  <div v-if="progressInfos">
-      <div v-for="(progressInfo, index) in progressInfos"
-        :key="index" >
-
-<section :id="`${id}-section`" class="m-4 p-4 mt-4 mb-4 transition-colors
-text-light-100 dark:text-white mx-auto">
- <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
-border-gray-300 text-gray-600 dark:text-white relative">
-
-  <div  v-on:click="`delItem(${i})`" title="Delete" class="absolute
-cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
-	<img width="25" height="25" src="https://raw.githubusercontent.com/girish1729/progress-up/tree/main/backend/public/icons/misc/trash-icon.svg" />
-  </div>
-
-  <div class="flex flex-wrap -mx-2 mb-8">
-      <!--first col -->
-      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
-         <div class="h-12 text-sm text-grey-dark flex items-left
-justify-left">
-		<div :id="`${progressInfo.name}`"></div>
-         </div>
+  <div v-for="(file,id) in uploadFileInfos" :key = "id" >
+    <section class="m-4 p-4 mt-4 mb-4 transition-colors
+    text-light-100 dark:text-white mx-auto">
+     <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
+    border-gray-300 text-gray-600 dark:text-white relative">
+    
+      <div v-on:click="delItem(id)" title="Delete" class="absolute
+    cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
+    	<img width="25" height="25" src="assets/icons/misc/trash-icon.svg" />
       </div>
-
-      <!--second col -->
-	<!--
-      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
-        <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
-          <ul>
-      	    <li  class="text-xl font-light leading-relaxed text-gray-800
-dark:text-white">
-      	    Name: {{progressInfo.name}}
-      	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800
-dark:text-white">
-      	    Date: {{progressInfo.ts}}
-      	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800
-dark:text-white">
-      	    Type: {{progressInfo.mime}}
-      	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800
-dark:text-white">
-      	    Size: {{progressInfo.size}} 
-      	    </li>
-          </ul>
-        </div>
-       </div>
-      -->
-  </div>
-
-      <div class='ldBar bottom-0 right-0 pb-8' :id="id" ></div>
-
-  </div>
-</section>
-
+    
+      <div class="flex flex-wrap -mx-2 mb-8">
+          <!--first col -->
+          <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+             <div class="h-12 text-sm text-grey-dark flex items-left
+    justify-left">
+                 <img width="125" height="125" src="file.imagesrc" title="file.name" alt="file.name" class="w-12 h-12" />
+             </div>
+          </div>
+    
+          <!--second col -->
+          <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+            <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
+              <ul>
+          	    <li  class="text-xl font-light leading-relaxed text-gray-800
+    dark:text-white">
+          	    Name: {{file.name}}
+          	    </li>
+          	    <li class="text-xl font-light leading-relaxed text-gray-800
+    dark:text-white">
+          	    Date: {{file.ts}}
+          	    </li>
+          	    <li class="text-xl font-light leading-relaxed text-gray-800
+    dark:text-white">
+          	    Type: {{file.mime}}
+          	    </li>
+          	    <li class="text-xl font-light leading-relaxed text-gray-800
+    dark:text-white">
+          	    Size: {{file.size}} 
+          	    </li>
+              </ul>
+            </div>
+           </div>
       </div>
-    </div>
+          <div class='ldBar bottom-0 right-0 pb-8' id="file.id" ></div>
+      </div>
+    </section>
   </div>
+</div>
+
 
 </template>
 
@@ -457,7 +447,7 @@ export default {
   data() {
     return {
       Files: undefined,
-      progressInfos: [],
+      uploadFileInfos: [],
     };
   },
 
@@ -466,7 +456,7 @@ dragover(evt) {
 	evt.preventDefault();
   },
   drop(evt) {
-	this.Files = evt.DataTransfer.files;
+	Files = evt.DataTransfer.files;
   },
   openFileBrowser() {
       document.getElementById("fileInput").click();
@@ -474,9 +464,9 @@ dragover(evt) {
   uploadFile(file, onUploadProgress) {
     let formData = new FormData();
 
-    formData.append(this.filesName, file);
+    formData.append(filesName, file);
 
-    return axios.post(this.uploadURL, formData, {
+    return axios.post(uploadURL, formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       },
@@ -485,15 +475,16 @@ dragover(evt) {
   },
 
     uploadProgress(idx, file) {
-      this.progressInfos[idx] = { percentage: 0, fileName: file.name,
+      uploadFileInfos[idx] = { percentage: 0, fileName: file.name,
 size: file.size };
 
-      this.uploadFile(file, (event) => {
-        this.progressInfos[idx].percentage = Math.round(100 * event.loaded / event.total);
+      uploadFile(file, (event) => {
+        uploadFileInfos[idx].percentage = Math.round(100 * event.loaded / event.total);
       })
         .then((response) => {
       });
     },
+
 fileSelectFinish(target) {
     let selectedFiles = target.files;
     uploadFileList = selectedFiles;
@@ -508,77 +499,60 @@ humanFileSize(size) {
     );
 },
 
-setIconImage(name, type) {
-    type = type.split('/')[0];
-    console.log(type);
-    var fileIcon = fileTypeIcons[type];
-    if (fileIcon == undefined) {
-        fileIcon = "file.svg";
-    }
-    var icon = [
-        '<img width="125" height="125" src="',
-	'https://raw.githubusercontent.com/girish1729/progress-up/tree/main/backend/public/icons/filetypes/' + fileIcon,
-        '" title="', name,
-        '" alt="', name,
-        '" class="h-9 w-9" />'
-    ].join('');
-    document.getElementById(name).innerHTML = icon;
+populateStats() {
+    statsTableDOM = document.getElementById("progress-up-statsTable");
 },
 
-showThumbnails() {
-    for (var i = 0, f; f = uploadFileList[i]; i++) {
-        if (!f.type.match('image.*')) {
-            setIconImage(f.name, f.type);
+    buildThumb(f: File, type: string) {
+        type = type.split('/')[0];
+
+        if (type != 'image') {
+            var fileIcon = this.fileTypeIcons[type];
+            if (fileIcon == undefined) {
+                fileIcon = "file.svg";
+            }
+            return 'assets/icons/filetypes/' + fileIcon;
         } else {
             var reader = new FileReader();
-            // Closure to capture the file information.  
             reader.onload = (function(theFile) {
                 return function(e) {
-                    var thumb = [
-                        '<img width="125" height="125" src="',
-                        e.target.result,
-                        '" title="', theFile.name,
-        		'" alt="', theFile.name,
-        		'" class="w-12 h-12" />'
-                    ].join('');
-		    document.getElementById(theFile.name).innerHTML = thumb;
+                    return e.target ? e.target.result : '';
                 };
             })(f);
             reader.readAsDataURL(f);
+            return;
         }
-    }
-},
+    },
 
-populateStats() {
-    statsTableDOM = document.getElementById("progress-up-statsTable");
-    statsTableDOM.innerHTML = statsTable.join('');
-},
+    setupUpload() {
+        for (var i = 0; i < this.uploadFileList.length; i++) {
+            let f = this.uploadFileList[i];
+            let ts = f.lastModifiedDate.toLocaleDateString();
+            let name = f.name;
+            let size = this.humanFileSize(f.size);
+            let mime = f.type;
+            let id = 'a' + i;
+            let imagesrc = String(this.buildThumb(f, mime));
+            this.uploadFileInfos.push({
+                ts,
+                name,
+                size,
+                mime,
+                id,
+                imagesrc
+            });
 
+            var bar = new ldBar('#' + info["id"], {
+                preset: this.preset
+            });
+            bar.set(0);
 
-setupUpload() {
-    var progressHTML = [];
-    for (var i = 0; i < uploadFileList.length; i++) {
-        let f = uploadFileList[i];
-        let ts = f.lastModifiedDate.toLocaleDateString();
-        let name = f.name;
-        totalsize += f.size;
-        let size = humanFileSize(f.size);
-        let mime = f.type;
-        let id = 'a' + i;
-        totalfiles += 1;
-    }
-
-    for (var i = 0; i < uploadFileList.length; i++) {
-        var selector = '#a' + i;
-        var bar = new LoadingBar.ldBar(selector, {
-            preset: preset
-        });
-        bar.set(0);
-        progressBars.push(bar);
-    }
-    showThumbnails();
-    enableUploadButton();
-},
+            this.progressBars.push(bar);
+            this.totalsize += f.size;
+            this.totalfiles += 1;
+        }
+        this.disableUpload = false;
+ },
 
 delItem(index) {
     let list = [...uploadFileList];
@@ -748,9 +722,9 @@ setIndicator() {
 
 
     uploadAllFiles(files) {
-      this.progressInfos = []; 
-      for (let i = 0; i < files.length; i++) {
-        this.uploadProgress(i, files[i]);
+      uploadFileInfos = []; 
+      for (let i = 0; i < uploadFileInfos.length; i++) {
+        uploadProgress(i, uploadFileInfos[i]);
       }
     },
 
@@ -761,7 +735,7 @@ enableUploadButton() {
     upBut.classList.remove('opacity-20');
 },
  clearAll() {
-      this.progressInfos = []; 
+      progressInfos = []; 
     progressArea.innerHTML = '';
     statsArea.innerHTML = '';
     configSummary.innerHTML = '';
@@ -780,8 +754,8 @@ enableUploadButton() {
 
     },
     onChange(event) {
-      this.Files = event.target.files;
-      uploadAllFiles(this.Files);
+      Files = event.target.files;
+      uploadAllFiles(Files);
     },
 
 

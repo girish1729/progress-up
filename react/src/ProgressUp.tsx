@@ -8,7 +8,7 @@ import axios from "axios";
 
 function ProgressUp(props: any) {
 
-        let [progFiles, setProg] = useState <Array<any>>([]);
+        let [uploadFileInfos, setProg] = useState <Array<any>>([]);
         const url = props.uploadURL;
 
         const uploadOneFile = async (file:File, idx: Number ) => {
@@ -61,13 +61,13 @@ function ProgressUp(props: any) {
                     const fileName = files[i].name;
                     const size = files[i].size;
                     formData.append(props.filesName, files[i]);
-                    progFiles.push({
+                    uploadFileInfos.push({
                         fileName,
                         size,
                         progressPercent: 0
                     });
                     uploadForm(fileName, formData);
-                setProg(progFiles);
+                setProg(uploadFileInfos);
             }
         };
 	*/
@@ -163,83 +163,61 @@ let fileTypeIcons = {
         return (ret);
     };
 
-    const setIconImage = (name:string, type:string) => {
+    const buildThumb = (f: File, type: string) => {
         type = type.split('/')[0];
-        console.log(type);
-        var fileIcon = fileTypeIcons[type];
-        if (fileIcon == undefined) {
-            fileIcon = "file.svg";
-        }
-        var icon = [
-            '<img width="125" height="125" src="',
-            'https://raw.githubusercontent.com/girish1729/progress-up/tree/main/backend/public/icons/filetypes/' + fileIcon,
-            '" title="', name,
-            '" alt="', name,
-            '" className="h-9 w-9" />'
-        ].join('');
-        //document.getElementById(name).innerHTML = icon;
-    };
 
-    
-     const showThumbnails = ( ) => {
-        for (var i = 0, f; f = uploadFileList[i]; i++) {
-            if (!f.type.match('image.*')) {
-                setIconImage(f.name, f.type);
-            } else {
-                var reader = new FileReader();
-                // Closure to capture the file information.  
-                reader.onload = (function(theFile) {
-                    return function(e) {
-                        var thumb = [
-                            '<img width="125" height="125" src="',
-                            e.target ? e.target.result: '',
-                            '" title="', theFile.name,
-                            '" alt="', theFile.name,
-                            '" className="w-12 h-12" />'
-                        ].join('');
-                        //document.getElementById(theFile.name).innerHTML = thumb;
-                    };
-                })(f);
-                reader.readAsDataURL(f);
+        if (type != 'image') {
+            var fileIcon = this.fileTypeIcons[type];
+            if (fileIcon == undefined) {
+                fileIcon = "file.svg";
             }
+            return 'assets/icons/filetypes/' + fileIcon;
+        } else {
+            var reader = new FileReader();
+            reader.onload = (function(theFile) {
+                return function(e) {
+                    return e.target ? e.target.result : '';
+                };
+            })(f);
+            reader.readAsDataURL(f);
+            return;
         }
     };
 
     const setupUpload = () => {
-        for (var i = 0; i < uploadFileList.length; i++) {
-            let f = uploadFileList[i];
+        for (var i = 0; i < this.uploadFileList.length; i++) {
+            let f = this.uploadFileList[i];
             let ts = f.lastModifiedDate.toLocaleDateString();
             let name = f.name;
-            totalsize += f.size;
-            let size:any = humanFileSize(f.size);
+            let size = this.humanFileSize(f.size);
             let mime = f.type;
             let id = 'a' + i;
-            totalfiles += 1;
-        }
+            let imagesrc = String(this.buildThumb(f, mime));
+            this.uploadFileInfos.push({
+                ts,
+                name,
+                size,
+                mime,
+                id,
+                imagesrc
+            });
 
-        for (var i = 0; i < uploadFileList.length; i++) {
-            var selector = '#a' + i;
-            var bar = new ldBar(selector, {
-                preset: preset
+            var bar = new ldBar('#' + info["id"], {
+                preset: this.preset
             });
             bar.set(0);
-            progressBars.push(bar);
+
+            this.progressBars.push(bar);
+            this.totalsize += f.size;
+            this.totalfiles += 1;
         }
-
-        showThumbnails();
-
-	disableUpload = false;
+        this.disableUpload = false;
     };
 
     const delItem = (index: number) => {
-        let list = [...uploadFileList];
+        let list = [...uploadFileInfo];
         list.splice(index, 1);
-        uploadFileList = list;
-	/*
-        el = document.getElementById('a' + index + '-section');
-        el.remove();
-	*/
-
+        uploadFileInfo = list;
     };
 
     const spitStatistics = (idx:number) => {
@@ -520,6 +498,7 @@ type="checkbox" />
 	      </div>
 	     </div>
 	   
+      {authEnabled &&
              <div id='progress-up-authsection' >
 	        <div className="flex flex-wrap -mx-3 mb-6">
 	          <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
@@ -565,6 +544,7 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 	          </div>
 	         </div>
  	   </div>
+      }
 	   
 	   <button type="button" onClick={saveConfig} className="inline-block px-6
 	py-2.5 bg-red-600 text-dark dark:text-white font-medium text-xs leading-tight uppercase
@@ -750,27 +730,26 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 
 <div id="progress-up-progressArea"> 
 
-  {progFiles.length > 0
+  {uploadFileInfos.length > 0
   ? (
-  progFiles.map(({name, ts, mime, size}) => (
+  uploadFileInfos.map(({name, ts, mime, size,id, imagesrc}) => (
  
 
-<section id="{id} + '-section'" className="m-4 p-4 mt-4 mb-4 transition-colors
+<section  className="m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white mx-auto">
  <div className="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
 border-gray-300 text-gray-600 dark:text-white relative">
 
   <div  onClick={delItem(id)} title="Delete" className="absolute
 cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
-	<img width="25" height="25" src="https://raw.githubusercontent.com/girish1729/progress-up/tree/main/backend/public/icons/misc/trash-icon.svg" />
+	<img width="25" height="25" src="assets/icons/misc/trash-icon.svg" />
   </div>
 
   <div className="flex flex-wrap -mx-2 mb-8">
       <div className="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div className="h-12 text-sm text-grey-dark flex items-left
 justify-left">
-		<div id="name">
-		</div>]
+             <img width="125" height="125" src="imagesrc" title="name" alt="name" class="w-12 h-12" />
          </div>
       </div>
 
@@ -797,7 +776,7 @@ dark:text-white">
         </div>
        </div>
   </div>
-      <div className='ldBar bottom-0 right-0 pb-8' id="id" ></div>
+      <div className='ldBar bottom-0 right-0 pb-8' id={id} ></div>
 
   </div>
 </section>

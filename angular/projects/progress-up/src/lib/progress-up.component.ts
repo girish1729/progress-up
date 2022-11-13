@@ -4,6 +4,10 @@ import {
     ViewEncapsulation
 } from '@angular/core';
 
+import * as ldBar from '../assets/progressBar/loading-bar.js';
+
+declare var ldBar: any;
+
 
 import {
     ProgressUpService
@@ -17,18 +21,20 @@ import {
     Observable
 } from 'rxjs';
 
-interface statsTableType  {
+interface statsTableType {
     id: number;
-    ts: String;
-    status: String;
-    details: String;
+    ts: string;
+    status: string;
+    details: string;
 };
 
-interface progressInfoType  {
-    name: String;
-    ts: String;
-    mime: String;
-    size: String;
+interface fileInfo {
+    ts: string;
+    name: string;
+    size: string;
+    mime: string;
+    id: string;
+    imagesrc: string;
 };
 
 
@@ -50,24 +56,26 @@ export class ProgressUpComponent {
     extra = '';
 
 
-fileTypeIcons: {[key: string]: string} = {
-    "video": "avi.svg",
-    "css": "css.svg",
-    "csv": "csv.svg",
-    "eps": "eps.svg",
-    "excel": "excel.svg",
-    "html": "html.svg",
-    "movie": "mov.svg",
-    "mp3": "mp3.svg",
-    "other": "other.svg",
-    "pdf": "pdf.svg",
-    "ppt": "ppt.svg",
-    "rar": "rar.svg",
-    "text": "txt.svg",
-    "audio": "wav.svg",
-    "word": "word.svg",
-    "zip": "zip.svg"
-};
+    fileTypeIcons: {
+        [key: string]: string
+    } = {
+        "video": "avi.svg",
+        "css": "css.svg",
+        "csv": "csv.svg",
+        "eps": "eps.svg",
+        "excel": "excel.svg",
+        "html": "html.svg",
+        "movie": "mov.svg",
+        "mp3": "mp3.svg",
+        "other": "other.svg",
+        "pdf": "pdf.svg",
+        "ppt": "ppt.svg",
+        "rar": "rar.svg",
+        "text": "txt.svg",
+        "audio": "wav.svg",
+        "word": "word.svg",
+        "zip": "zip.svg"
+    };
 
 
     /* XXX these are backend variables */
@@ -80,12 +88,12 @@ fileTypeIcons: {[key: string]: string} = {
     pass = '';
     progType = 'line';
 
-    uploadFileList:any = [];
+    uploadFileList: any = [];
+    uploadFileInfos: fileInfo[] = [];
     disableUpload = true;
 
-    progressBars:any[] = [];
-    progressInfos:progressInfoType[] = [];
-    statsTable:statsTableType[] = [];
+    progressBars: any[] = [];
+    statsTable: statsTableType[] = [];
 
 
     totalfiles = 0;
@@ -103,10 +111,10 @@ fileTypeIcons: {[key: string]: string} = {
     uploadOneFile(file: File, idx: number) {
         let self = this;
 
-	let fname = file.name;
+        let fname = file.name;
         let options = {
-            onUploadProgress: function(e:any) {
-                let perc:number = Number(e.progress * 100);
+            onUploadProgress: function(e: any) {
+                let perc: number = Number(e.progress * 100);
                 self.progressBars[idx].set(perc);
             }
         };
@@ -119,7 +127,7 @@ fileTypeIcons: {[key: string]: string} = {
                 'Authorization': +basicAuth
             };
         }
-	/*
+        /*
         await axios.post(this.uploadURL, uplFormData, options).then((resp) => {
             this.spitStatistics(idx);
         }).catch((error) => {
@@ -134,8 +142,8 @@ fileTypeIcons: {[key: string]: string} = {
                     if (event.total) {
                         const total: number = event.total;
                         //this.progress[file.name] = 
-			let perc = Math.round(100 * event.loaded / total);
-                	self.progressBars[idx].set(perc);
+                        let perc = Math.round(100 * event.loaded / total);
+                        self.progressBars[idx].set(perc);
                     }
                 } else if (event instanceof HttpResponse) {
                     console.log(event);
@@ -167,58 +175,37 @@ fileTypeIcons: {[key: string]: string} = {
         this.setupUpload();
     }
 
-    fileSelectFinish(target:any) {
+    fileSelectFinish(target: any) {
         let selectedFiles = target.files;
         this.uploadFileList = selectedFiles;
         this.setupUpload();
     }
 
-    humanFileSize(size:number) {
-        const i:any = Math.floor(Math.log(size) / Math.log(1024));
-	let t:any = size / Number(Math.pow(1024, i).toFixed(2)) * 1;
-        const ret:string =   t + " " + ["B", "kB", "MB", "GB", "TB"][i];
+    humanFileSize(size: number) {
+        const i: any = Math.floor(Math.log(size) / Math.log(1024));
+        let t: any = size / Number(Math.pow(1024, i).toFixed(2)) * 1;
+        const ret: string = t + " " + ["B", "kB", "MB", "GB", "TB"][i];
         return (ret);
     }
 
-    setIconImage(name:string, type:string) {
+    buildThumb(f: File, type: string) {
         type = type.split('/')[0];
-        console.log(type);
-        var fileIcon = this.fileTypeIcons[type];
-        if (fileIcon == undefined) {
-            fileIcon = "file.svg";
-        }
-        var icon = [
-            '<img width="125" height="125" src="',
-            'https://raw.githubusercontent.com/girish1729/progress-up/tree/main/backend/public/icons/filetypes/' + fileIcon,
-            '" title="', name,
-            '" alt="', name,
-            '" class="h-9 w-9" />'
-        ].join('');
-        //document.getElementById(name).innerHTML = icon;
-    }
 
-    
-showThumbnails() {
-        for (var i = 0, f; f = this.uploadFileList[i]; i++) {
-            if (!f.type.match('image.*')) {
-                this.setIconImage(f.name, f.type);
-            } else {
-                var reader = new FileReader();
-                // Closure to capture the file information.  
-                reader.onload = (function(theFile) {
-                    return function(e) {
-                        var thumb = [
-                            '<img width="125" height="125" src="',
-                            e.target ? e.target.result: '',
-                            '" title="', theFile.name,
-                            '" alt="', theFile.name,
-                            '" class="w-12 h-12" />'
-                        ].join('');
-                        //document.getElementById(theFile.name).innerHTML = thumb;
-                    };
-                })(f);
-                reader.readAsDataURL(f);
+        if (type != 'image') {
+            var fileIcon = this.fileTypeIcons[type];
+            if (fileIcon == undefined) {
+                fileIcon = "file.svg";
             }
+            return 'assets/icons/filetypes/' + fileIcon;
+        } else {
+            var reader = new FileReader();
+            reader.onload = (function(theFile) {
+                return function(e) {
+                    return e.target ? e.target.result : '';
+                };
+            })(f);
+            reader.readAsDataURL(f);
+            return;
         }
     }
 
@@ -227,43 +214,42 @@ showThumbnails() {
             let f = this.uploadFileList[i];
             let ts = f.lastModifiedDate.toLocaleDateString();
             let name = f.name;
-            this.totalsize += f.size;
-            let size:any = this.humanFileSize(f.size);
+            let size = this.humanFileSize(f.size);
             let mime = f.type;
             let id = 'a' + i;
-            this.totalfiles += 1;
-        }
+            let imagesrc = String(this.buildThumb(f, mime));
+            this.uploadFileInfos.push({
+                ts,
+                name,
+                size,
+                mime,
+                id,
+                imagesrc
+            });
 
-        for (var i = 0; i < this.uploadFileList.length; i++) {
-            var selector = '#a' + i;
-            var bar = new this.uploadService.ldBar(selector, {
+            var bar = new ldBar('#' + info["id"], {
                 preset: this.preset
             });
             bar.set(0);
+
             this.progressBars.push(bar);
+            this.totalsize += f.size;
+            this.totalfiles += 1;
         }
-
-        this.showThumbnails();
-
-	this.disableUpload = false;
+        this.disableUpload = false;
     }
 
     delItem(index: number) {
         let list = [...this.uploadFileList];
         list.splice(index, 1);
         this.uploadFileList = list;
-	/*
-        el = document.getElementById('a' + index + '-section');
-        el.remove();
-	*/
-
     }
 
-    spitStatistics(idx:number) {
+    spitStatistics(idx: number) {
         if (idx == this.uploadFileList.length - 1) {
             let endUploadts = Date.now();
             let totaltime = endUploadts - this.startUploadts;
-            let totalsize:any = this.humanFileSize(this.totalsize);
+            let totalsize: any = this.humanFileSize(this.totalsize);
 
             var ts = new Date().toLocaleString();
             var tot = this.uploadFileList.length;
@@ -275,7 +261,7 @@ showThumbnails() {
 
             var id = this.statsTable.length + 1;
 
-	    this.disableUpload = true;
+            this.disableUpload = true;
             this.progressBars = [];
             this.totalfiles = 0;
             this.totalsize = 0;
@@ -285,8 +271,7 @@ showThumbnails() {
         }
     }
 
-    saveConfig() {
-    }
+    saveConfig() {}
 
     async testUpload() {
         console.log("Uploading using HTML5 File API...");
@@ -308,7 +293,7 @@ showThumbnails() {
             };
         }
 
-	/*
+        /*
         await axios.post(this.uploadURL, testForm, options).then((resp) => {
             alert("Test succeeded");
         }).catch((error) => {
@@ -360,8 +345,8 @@ showThumbnails() {
 
 
     clearAll() {
-        this.progressInfos = [];
-	/*
+        this.uploadFileInfos = [];
+        /*
         this.progressArea.innerHTML = '';
         this.statsArea.innerHTML = '';
         this.configSummary.innerHTML = '';
