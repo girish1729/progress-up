@@ -4,9 +4,9 @@ import {
     ViewEncapsulation
 } from '@angular/core';
 
-import * as ldBar from '../assets/progressBar/loading-bar.js';
+import * as loadingBar from '../assets/progressBar/loading-bar.js';
 
-declare var ldBar: any;
+declare var loadingBar: any;
 
 
 import {
@@ -227,7 +227,7 @@ export class ProgressUpComponent {
                 imagesrc
             });
 
-            var bar = new ldBar('#' + info["id"], {
+            var bar = new loadingBar.ldBar('#' + id, {
                 preset: this.preset
             });
             bar.set(0);
