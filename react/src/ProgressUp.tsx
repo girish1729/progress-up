@@ -8,40 +8,55 @@ import axios from "axios";
 
 function ProgressUp(props: any) {
 
-        let [uploadFileInfos, setProg] = useState <Array<any>>([]);
-        const url = props.uploadURL;
+    let [uploadFileInfos, setProg] = useState < Array < any >> ([]);
+    const [isUploadDisabled, setIsUploadDisabled] = React.useState(true);
+    const [inputs, setInputs] = useState({});
+    const [details, setDetails] = useState('');
 
-        const uploadOneFile = async (file:File, idx: Number ) => {
-	    let formData = new FormData();
-	    formData.append(filesName, file);
-	    let fname = file.name;
-            await axios.post(url, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                },
-                onUploadProgress: (progEvent) => {
-                    let perc:number ;
-                    if (progEvent.total) {
-                        perc = (progEvent.loaded / progEvent.total) * 100;
-                	progressBars[idx].set(perc);
-                        console.log(perc);
-                    }
+    const url = props.uploadURL;
 
-                    setProg((upl:any) => {
-                        return upl.map((p:any) => {
-                            if (p.fileName === fname) {
-                                p.progressPercent = perc;
-                            }
-                            return p;
-                        });
+
+    const handleChange = (event) => {
+        const name = event.target.name;
+        const value = event.target.value;
+        setInputs(values => ({
+            ...values,
+            [name]: value
+        }))
+    }
+
+
+    const uploadOneFile = async (file: File, idx: Number) => {
+        let formData = new FormData();
+        formData.append(filesName, file);
+        let fname = file.name;
+        await axios.post(url, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+            onUploadProgress: (progEvent) => {
+                let perc: number;
+                if (progEvent.total) {
+                    perc = (progEvent.loaded / progEvent.total) * 100;
+                    progressBars[idx].set(perc);
+                    console.log(perc);
+                }
+
+                setProg((upl: any) => {
+                    return upl.map((p: any) => {
+                        if (p.fileName === fname) {
+                            p.progressPercent = perc;
+                        }
+                        return p;
                     });
+                });
 
-                },
-            }).then(function() {
-                console.log("All files uploaded");
-            });
-        };
-	/*
+            },
+        }).then(function() {
+            console.log("All files uploaded");
+        });
+    };
+    /*
         const onDrop = (e:any) => {
             const files = e.DataTransfer.files;
             if (files) {
@@ -72,7 +87,7 @@ function ProgressUp(props: any) {
         };
 	*/
 
-	/* Insert new */
+    /* Insert new */
 
 
 
@@ -80,24 +95,24 @@ function ProgressUp(props: any) {
     let extra = '';
 
 
-let fileTypeIcons = {
-    "video": "avi.svg",
-    "css": "css.svg",
-    "csv": "csv.svg",
-    "eps": "eps.svg",
-    "excel": "excel.svg",
-    "html": "html.svg",
-    "movie": "mov.svg",
-    "mp3": "mp3.svg",
-    "other": "other.svg",
-    "pdf": "pdf.svg",
-    "ppt": "ppt.svg",
-    "rar": "rar.svg",
-    "text": "txt.svg",
-    "audio": "wav.svg",
-    "word": "word.svg",
-    "zip": "zip.svg"
-};
+    let fileTypeIcons = {
+        "video": "avi.svg",
+        "css": "css.svg",
+        "csv": "csv.svg",
+        "eps": "eps.svg",
+        "excel": "excel.svg",
+        "html": "html.svg",
+        "movie": "mov.svg",
+        "mp3": "mp3.svg",
+        "other": "other.svg",
+        "pdf": "pdf.svg",
+        "ppt": "ppt.svg",
+        "rar": "rar.svg",
+        "text": "txt.svg",
+        "audio": "wav.svg",
+        "word": "word.svg",
+        "zip": "zip.svg"
+    };
 
 
     /* XXX these are backend variables */
@@ -111,7 +126,6 @@ let fileTypeIcons = {
     let progType = 'line';
 
     let uploadFileList = [];
-    let disableUpload = true;
 
     let progressBars = [];
     let progressInfos = [];
@@ -129,7 +143,7 @@ let fileTypeIcons = {
     let showProgress: boolean = true;
 
 
-    const uploadAll = ( ) => {
+    const uploadAll = () => {
         if (uploadFileList) {
             for (let i = 0; i < uploadFileList.length; i++) {
                 let file = uploadFileList[i];
@@ -150,16 +164,16 @@ let fileTypeIcons = {
         setupUpload();
     };
 
-    const fileSelectFinish = (target:any) => {
+    const fileSelectFinish = (target: any) => {
         let selectedFiles = target.files;
         uploadFileList = selectedFiles;
         setupUpload();
     };
 
-    const humanFileSize = (size:number) => {
-        const i:any = Math.floor(Math.log(size) / Math.log(1024));
-	let t:any = size / Number(Math.pow(1024, i).toFixed(2)) * 1;
-        const ret:string =   t + " " + ["B", "kB", "MB", "GB", "TB"][i];
+    const humanFileSize = (size: number) => {
+        const i: any = Math.floor(Math.log(size) / Math.log(1024));
+        let t: any = size / Number(Math.pow(1024, i).toFixed(2)) * 1;
+        const ret: string = t + " " + ["B", "kB", "MB", "GB", "TB"][i];
         return (ret);
     };
 
@@ -211,7 +225,7 @@ let fileTypeIcons = {
             this.totalsize += f.size;
             this.totalfiles += 1;
         }
-        this.disableUpload = false;
+        setIsUploadDisabled(false);
     };
 
     const delItem = (index: number) => {
@@ -220,7 +234,7 @@ let fileTypeIcons = {
         uploadFileInfo = list;
     };
 
-    const spitStatistics = (idx:number) => {
+    const spitStatistics = (idx: number) => {
         if (idx == uploadFileList.length - 1) {
             let endUploadts = Date.now();
             let totaltime = endUploadts - startUploadts;
@@ -231,12 +245,13 @@ let fileTypeIcons = {
             var status = totalfiles == tot ?
                 '<img src="/icons/misc/success-icon.svg" >' :
                 '<img src="/icons/misc/failure-icon.svg" >';
-            var details = totalfiles / tot + "files size " + totalsize +
-                "sent in " + totaltime + " ms";
+
+            setDetails(totalfiles / tot + "files size " + totalsize +
+                "sent in " + totaltime + " ms");
 
             var id = statsTable.length + 1;
 
-	    disableUpload = true;
+            setIsUploadDisabled(true);
             progressBars = [];
             totalfiles = 0;
             totalsize = 0;
@@ -246,8 +261,7 @@ let fileTypeIcons = {
         }
     };
 
-    const saveConfig = ( ) => {
-    };
+    const saveConfig = () => {};
 
     const testUpload = async () => {
         console.log("Uploading using HTML5 File API...");
@@ -269,7 +283,7 @@ let fileTypeIcons = {
             };
         }
 
-	/*
+        /*
         await axios.post(uploadURL, testForm, options).then((resp) => {
             alert("Test succeeded");
         }).catch((error) => {
@@ -321,12 +335,8 @@ let fileTypeIcons = {
 
 
     const clearAll = () => {
+        setDetails("");
         progressInfos = [];
-	/*
-        progressArea.innerHTML = '';
-        statsArea.innerHTML = '';
-        configSummary.innerHTML = '';
-	*/
         uploadFileList = [];
         progressBars = [];
         totalfiles = 0;
@@ -335,11 +345,10 @@ let fileTypeIcons = {
         startUploadts = 0;
         endUploadts = 0;
 
-        disableUpload = true;
+        setIsUploadDisabled(true);
         console.log("Cleared");
 
     };
-
   return (
   <Fragment>
 
@@ -374,10 +383,7 @@ let fileTypeIcons = {
  <div id="first" className="p-4">
 	<div id='progress-up-statsArea'>
 	<div id="uploadStats">
-	<h2 className="text-5xl leading-tight border-b">
-		{totalfiles} file(s) uploaded {totalsize} sent in
-{totaltime} milliseconds
-</h2>
+	<h2 className="text-5xl leading-tight border-b">{details} </h2>
 	</div>
 
 
@@ -413,7 +419,11 @@ className='text-sm'>{filesName}</span>
 	</div>
 	
 
-	<button disabled="disableUpload" onClick={uploadAll} className="inline-block px-6
+	<button disabled={disableUpload} 
+
+className={`container${isUploadDisabled ? " opacity-20" : ""}`}
+
+onClick={uploadAll} className="inline-block px-6
 	py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight
 	uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg
 	focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0
@@ -437,7 +447,9 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	   font-bold mb-2" htmlFor="progress-up-uploadURL">
 	          POST endpoint  
 	         </label>
-	         <input id='uploadURL' className="appearance-none block w-full bg-gray-200
+	         <input value={inputs.uploadURL || ""} 
+        onChange={handleChange}
+className="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	   focus:outline-none focus:bg-light" type="text"
 	   placeholder="URL to post [cross origin or absolute URL needs
@@ -450,7 +462,7 @@ CORS]" />
 	   font-bold mb-2" htmlFor="progress-up-filesName">
 	   	Name of files input field
 	         </label>
-	         <input id='filesName' className="appearance-none block w-full bg-gray-200
+	         <input value={inputs.filesName || ""} onChange={handleChange} id='filesName' className="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	    type="text" placeholder="Name of files input field" />
@@ -464,7 +476,7 @@ CORS]" />
 	           Progress indicator type
 	         </label>
 	         <div className="relative">
-	           <select id='progType'
+	           <select id='progType' onChange={handleChange} value={inputs.progType || ""}
 v-on:change="setIndicator()" className="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
@@ -492,7 +504,8 @@ v-on:change="setIndicator()" className="block appearance-none w-full bg-gray-200
 	         <span className="text-sm">
 	           HTTP Auth required?
 	         </span>
-	         <input id='authEnabled' className="mr-2 leading-tight"
+	         <input id='authEnabled' onChange={handleChange} value={inputs.authEnabled || false}
+className="mr-2 leading-tight"
 type="checkbox" />
 	       </label>
 	      </div>
@@ -507,9 +520,7 @@ text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	              Auth type
 	            </label>
 	            <div className="relative">
-	              <select id='authType' className="block
-appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700
-py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
+	              <select id='authType' onChange={handleChange} value={inputs.authType || ""} className="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
 	                <option>HTTP basic auth</option>
 	                <option>HTTP digest auth</option>
 	              </select>
@@ -525,7 +536,7 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 	      font-bold mb-2" htmlFor="user">
 	             Username  
 	            </label>
-	            <input id='user' className="appearance-none block w-full bg-gray-200
+	            <input id='user' value={inputs.user || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	      focus:outline-none focus:bg-light"  type="text"
 	      placeholder="username" />
@@ -537,7 +548,7 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 	      font-bold mb-2" htmlFor="progress-up-pass">
 	      	Password
 	            </label>
-	            <input id='pass' className="appearance-none block w-full bg-gray-200
+	            <input id='pass' value={inputs.pass || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	      focus:outline-none focus:bg-light focus:border-gray-500"
 	       type="password" placeholder="Password" />

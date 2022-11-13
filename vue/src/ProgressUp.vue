@@ -35,11 +35,7 @@
 	<div id='progress-up-statsArea'>
 	<div id="uploadStats">
 	<h2 class="text-5xl leading-tight border-b">
-<!--
-		{{totalfiles}} file(s) uploaded {{totalsize}} sent in
-{{totaltime}} milliseconds
--->
-</h2>
+		{{details}} </h2>
 	</div>
 
 
@@ -74,8 +70,8 @@ class='text-sm'>{{filesName}}</span>
 	py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight
 	uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg
 	focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0
-	active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out
-	opacity-20" disabled>Begin Uploading files
+	active:bg-blue-600 active:shadow-lg transition duration-150
+ease-in-out" :class="{ disableUpload ? 'opacity-20': ''}" :disabled="disableUpload">Begin Uploading files
 	</button>
 	
 	<button type="button" @click="clearAll()" class="inline-block
@@ -93,10 +89,10 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	     <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
 	         <label class="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" for="progress-up-uploadURL">
+	   font-bold mb-2" for="uploadURL">
 	          POST endpoint  
 	         </label>
-	         <input id='progress-up-uploadURL' class="appearance-none block w-full bg-gray-200
+	         <input v-model='form.uploadURL' class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	   focus:outline-none focus:bg-light" type="text"
 	   placeholder="URL to post [cross origin or absolute URL needs CORS]">
@@ -108,7 +104,7 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	   font-bold mb-2" for="progress-up-filesName">
 	   	Name of files input field
 	         </label>
-	         <input id='progress-up-filesName' class="appearance-none block w-full bg-gray-200
+	         <input v-model='form.filesName' class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	    type="text" placeholder="Name of files input field">
@@ -122,7 +118,7 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	           Progress indicator type
 	         </label>
 	         <div class="relative">
-	           <select id='progress-up-indicator'
+	           <select v-model='form.progType'
 v-on:change="setIndicator()" class="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
@@ -150,7 +146,7 @@ v-on:change="setIndicator()" class="block appearance-none w-full bg-gray-200 bor
 	         <span class="text-sm">
 	           HTTP Auth required?
 	         </span>
-	         <input v-on:change="toggleAuthQ(" id='authEnabled' class="mr-2 leading-tight" type="checkbox">
+	         <input v-on:change="toggleAuthQ(" v-model='form.authEnabled' class="mr-2 leading-tight" type="checkbox">
 	       </label>
 	      </div>
 	     </div>
@@ -163,7 +159,7 @@ text-dark-700 text-xs font-bold mb-2" for="progress-up-authtype">
 	              Auth type
 	            </label>
 	            <div class="relative">
-	              <select id='progress-up-authtype' class="block
+	              <select v-model='form.authtype' class="block
 appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700
 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
 	                <option>HTTP basic auth</option>
@@ -181,7 +177,7 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 	      font-bold mb-2" for="progress-up-username">
 	             Username  
 	            </label>
-	            <input id='progress-up-username' class="appearance-none block w-full bg-gray-200
+	            <input v-model='form.user' class="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	      focus:outline-none focus:bg-light"  type="text"
 	      placeholder="username">
@@ -193,7 +189,7 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 	      font-bold mb-2" for="progress-up-pass">
 	      	Password
 	            </label>
-	            <input id='progress-up-pass' class="appearance-none block w-full bg-gray-200
+	            <input v-model='form.pass' class="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	      focus:outline-none focus:bg-light focus:border-gray-500"
 	       type="password" placeholder="Password">
@@ -443,9 +439,19 @@ export default {
   props: {
     uploadURL: undefined,
     filesName: undefined,
+    disableUpload : true
   },
   data() {
     return {
+form : {
+   uploadURL : '',
+   filesName: '',
+authEnabled: false,
+authType: '',
+user : '',
+pass : ''
+progType: 'line'
+  },
       Files: undefined,
       uploadFileInfos: [],
     };
@@ -579,8 +585,7 @@ ${totaltime} ms`;
 
         var id = statsTable.length + 1;
       
-        upBut.setAttribute('disabled', true);
-        upBut.classList.add('opacity-20');
+            this.disableUpload = true;
         populateStats();
         progressBars = [];
         totalfiles = 0;
@@ -735,10 +740,8 @@ enableUploadButton() {
     upBut.classList.remove('opacity-20');
 },
  clearAll() {
-      progressInfos = []; 
-    progressArea.innerHTML = '';
-    statsArea.innerHTML = '';
-    configSummary.innerHTML = '';
+    details = "";
+    progressInfos = []; 
     uploadFileList = [];
     uploadFileList = [];
     progressBars = [];
@@ -748,8 +751,7 @@ enableUploadButton() {
     startUploadts = 0;
     endUploadts = 0;
 
-    upBut = document.getElementById("upButton");
-    upBut.disabled = true;
+    disableUpload = true;
     console.log("Cleared");
 
     },

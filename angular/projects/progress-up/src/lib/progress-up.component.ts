@@ -1,6 +1,7 @@
 import {
     Component,
     Input,
+    ElementRef,
     ViewEncapsulation
 } from '@angular/core';
 
@@ -55,6 +56,8 @@ export class ProgressUpComponent {
     preset = "line";
     extra = '';
 
+    upBut = this.el.nativeElement.querySelector("#upBut"); 
+
 
     fileTypeIcons: {
         [key: string]: string
@@ -93,6 +96,7 @@ export class ProgressUpComponent {
     disableUpload = true;
 
     progressBars: any[] = [];
+    details = '';
     statsTable: statsTableType[] = [];
 
 
@@ -106,7 +110,7 @@ export class ProgressUpComponent {
     progress: any = {};
     showProgress: boolean = true;
 
-    constructor(private uploadService: ProgressUpService) {}
+    constructor(private el:ElementRef, private uploadService: ProgressUpService) {}
 
     uploadOneFile(file: File, idx: number) {
         let self = this;
@@ -237,6 +241,8 @@ export class ProgressUpComponent {
             this.totalfiles += 1;
         }
         this.disableUpload = false;
+	upBut.classList.remove('opacity-20'); 
+
     }
 
     delItem(index: number) {
@@ -256,12 +262,13 @@ export class ProgressUpComponent {
             var status = this.totalfiles == tot ?
                 '<img src="/icons/misc/success-icon.svg" >' :
                 '<img src="/icons/misc/failure-icon.svg" >';
-            var details = this.totalfiles / tot + "files size " + totalsize +
+            this.details = this.totalfiles / tot + "files size " + totalsize +
                 "sent in " + totaltime + " ms";
 
             var id = this.statsTable.length + 1;
 
             this.disableUpload = true;
+	    upBut.classList.add('opacity-20'); 
             this.progressBars = [];
             this.totalfiles = 0;
             this.totalsize = 0;
@@ -346,11 +353,7 @@ export class ProgressUpComponent {
 
     clearAll() {
         this.uploadFileInfos = [];
-        /*
-        this.progressArea.innerHTML = '';
-        this.statsArea.innerHTML = '';
-        this.configSummary.innerHTML = '';
-	*/
+        this.details = '';
         this.uploadFileList = [];
         this.progressBars = [];
         this.totalfiles = 0;
@@ -360,6 +363,7 @@ export class ProgressUpComponent {
         this.endUploadts = 0;
 
         this.disableUpload = true;
+	upBut.classList.add('opacity-20'); 
         console.log("Cleared");
 
     }
