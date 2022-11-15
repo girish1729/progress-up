@@ -4,11 +4,11 @@ import {
     ElementRef,
     ViewEncapsulation
 } from '@angular/core';
+//import {ldBar} from 'assets/progressBar/loading-bar.js';
 
-import * as loadingBar from '../assets/progressBar/loading-bar.js';
+//import * as loadingBar from 'assets/progressBar/loading-bar.js';
 
-declare var loadingBar: any;
-
+declare var ldBar: any;
 
 import {
     ProgressUpService
@@ -127,9 +127,11 @@ export class ProgressUpComponent {
             var username = 'user';
             var password = 'password';
             var basicAuth = 'Basic ' + btoa(username + ':' + password);
+		/*
             options['headers'] = {
                 'Authorization': +basicAuth
             };
+		*/
         }
         /*
         await axios.post(this.uploadURL, uplFormData, options).then((resp) => {
@@ -231,7 +233,7 @@ export class ProgressUpComponent {
                 imagesrc
             });
 
-            var bar = new loadingBar.ldBar('#' + id, {
+            var bar = new ldBar('#' + id, {
                 preset: this.preset
             });
             bar.set(0);
@@ -241,7 +243,7 @@ export class ProgressUpComponent {
             this.totalfiles += 1;
         }
         this.disableUpload = false;
-	upBut.classList.remove('opacity-20'); 
+	this.upBut.classList.remove('opacity-20'); 
 
     }
 
@@ -268,7 +270,7 @@ export class ProgressUpComponent {
             var id = this.statsTable.length + 1;
 
             this.disableUpload = true;
-	    upBut.classList.add('opacity-20'); 
+	    this.upBut.classList.add('opacity-20'); 
             this.progressBars = [];
             this.totalfiles = 0;
             this.totalsize = 0;
@@ -363,7 +365,7 @@ export class ProgressUpComponent {
         this.endUploadts = 0;
 
         this.disableUpload = true;
-	upBut.classList.add('opacity-20'); 
+	this.upBut.classList.add('opacity-20'); 
         console.log("Cleared");
 
     }

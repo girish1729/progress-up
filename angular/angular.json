@@ -14,6 +14,35 @@
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
+	  "options": {
+            "outputPath": "dist/progress-up",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles.css"
+              ,
+              {
+                "input":
+"projects/progress-up/assets/progressBar/loading-bar.css",
+                "inject": true,
+                "bundleName": "loading-bar.css"
+              }
+            ],
+            "scripts": [
+              {
+                "input": "projects/progress-up/assets/progressBar/loading-bar.js",
+                "inject": true,
+                "bundleName": "loading-bar.js"
+              }
+
+            ]
+          },
           "options": {
             "project": "projects/progress-up/ng-package.json"
           },
@@ -35,8 +64,8 @@
             "karmaConfig": "projects/progress-up/karma.conf.js"
           }
         }
-      }
-    }
+     }
+     }
   },
   "defaultProject": "progress-up"
 }

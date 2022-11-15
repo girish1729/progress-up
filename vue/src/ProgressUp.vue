@@ -8,7 +8,7 @@
 <!-- XXX tabs -->
 <div class="bg-light p7 rounded w-9/12 mx-auto">
   <!-- Tabs -->
-  <ul id="tabs" class="inline-flex pt-2 px-1 w-full border-b">
+  <ul :id="tabs" class="inline-flex pt-2 px-1 w-full border-b">
 
     <li class="bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px">
 	<a id="default-tab" href="#first">File upload</a>
@@ -54,14 +54,13 @@
 
 	<div id="config">
 		<h2 class="leading-tight pb-2">
-<!--
 			&#128202; Progress type <span
-class='text-sm'>{{preset}}</span>  
+class='text-sm'>{{form.preset}}</span>  
 			 &#128228; Upload URL <span
-class='text-sm'>{{uploadURL}}</span> 
+class='text-sm'>{{form.uploadURL}}</span> 
 		&#128218; FilesName <span
-class='text-sm'>{{filesName}}</span>
--->
+class='text-sm'>{{form.filesName}}</span>
+
 		</h2>
 	</div>
 	
@@ -430,6 +429,10 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 
 
 <script>
+
+
+
+
 import axios from "axios";
 import LoadingBar from "./assets/loading-bar.js";
 
@@ -458,6 +461,26 @@ progType: 'line'
   },
 
   methods: {
+//let tabsContainer = document.querySelector("#tabs");
+//let tabTogglers = tabsContainer.querySelectorAll("#tabs a");
+//tabTogglers.forEach(function(toggler) {
+ //   toggler.addEventListener("click", function(e) {
+        //let tabName = this.getAttribute("href");
+        //let tabContents = document.querySelector("#tab-contents");
+//  });
+//});
+
+switchTabs() {
+        for (let i = 0; i < tabContents.children.length; i++) {
+            tabTogglers[i].parentElement.classList.remove("border-t", "border-r", "border-l", "-mb-px", "bg-white");
+            tabContents.children[i].classList.remove("hidden");
+            if ("#" + tabContents.children[i].id === tabName) {
+                continue;
+            }
+            tabContents.children[i].classList.add("hidden");
+        }
+        e.target.parentElement.classList.add("border-t", "border-r", "border-l", "-mb-px", "bg-white");
+},
 dragover(evt) {
 	evt.preventDefault();
   },
@@ -630,12 +653,6 @@ uploadAll() {
         uploadOneFile(f, i);
     }
 },
-
-toggleAuthQ(val) {
-    const authSection = document.querySelector("#progress-up-authsection");
-    authSection.classList.toggle("hidden");
-},
-
 initApp() {
     document.getElementById("progress-up-uploadURL").value = uploadURL;
     document.getElementById("progress-up-filesName").value = filesName;
@@ -732,13 +749,7 @@ setIndicator() {
         uploadProgress(i, uploadFileInfos[i]);
       }
     },
-
-
-enableUploadButton() {
-    upBut = document.getElementById("upButton");
-    upBut.removeAttribute('disabled');
-    upBut.classList.remove('opacity-20');
-},
+,
  clearAll() {
     details = "";
     progressInfos = []; 
