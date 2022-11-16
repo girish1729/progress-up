@@ -54,8 +54,6 @@ export class ProgressUpComponent {
     preset = "line";
     extra = '';
 
-    upBut = this.el.nativeElement.querySelector("#upBut"); 
-  
     fileTypeIcons: {
         [key: string]: string
     } = {
@@ -80,19 +78,22 @@ export class ProgressUpComponent {
 
     /* XXX these are backend variables */
     ///uploadURL = 'https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34';
-    uploadURL = 'https://localhost:2324/uploadmultiple';
-    filesName = "uploadFiles";
-    authEnabled = false;
-    authType = "Basic";
-    user = '';
-    pass = '';
+    form = {
+    uploadURL : 'https://localhost:2324/uploadmultiple',
+    filesName : "uploadFiles",
+    authEnabled : false,
+    authType : "Basic",
+    user : '',
+    pass : '',
+    progType : 'line'
+    };
     progType = 'line';
 
 
     configVals = '<h2 class="leading-tight pb-2"> &#128202; Progress type <span class="text-sm">' 
 	+ this.preset + '</span>  &#128228; Upload URL <span class="text-sm">' 
-	+ this.uploadURL + "</span> &#128218; FilesName <span class='text-sm'>" 
-	+ this.filesName + "</span> </h2> ";
+	+ this.form.uploadURL + "</span> &#128218; FilesName <span class='text-sm'>" 
+	+ this.form.filesName + "</span> </h2> ";
 
     uploadFileList: any = [];
     uploadFileInfos: fileInfo[] = [];
@@ -132,7 +133,7 @@ export class ProgressUpComponent {
             }
         };
 
-        if (this.authEnabled) {
+        if (this.form.authEnabled) {
             var username = 'user';
             var password = 'password';
             var basicAuth = 'Basic ' + btoa(username + ':' + password);
@@ -151,7 +152,7 @@ export class ProgressUpComponent {
         });
 	*/
 
-        this.uploadService.upload(this.uploadURL, fname, file).subscribe(
+        this.uploadService.upload(this.form.uploadURL, fname, file).subscribe(
             (event: HttpEvent < any > ) => {
                 if (event.type === HttpEventType.UploadProgress) {
                     if (event.total) {
@@ -203,12 +204,12 @@ export class ProgressUpComponent {
         return (ret);
     }
 
-     buildThumb(f, type, cb ) {
+     buildThumb(f:File, type:string, cb:Function ) {
         type = type.split('/')[0];
 	console.log(type);
 
         if (type != "image") {
-            var fileIcon = this.fileTypes[type];
+            var fileIcon = this.fileTypeIcons[type];
             if (fileIcon == undefined) {
                 fileIcon = "file.svg";
             }
@@ -218,7 +219,9 @@ export class ProgressUpComponent {
             var reader = new FileReader();
             reader.onload = (function(theFile) {
                 return function(e) {
+		   if(e.target) {
                     cb(e.target.result);
+		   }
                 };
             })(f);
             reader.readAsDataURL(f);
@@ -233,7 +236,7 @@ export class ProgressUpComponent {
             let size = this.humanFileSize(f.size);
             let mime = f.type;
             let id = "a" + i;
-	    this.buildThumb(f, mime, (src) => {
+	    this.buildThumb(f, mime, (src:string) => {
                let imagesrc = src;
             this.uploadFileInfos.push({
                 ts:ts,
@@ -244,17 +247,17 @@ export class ProgressUpComponent {
                 imagesrc:imagesrc
             });
 
-            var bar = new ldBar("#" + id, {
-                preset: this.form.preset
+            let bar = new ldBar("#" + id, {
+                preset: this.preset
             });
             bar.set(0);
-	    });
 
             this.progressBars.push(bar);
-            totalsize += f.size;
-            totalfiles += 1;
+            this.totalsize += f.size;
+            this.totalfiles += 1;
+	    });
         }
-        disableUpload = false;
+        this.disableUpload = false;
     }
 
     delItem(index: number) {
@@ -280,7 +283,6 @@ export class ProgressUpComponent {
             var id = this.statsTable.length + 1;
 
             this.disableUpload = true;
-	    this.upBut.classList.add('opacity-20'); 
             this.progressBars = [];
             this.totalfiles = 0;
             this.totalsize = 0;
@@ -290,7 +292,9 @@ export class ProgressUpComponent {
         }
     }
 
-    saveConfig() {}
+    saveConfig() {
+	console.log(this.form);
+    }
 
     async testUpload() {
         console.log("Uploading using HTML5 File API...");
@@ -299,9 +303,9 @@ export class ProgressUpComponent {
         const blob = new Blob(['Test upload DELETE'], {
             type: 'plain/text'
         });
-        testForm.append(this.filesName, blob, 'progress-up-test.txt');
+        testForm.append(this.form.filesName, blob, 'progress-up-test.txt');
         let options = {};
-        if (this.authEnabled) {
+        if (this.form.authEnabled) {
             var username = 'user';
             var password = 'password';
             var basicAuth = 'Basic ' + btoa(username + ':' + password);
@@ -328,34 +332,14 @@ export class ProgressUpComponent {
     }
 
     setIndicator() {
-        console.log(this.progType);
-        this.progType = this.progType.toLowerCase()
+        console.log(this.form.progType);
+        this.preset = this.form.progType.toLowerCase()
         switch (this.progType) {
-            case "line":
-                this.preset = this.progType;
-                break;
-            case "fan":
-                this.preset = this.progType;
-                break;
             case "bubble":
-                this.preset = this.progType;
                 this.extra = 'data-img-size="100,100"';
                 break;
             case "rainbow":
-                this.preset = this.progType;
                 this.extra = 'data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"';
-                break;
-            case "energy":
-                this.preset = this.progType;
-                break;
-            case "stripe":
-                this.preset = this.progType;
-                break;
-            case "text":
-                this.preset = this.progType;
-                break;
-            case "circle":
-                this.preset = this.progType;
                 break;
             default:
                 break;
@@ -375,7 +359,6 @@ export class ProgressUpComponent {
         this.endUploadts = 0;
 
         this.disableUpload = true;
-	this.upBut.classList.add('opacity-20'); 
         console.log("Cleared");
 
     }

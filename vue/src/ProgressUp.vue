@@ -25,26 +25,24 @@ onchange="document.documentElement.classList.toggle('dark')" />
   <!-- Tabs -->
   <ul id="tabs" class="inline-flex pt-2 px-1 w-full border-b">
 
-    <li class="bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px">
-	<a id="default-tab" 
-@click="toggleTabs(1)" :class="{'text-pink-600 bg-white': openTab !== 1, 'text-white bg-pink-600': openTab === 1}"> File upload</a>
+    <li class="bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2  -mb-px">
+	<a id="default-tab" @click="toggleTabs(1)" :class="{'px-4 text-dark-800 font-semibold py-2 rounded-t': openTab !== 1, 'bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px' : openTab === 1}" > File upload</a>
     </li>
 
     <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
-	<a
-@click="toggleTabs(2)" :class="{'text-pink-600 bg-white': openTab !== 2, 'text-white bg-pink-600': openTab === 2}">
+	<a @click="toggleTabs(2)" :class="{'px-4 text-dark-800 font-semibold py-2 rounded-t': openTab !== 2, 'bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px' : openTab === 2}" >
 Setup</a>
     </li> 
 
     <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
-	<a 
-@click="toggleTabs(3)" :class="{'text-pink-600 bg-white': openTab !== 3, 'text-white bg-pink-600': openTab === 3}">
+
+	<a @click="toggleTabs(3)" :class="{'px-4 text-dark-800 font-semibold py-2 rounded-t': openTab !== 3, 'bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px' : openTab === 3}" >
 Statistics</a>
     </li>
 
     <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
-	<a 
-@click="toggleTabs(4)" :class="{'text-pink-600 bg-white': openTab !== 4, 'text-white bg-pink-600': openTab === 4}">
+
+	<a @click="toggleTabs(4)" :class="{'px-4 text-dark-800 font-semibold py-2 rounded-t': openTab !== 4, 'bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px' : openTab === 4}" >
 Help</a>
     </li>
 
@@ -425,6 +423,7 @@ import ldBar from "./assets/progressBar/loading-bar.js";
 export default {
   data() {
     return {
+    openTab: 1,
     authEnabled: false,
 form : {
    uploadURL : '',
@@ -712,7 +711,11 @@ humanFileSize(size) {
             totalfiles += 1;
         }
         disableUpload = false;
- }
+ },
+
+    toggleTabs: function(tabNumber){
+      this.openTab = tabNumber
+    }
 
 }
 };

@@ -57,7 +57,6 @@ function ProgressUp() {
     };
 
   const {getRootProps, getInputProps} = useDropzone({onDrop})
-   let color = 'white';
 
     const fileTypes = {
         "video": avi,
@@ -387,6 +386,19 @@ function ProgressUp() {
 
   <Fragment>
 
+<div className="flex justify-end items-center space-x-2 mx-auto relative">
+  <div className="w-14 h-8">
+
+  <label htmlFor="dark-mode" className="w-full h-full rounded-full p-1 flex justify-between cursor-pointer">
+    <span className="hidden dark:inline">&#127774;</span>
+    <span className="inline dark:hidden">&#127769; </span>
+  </label>
+
+  <input type="checkbox" id="dark-mode" className='hidden'
+onChange={darkMode} />
+  </div>
+</div>
+
 
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 
@@ -394,20 +406,11 @@ function ProgressUp() {
 </h2>
 
 
-      <div className="flex flex-wrap">
-        <div className="w-full">
-          <ul
-            className="flex mb-0 list-none flex-wrap pt-3 pb-4 flex-row"
-            role="tablist"
-          >
-            <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
-              <a
-                className={
-                  "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
-                  (openTab === 1
-                    ? "text-white bg-" + color + "-600"
-                    : "text-" + color + "-600 bg-white")
-                }
+<div className="bg-light p7 rounded w-9/12 mx-auto">
+  <ul id="tabs" className="inline-flex pt-2 px-1 w-full border-b">
+
+    <li className= "bg-light text-dark-800 dark:text-light-800 font-semibold px-4 text-dark-800 font-semibold py-2 rounded-t">
+             <a className={ (openTab === 1 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t") }
                 onClick={e => {
                   e.preventDefault();
                   setOpenTab(1);
@@ -419,14 +422,12 @@ function ProgressUp() {
                 File upload
               </a>
             </li>
-            <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
+
+    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
               <a
                 className={
-                  "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
-                  (openTab === 2
-                    ? "text-white bg-" + color + "-600"
-                    : "text-" + color + "-600 bg-white")
-                }
+                  (openTab === 2 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
+
                 onClick={e => {
                   e.preventDefault();
                   setOpenTab(2);
@@ -438,14 +439,11 @@ function ProgressUp() {
                  Setup
               </a>
             </li>
-            <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
+
+    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
               <a
-                className={
-                  "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
-                  (openTab === 3
-                    ? "text-white bg-" + color + "-600"
-                    : "text-" + color + "-600 bg-white")
-                }
+
+                className={ (openTab === 3 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
                 onClick={e => {
                   e.preventDefault();
                   setOpenTab(3);
@@ -458,14 +456,9 @@ function ProgressUp() {
               </a>
             </li>
 
-            <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
-              <a
-                className={
-                  "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
-                  (openTab === 4
-                    ? "text-white bg-" + color + "-600"
-                    : "text-" + color + "-600 bg-white")
-                }
+
+    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
+              <a className={ (openTab === 4 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
                 onClick={e => {
                   e.preventDefault();
                   setOpenTab(4);
@@ -502,7 +495,7 @@ type="file" multiple hidden />
 
 	<div id='progress-up-configSummary'></div>
 
-	<button id="upButton" onClick="uploadAll()" className="inline-block px-6
+	<button id="upButton" onClick={uploadAll} className="inline-block px-6
 	py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight
 	uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg
 	focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0
@@ -510,7 +503,7 @@ type="file" multiple hidden />
 	opacity-20" disabled>Begin Uploading files
 	</button>
 	
-	<button type="button" onClick="clearAll()" className="inline-block
+	<button type="button" onClick={clearAll} className="inline-block
 px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
 	 Reset form
 	</button>
@@ -822,7 +815,6 @@ py-4 whitespace-nowrap"> See below for possible options </td>
   </div>
 
  </div>
-</div>
 </div>
 
 
