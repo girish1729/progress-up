@@ -342,7 +342,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 	  </div>
 	</div>
 
-	<img src="images/progress-types.png" alt="Progress-up types" />
+	<img src="./assets/progress-types.png" alt="Progress-up types" />
 
        <ul class='marker:text-green list-outside'>
          <li class='pb-2'> There is also the ability to perform a test Upload to validate the endpoint.  </li>
