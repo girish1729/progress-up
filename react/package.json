@@ -26,7 +26,8 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
-    "react-dropzone": "^14.2.3"
+    "react-dropzone": "^14.2.3",
+    "react-icons": "^4.6.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.22",

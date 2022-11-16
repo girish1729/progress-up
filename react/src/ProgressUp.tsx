@@ -1,20 +1,103 @@
 import React, {
     Fragment,
     useState,
+    useEffect,
+    setState,
     Component
 } from "react";
-import Dropzone from 'react-dropzone';
+import {useDropzone} from 'react-dropzone';
 import axios from "axios";
+import ldBar from './assets/progressBar/loading-bar.js';
+import uploadIcon from './assets/icons/upload/file-submit.svg';
+import progressTypes from './assets/progress-types.png';
 
-function ProgressUp(props: any) {
+import successIcon from './assets/icons/misc/success-icon.svg';
+import trashIcon from './assets/icons/misc/trash-icon.svg';
+import failureIcon from './assets/icons/misc/failure-icon.svg';
 
-    let [uploadFileInfos, setProg] = useState < Array < any >> ([]);
-    const [isUploadDisabled, setIsUploadDisabled] = React.useState(true);
+import avi from './assets/icons/filetypes/avi.svg';
+import css from './assets/icons/filetypes/css.svg';
+import csv from './assets/icons/filetypes/csv.svg';
+import eps from './assets/icons/filetypes/eps.svg';
+import excel from './assets/icons/filetypes/excel.svg';
+import file from './assets/icons/filetypes/file.svg';
+import html from './assets/icons/filetypes/html.svg';
+import jpg from './assets/icons/filetypes/jpg.svg';
+import mov from './assets/icons/filetypes/mov.svg';
+import mp3 from './assets/icons/filetypes/mp3.svg';
+import other from './assets/icons/filetypes/other.svg';
+import pdf from './assets/icons/filetypes/pdf.svg';
+import png from './assets/icons/filetypes/png.svg';
+import ppt from './assets/icons/filetypes/ppt.svg';
+import rar from './assets/icons/filetypes/rar.svg';
+import txt from './assets/icons/filetypes/txt.svg';
+import wav from './assets/icons/filetypes/wav.svg';
+import word from './assets/icons/filetypes/word.svg';
+import zip from './assets/icons/filetypes/zip.svg';
+
+function ProgressUp() {
+
+    let [uploadFileInfos, setFileInfos] = useState<[]>([]);
+    let [uploadFileList, setUpload] = useState<File[]>([]);
+    let [progressBars, setProgress] = useState<[]>([]);
+    let [statsTable, setStats] = useState<Array[]>([]);
+    const [openTab, setOpenTab] = useState(1);
+    const [isUploadDisabled, setIsUploadDisabled] = useState(true);
     const [inputs, setInputs] = useState({});
+    const [progType, setProgType] = useState("line");
+    const [authEnabled, enableAuth] = useState(false);
+    const [authType, setAuthType] = useState("Basic");
     const [details, setDetails] = useState('');
 
-    const url = props.uploadURL;
+    // From drag and drop
+    const onDrop = (files: FileList) => {
+	console.log("Dnd" + files);
+	setUpload(files);
+        setupUpload(files);
+    };
 
+  const {getRootProps, getInputProps} = useDropzone({onDrop})
+   let color = 'white';
+
+    const fileTypes = {
+        "video": avi,
+        "css": css,
+        "csv": csv,
+        "eps": eps,
+        "excel": excel,
+        "html": html,
+        "movie": mov,
+        "mp3": mp3,
+        "other": other,
+        "pdf": pdf,
+        "ppt": ppt,
+        "rar": rar,
+        "text": txt,
+        "audio": wav,
+        "word": word,
+        "zip": zip
+    };
+
+
+    let totalfiles = 0;
+    let totalsize = 0;
+    let totaltime = 0;
+    let startUploadts = 0;
+    let endUploadts = 0;
+
+
+    let progress: any = {};
+    let showProgress: boolean = true;
+
+
+
+
+    /* XXX these are backend variables */
+    ///uploadURL = 'https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34';
+    let uploadURL = 'https://localhost:2324/uploadmultiple';
+    let filesName = "uploadFiles";
+    let user = '';
+    let pass = '';
 
     const handleChange = (event) => {
         const name = event.target.name;
@@ -22,9 +105,25 @@ function ProgressUp(props: any) {
         setInputs(values => ({
             ...values,
             [name]: value
-        }))
-    }
+        }));
+    };
 
+ const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log(inputs);
+  };
+
+   useEffect(() => {
+	console.log("Updated");
+	console.log(uploadFileInfos);
+	createProgressBars();
+
+
+   }, [uploadFileInfos]);
+
+   const darkMode = () => {
+	document.body.classList.toggle('dark');
+  };
 
     const uploadOneFile = async (file: File, idx: Number) => {
         let formData = new FormData();
@@ -38,7 +137,8 @@ function ProgressUp(props: any) {
                 let perc: number;
                 if (progEvent.total) {
                     perc = (progEvent.loaded / progEvent.total) * 100;
-                    progressBars[idx].set(perc);
+                    //progressBars[idx].set(perc);
+		    //setProgress(idx => [...progressBars[idx]]);
                     console.log(perc);
                 }
 
@@ -56,92 +156,6 @@ function ProgressUp(props: any) {
             console.log("All files uploaded");
         });
     };
-    /*
-        const onDrop = (e:any) => {
-            const files = e.DataTransfer.files;
-            if (files) {
-		onFileUpload(files);
-	    }
-	}
-        const onChange = (e:any) => {
-            const files = e.target.files;
-            if (files) {
-		onFileUpload(files);
-	    }
-	}
-
-        const onFileUpload = (files) => {
-                for (let i = 0; i < files.length; i++) {
-                    const formData = new FormData();
-                    const fileName = files[i].name;
-                    const size = files[i].size;
-                    formData.append(props.filesName, files[i]);
-                    uploadFileInfos.push({
-                        fileName,
-                        size,
-                        progressPercent: 0
-                    });
-                    uploadForm(fileName, formData);
-                setProg(uploadFileInfos);
-            }
-        };
-	*/
-
-    /* Insert new */
-
-
-
-    let preset = "line";
-    let extra = '';
-
-
-    let fileTypeIcons = {
-        "video": "avi.svg",
-        "css": "css.svg",
-        "csv": "csv.svg",
-        "eps": "eps.svg",
-        "excel": "excel.svg",
-        "html": "html.svg",
-        "movie": "mov.svg",
-        "mp3": "mp3.svg",
-        "other": "other.svg",
-        "pdf": "pdf.svg",
-        "ppt": "ppt.svg",
-        "rar": "rar.svg",
-        "text": "txt.svg",
-        "audio": "wav.svg",
-        "word": "word.svg",
-        "zip": "zip.svg"
-    };
-
-
-    /* XXX these are backend variables */
-    ///uploadURL = 'https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34';
-    let uploadURL = 'https://localhost:2324/uploadmultiple';
-    let filesName = "uploadFiles";
-    let authEnabled = false;
-    let authType = "Basic";
-    let user = '';
-    let pass = '';
-    let progType = 'line';
-
-    let uploadFileList = [];
-
-    let progressBars = [];
-    let progressInfos = [];
-    let statsTable = [];
-
-
-    let totalfiles = 0;
-    let totalsize = 0;
-    let totaltime = 0;
-    let startUploadts = 0;
-    let endUploadts = 0;
-
-
-    let progress: any = {};
-    let showProgress: boolean = true;
-
 
     const uploadAll = () => {
         if (uploadFileList) {
@@ -152,22 +166,11 @@ function ProgressUp(props: any) {
         }
     };
 
-    const onDragOver = (event: any) => {
-        event.preventDefault();
-    };
-
-    // From drag and drop
-    const onDrop = (event: any) => {
-        event.preventDefault();
-        let files = event.dataTransfer.files;
-        uploadFileList = files;
-        setupUpload();
-    };
-
-    const fileSelectFinish = (target: any) => {
-        let selectedFiles = target.files;
-        uploadFileList = selectedFiles;
-        setupUpload();
+    const fileSelectFinish = (e: any) => {
+        let files = e.target.files;
+	console.log(files);
+	setUpload(files);
+        setupUpload(files);
     };
 
     const humanFileSize = (size: number) => {
@@ -177,61 +180,75 @@ function ProgressUp(props: any) {
         return (ret);
     };
 
-    const buildThumb = (f: File, type: string) => {
+    const buildThumb = (f: File, type: string, cb) => {
         type = type.split('/')[0];
 
         if (type != 'image') {
-            var fileIcon = this.fileTypeIcons[type];
+            let fileIcon = fileTypes[type];
             if (fileIcon == undefined) {
-                fileIcon = "file.svg";
+                fileIcon = file;
             }
-            return 'assets/icons/filetypes/' + fileIcon;
+            cb(fileIcon);
         } else {
-            var reader = new FileReader();
+            let reader = new FileReader();
             reader.onload = (function(theFile) {
                 return function(e) {
-                    return e.target ? e.target.result : '';
+                    cb(e.target.result); 
                 };
             })(f);
             reader.readAsDataURL(f);
-            return;
         }
     };
 
-    const setupUpload = () => {
-        for (var i = 0; i < this.uploadFileList.length; i++) {
-            let f = this.uploadFileList[i];
-            let ts = f.lastModifiedDate.toLocaleDateString();
-            let name = f.name;
-            let size = this.humanFileSize(f.size);
-            let mime = f.type;
-            let id = 'a' + i;
-            let imagesrc = String(this.buildThumb(f, mime));
-            this.uploadFileInfos.push({
-                ts,
-                name,
-                size,
-                mime,
-                id,
-                imagesrc
-            });
-
-            var bar = new ldBar('#' + info["id"], {
-                preset: this.preset
+    const createProgressBars = () => {
+	const allBars = [];
+	for(let j = 0; j < uploadFileList.length;j++) {
+            let id = 'a' + j;
+            let bar = new ldBar('#' + id, {
+                preset: progType
             });
             bar.set(0);
+	    allBars.push(bar);
+          }
+	    setProgress(allBars);
+   };
 
-            this.progressBars.push(bar);
-            this.totalsize += f.size;
-            this.totalfiles += 1;
-        }
+    const setupUpload = (files) => {
+	const allInfos = [];
+	for(let i = 0; i < files.length;i++) {
+	    let f = files[i];
+            let ts = f.lastModifiedDate.toLocaleDateString();
+            let name = f.name;
+            let size = humanFileSize(f.size);
+            let mime = f.type;
+            let id = 'a' + i;
+            buildThumb(f, mime, function(src) { 
+		let imagesrc = src; 
+	    let fInfo = {
+                ts:ts,
+                name:name,
+                size:size,
+                mime: mime,
+                id: id,
+                imagesrc:imagesrc
+            };
+	    allInfos.push(fInfo);
+
+            totalsize += f.size;
+            totalfiles += 1;
+	    if(i == files.length - 1) {
+	    console.log("Setting uploadinfo");
+  	    	setFileInfos(allInfos);
+	     }
+	    });
+	}
         setIsUploadDisabled(false);
     };
 
     const delItem = (index: number) => {
-        let list = [...uploadFileInfo];
+        let list = [...uploadFileInfos];
         list.splice(index, 1);
-        uploadFileInfo = list;
+        setFileInfos(list);
     };
 
     const spitStatistics = (idx: number) => {
@@ -243,16 +260,27 @@ function ProgressUp(props: any) {
             var ts = new Date().toLocaleString();
             var tot = uploadFileList.length;
             var status = totalfiles == tot ?
-                '<img src="/icons/misc/success-icon.svg" >' :
-                '<img src="/icons/misc/failure-icon.svg" >';
+                "<img src={successIcon} >" :
+                "<img src={failureIcon} >";
 
-            setDetails(totalfiles / tot + "files size " + totalsize +
-                "sent in " + totaltime + " ms");
+	   var details = totalfiles / tot + "files size " + totalsize +
+                "sent in " + totaltime + " ms";
+            setDetails(details);
 
             var id = statsTable.length + 1;
+	    let stat = {
+		id: id,
+		ts: ts,
+		status: status,
+		details: details
+	    };
+
+	    let st = [...statsTable];
+	    st.push(stat);
+	    setStats(st);
 
             setIsUploadDisabled(true);
-            progressBars = [];
+	    setProgress([]);
             totalfiles = 0;
             totalsize = 0;
             totaltime = 0;
@@ -261,7 +289,19 @@ function ProgressUp(props: any) {
         }
     };
 
-    const saveConfig = () => {};
+   const needsAuth = (event) => {
+    enableAuth(event.target.checked);
+};
+    const saveConfig = () => {
+    	       console.log(inputs);
+		console.log(inputs.uploadURL);
+		console.log(inputs.filesName);
+		console.log(progType);
+		console.log(authEnabled);
+		console.log(authType);
+		console.log(inputs.user);
+		console.log(inputs.pass);
+	};
 
     const testUpload = async () => {
         console.log("Uploading using HTML5 File API...");
@@ -293,52 +333,45 @@ function ProgressUp(props: any) {
 	*/
     };
 
-    const testEP = () => {
-        saveConfig();
-        testUpload();
+
+    const setAuth = (event) => {
+	let auth = event.target.value;
+        setAuthType(auth);
+        console.log(auth);
     };
 
-    const setIndicator = () => {
-        console.log(progType);
-        progType = progType.toLowerCase()
-        switch (progType) {
-            case "line":
-                preset = progType;
-                break;
-            case "fan":
-                preset = progType;
-                break;
+
+    const setIndicator = (event) => {
+
+	let ind = event.target.value;
+	ind = ind.toLowerCase()
+        setProgType(ind);
+        console.log(ind);
+        switch (ind) {
             case "bubble":
-                preset = progType;
                 extra = 'data-img-size="100,100"';
                 break;
             case "rainbow":
-                preset = progType;
                 extra = 'data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"';
-                break;
-            case "energy":
-                preset = progType;
-                break;
-            case "stripe":
-                preset = progType;
-                break;
-            case "text":
-                preset = progType;
-                break;
-            case "circle":
-                preset = progType;
                 break;
             default:
                 break;
         }
     };
 
+    const testEP = () => {
+        saveConfig();
+        testUpload();
+    };
+
 
     const clearAll = () => {
         setDetails("");
-        progressInfos = [];
-        uploadFileList = [];
-        progressBars = [];
+        setUpload([]);
+	setStats([]);
+	setFileInfos([]);
+	setProgress([]);
+        
         totalfiles = 0;
         totalsize = 0;
         totaltime = 0;
@@ -349,7 +382,9 @@ function ProgressUp(props: any) {
         console.log("Cleared");
 
     };
+
   return (
+
   <Fragment>
 
 
@@ -358,87 +393,135 @@ function ProgressUp(props: any) {
 <h2 className="text-5xl leading-tight mb-4 pb-4 border-b">  HTML5 Multiple File Upload with Progress Bar 
 </h2>
 
-<div className="bg-light p7 rounded w-9/12 mx-auto">
-  <ul id="tabs" className="inline-flex pt-2 px-1 w-full border-b">
 
-    <li className="bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px">
-	<a id="default-tab" href="#first">File upload</a>
-    </li>
+      <div className="flex flex-wrap">
+        <div className="w-full">
+          <ul
+            className="flex mb-0 list-none flex-wrap pt-3 pb-4 flex-row"
+            role="tablist"
+          >
+            <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
+              <a
+                className={
+                  "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
+                  (openTab === 1
+                    ? "text-white bg-" + color + "-600"
+                    : "text-" + color + "-600 bg-white")
+                }
+                onClick={e => {
+                  e.preventDefault();
+                  setOpenTab(1);
+                }}
+                data-toggle="tab"
+                href="#link1"
+                role="tablist"
+              >
+                File upload
+              </a>
+            </li>
+            <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
+              <a
+                className={
+                  "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
+                  (openTab === 2
+                    ? "text-white bg-" + color + "-600"
+                    : "text-" + color + "-600 bg-white")
+                }
+                onClick={e => {
+                  e.preventDefault();
+                  setOpenTab(2);
+                }}
+                data-toggle="tab"
+                href="#link2"
+                role="tablist"
+              >
+                 Setup
+              </a>
+            </li>
+            <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
+              <a
+                className={
+                  "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
+                  (openTab === 3
+                    ? "text-white bg-" + color + "-600"
+                    : "text-" + color + "-600 bg-white")
+                }
+                onClick={e => {
+                  e.preventDefault();
+                  setOpenTab(3);
+                }}
+                data-toggle="tab"
+                href="#link3"
+                role="tablist"
+              >
+                Statistics 
+              </a>
+            </li>
 
-    <li className="px-4 text-dark-800 font-semibold py-2 rounded-t">
-	<a href="#second">Setup</a>
-    </li> 
+            <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
+              <a
+                className={
+                  "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
+                  (openTab === 4
+                    ? "text-white bg-" + color + "-600"
+                    : "text-" + color + "-600 bg-white")
+                }
+                onClick={e => {
+                  e.preventDefault();
+                  setOpenTab(4);
+                }}
+                data-toggle="tab"
+                href="#link3"
+                role="tablist"
+              >
+                Help
+              </a>
+            </li>
+          </ul>
 
-    <li className="px-4 text-dark-800 font-semibold py-2 rounded-t">
-	<a href="#third">Statistics</a>
-    </li>
-
-    <li className="px-4 text-dark-800 font-semibold py-2 rounded-t">
-	<a href="#fourth">Help</a>
-    </li>
-  </ul>
 
 <div id="tab-contents">
 
- <div id="first" className="p-4">
+ <div className={openTab === 1 ? "block" : "hidden"} id="link1">
 	<div id='progress-up-statsArea'>
-	<div id="uploadStats">
-	<h2 className="text-5xl leading-tight border-b">{details} </h2>
+		<h2 className="text-5xl leading-tight border-b">{details} </h2>
 	</div>
 
-
-	</div>
-
-	<div id='progress-up-form' className="bg-light p-4 rounded mx-auto">
-
+	<div {...getRootProps()} className="bg-light p-4 rounded mx-auto">
     	  <div className="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
-
-	<Dropzone  onDrop={onDrop} >
 	   <form className='flex p-8  justify-center'>
-		<img htmlFor="fileInput" className="stroke-white dark:bg-white" width="100"
-height="100" src="assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" />
-	       <input id="fileInput" name="uploadFiles"
-onChange={fileSelectFinish} type="file" multiple hidden />
+		<img className="stroke-white dark:bg-white" width="100" height="100"
+src={uploadIcon} alt="progress-up file submit icon" />
+	       <input {...getInputProps()} id="progress-up-fileInput" name="uploadFiles"
+type="file" multiple hidden />
 	   </form>
 	   <h2 className="flex justify-center text-dark-500 text-xl font-medium mb-2"> 
 	     Drop files or click to select</h2>
-
-	</Dropzone>
 	  </div>
 	</div>
 
-	<div id="config">
-		<h2 className="leading-tight pb-2">
-			&#128202; Progress type <span
-className='text-sm'>{preset}</span>  
-			 &#128228; Upload URL <span
-className='text-sm'>{uploadURL}</span> 
-		&#128218; FilesName <span
-className='text-sm'>{filesName}</span>
-		</h2>
-	</div>
-	
+	<div id='progress-up-configSummary'></div>
 
-	<button disabled={disableUpload} 
-
-className={`container${isUploadDisabled ? " opacity-20" : ""}`}
-
-onClick={uploadAll} className="inline-block px-6
+	<button id="upButton" onClick="uploadAll()" className="inline-block px-6
 	py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight
 	uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg
 	focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0
 	active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out
-	" disabled>Begin Uploading files </button>
+	opacity-20" disabled>Begin Uploading files
+	</button>
 	
-	<button type="button" onClick={clearAll} className="inline-block
+	<button type="button" onClick="clearAll()" className="inline-block
 px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
 	 Reset form
 	</button>
  	
+
   </div>
 
 
-  <div id="second" className="hidden p-4">
+<div className={openTab === 2 ? "block" : "hidden"} id="link2">
+
+
 	<h2>File upload config</h2>
 	   <form className="w-full max-w-lg">
 	     <div className="flex flex-wrap -mx-3 mb-6">
@@ -476,12 +559,11 @@ CORS]" />
 	           Progress indicator type
 	         </label>
 	         <div className="relative">
-	           <select id='progType' onChange={handleChange} value={inputs.progType || ""}
-v-on:change="setIndicator()" className="block appearance-none w-full bg-gray-200 border
+	           <select id='progType' onChange={setIndicator} value={inputs.progType || ""} className="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	   >
-	   			<option selected>Line</option>
+	   			<option defaultValue>Line</option>
 	   			<option>Fan</option>
 	   			<option>Bubble</option>
 	   			<option>Energy</option>
@@ -504,7 +586,7 @@ v-on:change="setIndicator()" className="block appearance-none w-full bg-gray-200
 	         <span className="text-sm">
 	           HTTP Auth required?
 	         </span>
-	         <input id='authEnabled' onChange={handleChange} value={inputs.authEnabled || false}
+	         <input id='authEnabled' onChange={needsAuth} value={inputs.authEnabled || false}
 className="mr-2 leading-tight"
 type="checkbox" />
 	       </label>
@@ -520,7 +602,7 @@ text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	              Auth type
 	            </label>
 	            <div className="relative">
-	              <select id='authType' onChange={handleChange} value={inputs.authType || ""} className="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
+	              <select id='authType' onChange={setAuth} value={inputs.authType || ""} className="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
 	                <option>HTTP basic auth</option>
 	                <option>HTTP digest auth</option>
 	              </select>
@@ -574,7 +656,8 @@ ease-in-out" >
 	   </form>
   </div>
 
-  <div id="third" className="hidden p-4">
+
+<div className={openTab === 3 ? "block" : "hidden"} id="link3">
       <h2> Statistics </h2>
 	<div className="flex flex-col">
 	  <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -599,10 +682,10 @@ ease-in-out" >
 	          </thead>
 	          <tbody id="progress-up-statsTable">
 
+  {statsTable.length > 0 ? 
+   (statsTable.map(({id, ts, status, details}) => (
 
-  {statsTable.map(({id, ts, status, details}) => (
-
-     <div>
+     <div key={id}>
 	            <tr className="bg-gray-100 border-b">
 	              <td className="px-6 py-4 whitespace-nowrap text-sm
 font-medium text-gray-900">{id}</td>
@@ -618,7 +701,7 @@ font-medium text-gray-900">{id}</td>
 	            </tr>
 	</div>
    )
-   )}
+   )):<tr><td> No data </td></tr>}
 
 		   </tbody>
 	        </table>
@@ -626,9 +709,12 @@ font-medium text-gray-900">{id}</td>
 	    </div>
 	  </div>
 	</div>
+
    </div>
 
-  <div id="fourth" className="hidden p-4">
+
+
+ <div className={openTab === 4 ? "block" : "hidden"} id="link4">
     <div className="flex flex-col">
       <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
 	 <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
@@ -637,7 +723,6 @@ font-medium text-gray-900">{id}</td>
 	        <table className="min-w-full">
 	          <thead className="bg-light border-b">
 	            <tr>
-
 	              <th scope="col" className="text-sm font-medium text-dark-900 px-6 py-4 text-left">
 	               Param
 	              </th>
@@ -719,7 +804,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 	  </div>
 	</div>
 
-	<img src="images/progress-types.png" alt="Progress-up types" />
+	<img src={progressTypes} alt="Progress-up types" />
 
        <ul className='marker:text-green list-outside'>
          <li className='pb-2'> There is also the ability to perform a test Upload to validate the endpoint.  </li>
@@ -736,8 +821,10 @@ py-4 whitespace-nowrap"> See below for possible options </td>
        </ul>
   </div>
 
-  </div>
+ </div>
 </div>
+</div>
+
 
 <div id="progress-up-progressArea"> 
 
@@ -746,12 +833,12 @@ py-4 whitespace-nowrap"> See below for possible options </td>
   uploadFileInfos.map(({name, ts, mime, size,id, imagesrc}) => (
  
 
-<section  className="m-4 p-4 mt-4 mb-4 transition-colors
+<section key={name} className="m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white mx-auto">
  <div className="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
 border-gray-300 text-gray-600 dark:text-white relative">
 
-  <div  onClick={delItem(id)} title="Delete" className="absolute
+  <div  onClick={() => delItem(id)} title="Delete" className="absolute
 cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
 	<img width="25" height="25" src="assets/icons/misc/trash-icon.svg" />
   </div>
@@ -760,7 +847,7 @@ cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
       <div className="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div className="h-12 text-sm text-grey-dark flex items-left
 justify-left">
-             <img width="125" height="125" src="imagesrc" title="name" alt="name" class="w-12 h-12" />
+             <img width="125" height="125" src={imagesrc} title={name} alt={name} className="w-12 h-12" />
          </div>
       </div>
 
@@ -792,7 +879,7 @@ dark:text-white">
   </div>
 </section>
  ))
-) : <p>HTML5 Multiple upload progress indicator </p>}
+):<br/> }
 
 
   </div>

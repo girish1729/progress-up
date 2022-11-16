@@ -20,7 +20,12 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+{
+    "glob": "**/*",
+    "input": "./node_modules/progress-up/assets",
+    "output": "./assets"
+  }
             ],
             "scripts": []
           },
@@ -85,6 +90,7 @@
             "assets": [
               "src/favicon.ico",
               "src/assets"
+
             ],
             "styles": [
               "src/styles.css"

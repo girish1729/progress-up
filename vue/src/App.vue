@@ -1,5 +1,7 @@
 <template>
 
+<div class="dark:bg-gray-800 dark:text-white">
+
 <!-- Dark mode controls -->
 <div class="flex justify-end items-center space-x-2 mx-auto relative">
   <div class="w-14 h-8">
@@ -15,94 +17,44 @@ onchange="document.documentElement.classList.toggle('dark')" />
 </div>
 
 
-<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
+<!--
+	<div id="config">
+		<h2 class="leading-tight pb-2">
+			&#128202; Progress type <span
+class='text-sm'>{{form.progType}}</span>  
+			 &#128228; Upload URL <span
+class='text-sm'>{{form.uploadURL}}</span> 
+		&#128218; FilesName <span
+class='text-sm'>{{form.filesName}}</span>
 
-<h2 class="text-5xl leading-tight mb-4 pb-4 border-b">  HTML5 Multiple File Upload with Progress Bar 
-</h2>
-
-<!-- XXX tabs -->
-<div class="bg-light p7 rounded w-9/12 mx-auto">
-  <!-- Tabs -->
-  <ul id="tabs" class="inline-flex pt-2 px-1 w-full border-b">
-
-    <li class="bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px">
-	<a id="default-tab" 
-@click="toggleTabs(1)" :class="{'text-pink-600 bg-white': openTab !== 1, 'text-white bg-pink-600': openTab === 1}"> File upload</a>
-    </li>
-
-    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
-	<a
-@click="toggleTabs(2)" :class="{'text-pink-600 bg-white': openTab !== 2, 'text-white bg-pink-600': openTab === 2}">
-Setup</a>
-    </li> 
-
-    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
-	<a 
-@click="toggleTabs(3)" :class="{'text-pink-600 bg-white': openTab !== 3, 'text-white bg-pink-600': openTab === 3}">
-Statistics</a>
-    </li>
-
-    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
-	<a 
-@click="toggleTabs(4)" :class="{'text-pink-600 bg-white': openTab !== 4, 'text-white bg-pink-600': openTab === 4}">
-Help</a>
-    </li>
-
-  </ul>
-
-  <!-- Tab Contents -->
-<div id="tab-contents">
-
- <div :class="{'hidden': openTab !== 1, 'block': openTab === 1}">
-<!-- XXX drag drop -->
-	<div id='progress-up-statsArea'></div>
-
-	<div id='progress-up-form' class="bg-light p-4 rounded mx-auto">
-    	  <div class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
-	   <form class='flex p-8  justify-center'>
-		<img class="stroke-white dark:bg-white" width="100" height="100"
-src="./assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" />
-	       <input id="progress-up-fileInput" name="uploadFiles" type="file" multiple hidden>
-	   </form>
-	   <h2 class="flex justify-center text-dark-500 text-xl font-medium mb-2"> 
-	     Drop files or click to select</h2>
-	  </div>
+		</h2>
 	</div>
 
-	<div id='progress-up-configSummary'></div>
+<h2 class="text-5xl leading-tight border-b"> {{details}} </h2>
 
-	<button id="upButton" onClick="uploadAll()" class="inline-block px-6
-	py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight
-	uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg
-	focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0
-	active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out
-	opacity-20" disabled>Begin Uploading files
-	</button>
+	<div @dragover.prevent @drop.stop.prevent="onDrop" @click="openFileBrowser"  class="bg-light p-4 rounded mx-auto"> 
+    	  <div class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
+	   <form class='flex p-8  justify-center'>
+		<img class="stroke-white dark:bg-white" width="100"
+height="100" src="./assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" />
+	       <input ref="fileInput" @change="fileSelectFinish" name="uploadFiles" type="file" multiple hidden>
+	   </form>
+	</div>
+-->
 	
-	<button type="button" onClick="clearAll()" class="inline-block
-px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
-	 Reset form
-	</button>
- 	
-
-  </div>
-
-<!-- Second tab -->
-
- <div :class="{'hidden': openTab !== 2, 'block': openTab === 2}">
-	<h2>File upload config</h2>
+<h2>File upload config</h2>
 	   <form class="w-full max-w-lg">
 	     <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
 	         <label class="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" for="grid-post-endpoint">
+	   font-bold mb-2" for="uploadURL">
 	          POST endpoint  
 	         </label>
-	         <input id='progress-up-uploadURL' class="appearance-none block w-full bg-gray-200
+	         <input v-model='form.uploadURL' class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	   focus:outline-none focus:bg-light" type="text"
 	   placeholder="URL to post [cross origin or absolute URL needs CORS]">
-	         <p class="text-red-500 text-xs italic">Please fill out this field.</p>
+	         <p class="text-red-500 text-xs italic">Please fill out field.</p>
 	       </div>
 	   
 	       <div class="w-full md:w-1/2 px-3">
@@ -110,7 +62,7 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	   font-bold mb-2" for="progress-up-filesName">
 	   	Name of files input field
 	         </label>
-	         <input id='progress-up-filesName' class="appearance-none block w-full bg-gray-200
+	         <input v-model='form.filesName' class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	    type="text" placeholder="Name of files input field">
@@ -124,7 +76,7 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	           Progress indicator type
 	         </label>
 	         <div class="relative">
-	           <select id='progress-up-indicator' onChange="setIndicator()" class="block appearance-none w-full bg-gray-200 border
+	           <select v-model='form.progType' v-on:change="setIndicator()" class="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	   >
@@ -151,19 +103,20 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	         <span class="text-sm">
 	           HTTP Auth required?
 	         </span>
-	         <input onChange="toggleAuthQ(this)" id='progress-up-authenable' class="mr-2 leading-tight" type="checkbox">
+	         <input v-model='authEnabled' @change='enableAuth' class="mr-2 leading-tight" type="checkbox">
 	       </label>
 	      </div>
 	     </div>
 	   
-             <div id='progress-up-authsection' class="hidden">
+             <div v-bind:class="(authEnabled) ? 'block' : 'hidden'" >
 	        <div class="flex flex-wrap -mx-3 mb-6">
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-	            <label class="block uppercase tracking-wide text-dark-700 text-xs font-bold mb-2" for="grid-state">
+	            <label class="block uppercase tracking-wide
+text-dark-700 text-xs font-bold mb-2" for="progress-up-authtype">
 	              Auth type
 	            </label>
 	            <div class="relative">
-	              <select id='progress-up-authtype' class="block
+	              <select v-model='form.authType' class="block
 appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700
 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
 	                <option>HTTP basic auth</option>
@@ -178,22 +131,22 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 	      
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
 	            <label class="block uppercase tracking-wide text-dark-700 text-xs
-	      font-bold mb-2" for="grid-username">
+	      font-bold mb-2" for="username">
 	             Username  
 	            </label>
-	            <input id='progress-up-username' class="appearance-none block w-full bg-gray-200
+	            <input v-model='form.user' class="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	      focus:outline-none focus:bg-light"  type="text"
 	      placeholder="username">
-	            <p class="text-red-500 text-xs italic">Please fill out this field.</p>
+	            <p class="text-red-500 text-xs italic">Please fill out field.</p>
 	          </div>
 	      
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
 	            <label class="block uppercase tracking-wide text-dark-700 text-xs
-	      font-bold mb-2" for="grid-pass">
+	      font-bold mb-2" for="progress-up-pass">
 	      	Password
 	            </label>
-	            <input id='progress-up-pass' class="appearance-none block w-full bg-gray-200
+	            <input v-model='form.pass' class="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	      focus:outline-none focus:bg-light focus:border-gray-500"
 	       type="password" placeholder="Password">
@@ -201,168 +154,45 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 	         </div>
  	   </div>
 	   
-	   <button type="button" onClick="saveConfig()" class="inline-block px-6
+	   <button type="button" @click="saveConfig()" class="inline-block px-6
 	py-2.5 bg-red-600 text-dark dark:text-white font-medium text-xs leading-tight uppercase
 	rounded shadow-md hover:bg-red-700 hover:shadow-lg focus:bg-red-700
 	focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-800
 	active:shadow-lg transition duration-150 ease-in-out">Save</button>
 	   
-	   <button type="button" onClick="testEP()" class="inline-block
+	   <button type="button" @click="testEP()" class="inline-block
 px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out">
 	    Test file upload
 	   </button>
 	   </form>
-  </div>
 
-<!-- Third tab -->
 
- <div :class="{'hidden': openTab !== 3, 'block': openTab === 3}">
-      <h2> Statistics </h2>
-	<div class="flex flex-col">
-	  <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
-	    <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
-	      <div class="overflow-hidden">
-	        <table class="min-w-full">
-	          <thead class="bg-light border-b">
-	            <tr>
-	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
-	                #
-	              </th>
-	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
-	                Time
-	              </th>
-	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
-	                Status
-	              </th>
-	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
-	                Details
-	              </th>
+	<button id="upButton" @click="uploadAll()" v-bind:class="{ 'opacity-20' : disableUpload}" class="inline-block px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out" :disabled="disableUpload">Begin Uploading files </button>
+	
+<!--
+	<button type="button" @click="clearAll()" class="inline-block
+px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
+	 Reset form
+	</button>
+ 
+
+	
+     <div v-for="(stat, index) in statsTable" :key="index" >
+
+	            <tr class="bg-gray-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-gray-900">{{stat.id}}</td>
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+			   {{stat.ts}}
+	              </td>
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+			   {{stat.status}}
+	              </td>
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+			   {{stat.details}}
+	              </td>
 	            </tr>
-	          </thead>
-	          <tbody id="progress-up-statsTable">
-
-		   </tbody>
-	        </table>
-	      </div>
-	    </div>
-	  </div>
 	</div>
-
-   </div>
-
-<!-- Fourth tab -->
-
- <div :class="{'hidden': openTab !== 4, 'block': openTab === 4}">
-    <div class="flex flex-col">
-      <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
-	 <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
-	    <div class="overflow-hidden">
-
-	        <table class="min-w-full">
-	          <thead class="bg-light border-b">
-	            <tr>
-	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
-	               Param
-	              </th>
-	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
-	                Type
-	              </th>
-	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
-	                Description
-	              </th>
-	            </tr>
-	          </thead>
-	          <tbody>
-
-	            <tr class="bg-light-100 border-b">
-	              <td class="px-6 py-4 whitespace-nowrap text-sm
-font-medium text-dark-900">uploadURL</td>
-	              <td class="text-sm text-dark-900 font-light px-6
-py-4 whitespace-nowrap"> String </td>
-	              <td class="text-sm text-dark-900 font-light px-6
-py-4 whitespace-nowrap"> The absolute/relative path of HTTP POST
-endpoint </td>
-		   </tr>
-
-
-	            <tr class="bg-light-100 border-b">
-	              <td class="px-6 py-4 whitespace-nowrap text-sm
-font-medium text-dark-900">filesName</td>
-	              <td class="text-sm text-dark-900 font-light px-6 py-4 whitespace-nowrap"> String </td>
-	              <td class="text-sm text-dark-900 font-light px-6
-py-4 whitespace-nowrap"> The name of files configured in backend </td>
-		   </tr>
-
-	            <tr class="bg-light-100 border-b">
-	              <td class="px-6 py-4 whitespace-nowrap text-sm
-font-medium text-dark-900">HTTP auth </td>
-	              <td class="text-sm text-dark-900 font-light px-6
-py-4 whitespace-nowrap"> Checkbox </td>
-	              <td class="text-sm text-dark-900 font-light px-6
-py-4 whitespace-nowrap"> Enable it if your backend requires auth</td>
-		   </tr>
-
-	            <tr class="bg-light-100 border-b">
-	              <td class="px-6 py-4 whitespace-nowrap text-sm
-font-medium text-dark-900">HTTP auth type</td>
-	              <td class="text-sm text-dark-900 font-light px-6
-py-4 whitespace-nowrap"> Select option </td>
-	              <td class="text-sm text-dark-900 font-light px-6
-py-4 whitespace-nowrap"> Choose one of Digest/Basic HTTP auth </td>
-		   </tr>
-
-	            <tr class="bg-light-100 border-b">
-	              <td class="px-6 py-4 whitespace-nowrap text-sm
-font-medium text-dark-900">Auth username</td>
-	              <td class="text-sm text-dark-900 font-light px-6 py-4 whitespace-nowrap"> String </td>
-	              <td class="text-sm text-dark-900 font-light px-6
-py-4 whitespace-nowrap"> Username configured in backend for auth </td>
-		   </tr>
-
-	            <tr class="bg-light-100 border-b">
-	              <td class="px-6 py-4 whitespace-nowrap text-sm
-font-medium text-dark-900">Password</td>
-	              <td class="text-sm text-dark-900 font-light px-6 py-4 whitespace-nowrap"> String </td>
-	              <td class="text-sm text-dark-900 font-light px-6
-py-4 whitespace-nowrap"> Password configured in backend for auth </td>
-		   </tr>
-
-	            <tr class="bg-light-100 border-b">
-	              <td class="px-6 py-4 whitespace-nowrap text-sm
-font-medium text-dark-900">Progress Indicator</td>
-	              <td class="text-sm text-dark-900 font-light px-6
-py-4 whitespace-nowrap"> Select option</td>
-	              <td class="text-sm text-dark-900 font-light px-6
-py-4 whitespace-nowrap"> See below for possible options </td>
-		   </tr>
-		   </tbody>
-	        </table>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-
-	<img src="images/progress-types.png" alt="Progress-up types" />
-
-       <ul class='marker:text-green list-outside'>
-         <li class='pb-2'> There is also the ability to perform a test Upload to validate the endpoint.  </li>
-         <li>
-       	Remember that the configuration is active only for the session.
-         </li>
-       
-         <li>
-       	There is also statistics for upload and profiling available.
-         </li>
-         <li>
-       	If using absolute URL please ensure <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS is enabled</a>.
-         </li>
-       </ul>
-  </div>
-
- </div>
-</div>
-<!-- XXX tabs -->
-
 
 <div id="progress-up-progressArea"> 
   <div v-for="(file,id) in uploadFileInfos" :key = "id" >
@@ -413,14 +243,14 @@ py-4 whitespace-nowrap"> See below for possible options </td>
     </section>
   </div>
 </div>
+-->
 
+ 
+  </div>
 </template>
-
-
 <script>
-import axios from "axios";
 
-import ldBar from "./assets/progressBar/loading-bar.js";
+import axios from "axios";
 
 export default {
   data() {
@@ -719,24 +549,6 @@ humanFileSize(size) {
 
 </script>
 
-<style scoped>
+<style>
 @import url("https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/progress-up.css");
-.ldBar {
-  position: relative;
-}
-.ldBar.label-center > .ldBar-label {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  text-shadow: 0 0 3px #fff;
-}
-.ldBar-label:after {
-  content: "%";
-  display: inline;
-}
-.ldBar.no-percent .ldBar-label:after {
-  content: "";
-}
 </style>

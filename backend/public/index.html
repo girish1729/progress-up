@@ -105,12 +105,12 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	     <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
 	         <label class="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" for="grid-post-endpoint">
+	   font-bold mb-2" for="progress-up-uploadURL">
 	          POST endpoint  
 	         </label>
 	         <input id='progress-up-uploadURL' class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
-	   focus:outline-none focus:bg-light" id="grid-post-endpoint" type="text"
+	   focus:outline-none focus:bg-light"  type="text"
 	   placeholder="URL to post [cross origin or absolute URL needs CORS]">
 	         <p class="text-red-500 text-xs italic">Please fill out this field.</p>
 	       </div>
@@ -123,7 +123,7 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	         <input id='progress-up-filesName' class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
-	   id="grid-files-name" type="text" placeholder="Name of files input field">
+	    type="text" placeholder="Name of files input field">
 	       </div>
 	      </div>
 	   
@@ -169,13 +169,14 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
              <div id='progress-up-authsection' class="hidden">
 	        <div class="flex flex-wrap -mx-3 mb-6">
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-	            <label class="block uppercase tracking-wide text-dark-700 text-xs font-bold mb-2" for="grid-state">
+	            <label class="block uppercase tracking-wide
+text-dark-700 text-xs font-bold mb-2" for="progress-up-authtype">
 	              Auth type
 	            </label>
 	            <div class="relative">
 	              <select id='progress-up-authtype' class="block
 appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700
-py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" id="grid-state">
+py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500">
 	                <option>HTTP basic auth</option>
 	                <option>HTTP digest auth</option>
 	              </select>
@@ -188,25 +189,25 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 	      
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
 	            <label class="block uppercase tracking-wide text-dark-700 text-xs
-	      font-bold mb-2" for="grid-username">
+	      font-bold mb-2" for="progress-up-username">
 	             Username  
 	            </label>
 	            <input id='progress-up-username' class="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
-	      focus:outline-none focus:bg-light" id="grid-username" type="text"
+	      focus:outline-none focus:bg-light"  type="text"
 	      placeholder="username">
 	            <p class="text-red-500 text-xs italic">Please fill out this field.</p>
 	          </div>
 	      
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
 	            <label class="block uppercase tracking-wide text-dark-700 text-xs
-	      font-bold mb-2" for="grid-pass">
+	      font-bold mb-2" for="progress-up-pass">
 	      	Password
 	            </label>
 	            <input id='progress-up-pass' class="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	      focus:outline-none focus:bg-light focus:border-gray-500"
-	      id="grid-pass" type="password" placeholder="Password">
+	       type="password" placeholder="Password">
 	          </div>
 	         </div>
  	   </div>

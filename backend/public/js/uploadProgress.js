@@ -437,13 +437,8 @@ function setIndicator() {
     var progType = document.getElementById("progress-up-indicator").value;
     console.log(progType);
     progType = progType.toLowerCase()
+    preset = progType;
     switch (progType) {
-        case "line":
-            preset = progType;
-            break;
-        case "fan":
-            preset = progType;
-            break;
         case "bubble":
             preset = progType;
             extra = 'data-img-size="100,100"';
@@ -451,18 +446,6 @@ function setIndicator() {
         case "rainbow":
             preset = progType;
             extra = 'data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"';
-            break;
-        case "energy":
-            preset = progType;
-            break;
-        case "stripe":
-            preset = progType;
-            break;
-        case "text":
-            preset = progType;
-            break;
-        case "circle":
-            preset = progType;
             break;
         default:
             break;

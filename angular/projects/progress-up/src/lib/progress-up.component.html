@@ -1,7 +1,44 @@
-<div id='progress-up-statsArea'>
-		<h2 class="text-5xl leading-tight border-b"> {{details}} </h2>
-</div>
+<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 
+<h2 class="text-5xl leading-tight mb-4 pb-4 border-b">  HTML5 Multiple File Upload with Progress Bar 
+</h2>
+
+<!-- XXX tabs -->
+<div class="bg-light p7 rounded w-9/12 mx-auto">
+  <!-- Tabs -->
+  <ul id="tabs" class="inline-flex pt-2 px-1 w-full border-b">
+
+    <li class="bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px">
+	<a  (click)="toggleTabs(1)" [ngClass]="{'text-pink-600 bg-white': openTab !== 1, 'text-white bg-pink-600': openTab === 1}">
+File upload</a>
+    </li>
+
+    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
+
+	<a  (click)="toggleTabs(2)" [ngClass]="{'text-pink-600 bg-white': openTab !== 2, 'text-white bg-pink-600': openTab === 2}"> Setup</a>
+    </li> 
+
+    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
+	<a  (click)="toggleTabs(3)" [ngClass]="{'text-pink-600 bg-white': openTab !== 3, 'text-white bg-pink-600': openTab === 3}">Statistics</a>
+    </li>
+
+    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
+	<a  (click)="toggleTabs(4)" [ngClass]="{'text-pink-600 bg-white': openTab !== 4, 'text-white bg-pink-600': openTab === 4}">  Help</a>
+    </li>
+  </ul>
+
+  <!-- Tab Contents -->
+<div id="tab-contents">
+
+ <div [ngClass]="{'hidden': openTab !== 1, 'block': openTab === 1}">
+<!-- XXX drag drop -->
+	<div id='progress-up-statsArea'>
+	<div id="uploadStats">
+		<h2 class="text-5xl leading-tight border-b"> {{details}} </h2>
+	</div>
+
+
+	</div>
 
 	<div (dragover)="onDragOver($event)" (drop)="onDropSuccess($event)"
 (click)="fileInput.click()" id='progress-up-form' class="bg-light p-4 rounded mx-auto">
@@ -17,15 +54,7 @@ height="100" src="assets/icons/upload/file-submit.svg" alt="progress-up file sub
 	  </div>
 	</div>
 
-	<div id="config">
-		<h2 class="leading-tight pb-2">
-			&#128202; Progress type <span
-class='text-sm'>{{preset}}</span>  
-			 &#128228; Upload URL <span
-class='text-sm'>{{uploadURL}}</span> 
-		&#128218; FilesName <span
-class='text-sm'>{{filesName}}</span>
-		</h2>
+	<div [innerHTML]="configVals" id="config">
 	</div>
 	
 
@@ -42,15 +71,22 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	 Reset form
 	</button>
  	
+  </div>
 
- <form class="w-full max-w-lg">
+<!-- Second tab -->
+
+  <div [ngClass]="{'hidden': openTab !== 2, 'block': openTab === 2}">
+
+	<h2>File upload config</h2>
+
+        <form class="w-full max-w-lg">
 	     <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
 	         <label class="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" for="progress-up-uploadURL">
+	   font-bold mb-2" for="uploadURL">
 	          POST endpoint  
 	         </label>
-	         <input [(ngModel)]='uploadURL' class="appearance-none block w-full bg-gray-200
+	         <input name='uploadURL' class="form-control" [(ngModel)]='uploadURL' class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	   focus:outline-none focus:bg-light" type="text"
 	   placeholder="URL to post [cross origin or absolute URL needs CORS]">
@@ -59,10 +95,10 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	   
 	       <div class="w-full md:w-1/2 px-3">
 	         <label class="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" for="progress-up-filesName">
+	   font-bold mb-2" for="filesName">
 	   	Name of files input field
 	         </label>
-	         <input [(ngModel)]='filesName' class="appearance-none block w-full bg-gray-200
+	         <input name='filesName' class="form-control" [(ngModel)]='filesName' class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	    type="text" placeholder="Name of files input field">
@@ -76,11 +112,8 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	           Progress indicator type
 	         </label>
 	         <div class="relative">
-	           <select [(ngModel)]='progType'
-v-on:change="setIndicator()" class="block appearance-none w-full bg-gray-200 border
-	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
-	   focus:outline-none focus:bg-light focus:border-gray-500"
-	   >
+	           <select class='form-control' name='progType'
+[(ngModel)]='progType' (onChange)="setIndicator()" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
 	   			<option default>Line</option>
 	   			<option>Fan</option>
 	   			<option>Bubble</option>
@@ -104,7 +137,7 @@ v-on:change="setIndicator()" class="block appearance-none w-full bg-gray-200 bor
 	         <span class="text-sm">
 	           HTTP Auth required?
 	         </span>
-	         <input [(ngModel)]='authEnabled' class="mr-2 leading-tight" type="checkbox">
+	         <input name='authEnabled' class="form-control" [(ngModel)]='authEnabled' class="mr-2 leading-tight" type="checkbox">
 	       </label>
 	      </div>
 	     </div>
@@ -117,10 +150,7 @@ text-dark-700 text-xs font-bold mb-2" for="authType">
 	              Auth type
 	            </label>
 	            <div class="relative">
-	              <select [(ngModel)]='authType' class="block
-appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700
-py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
-	                <option>HTTP basic auth</option>
+	              <select name='authType' class='form-control' [(ngModel)]='authType' class="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" > <option>HTTP basic auth</option>
 	                <option>HTTP digest auth</option>
 	              </select>
 	       
@@ -135,7 +165,7 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 	      font-bold mb-2" for="user">
 	             Username  
 	            </label>
-	            <input [(ngModel)]='user' class="appearance-none block w-full bg-gray-200
+	            <input name='user' class="form-control" [(ngModel)]='user' class="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	      focus:outline-none focus:bg-light"  type="text"
 	      placeholder="username">
@@ -147,7 +177,7 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 	      font-bold mb-2" for="progress-up-pass">
 	      	Password
 	            </label>
-	            <input [(ngModel)]='pass' class="appearance-none block w-full bg-gray-200
+	            <input  name='pass' class="form-control" [(ngModel)]='pass' class="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	      focus:outline-none focus:bg-light focus:border-gray-500"
 	       type="password" placeholder="Password">
@@ -165,8 +195,36 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out">
 	    Test file upload
 	   </button>
-	   </form>
-     <div *ngFor="let stat in statsTable">
+    </form>
+  </div>
+
+<!-- Third tab -->
+  <div [ngClass]="{'hidden': openTab !== 3, 'block': openTab === 3}">
+      <h2> Statistics </h2>
+	<div class="flex flex-col">
+	  <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+	    <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
+	      <div class="overflow-hidden">
+	        <table class="min-w-full">
+	          <thead class="bg-light border-b">
+	            <tr>
+	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
+	                #
+	              </th>
+	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
+	                Time
+	              </th>
+	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
+	                Status
+	              </th>
+	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
+	                Details
+	              </th>
+	            </tr>
+	          </thead>
+	          <tbody id="progress-up-statsTable">
+
+     <div *ngFor="let stat of statsTable;">
 
 	            <tr class="bg-gray-100 border-b">
 	              <td class="px-6 py-4 whitespace-nowrap text-sm
@@ -183,9 +241,179 @@ font-medium text-gray-900">{{stat.id}}</td>
 	            </tr>
 	</div>
 
-<div id="progress-up-progressArea"> 
-  <div *ngFor="let file in uploadFileInfos; let id = index" >
-          <div class='ldBar bottom-0 right-0 pb-8' [id]="file.id" ></div>
+		   </tbody>
+	        </table>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+   </div>
+
+<!-- Fourth tab -->
+  <div [ngClass]="{'hidden': openTab !== 4, 'block': openTab === 4}">
+
+    <div class="flex flex-col">
+      <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+	 <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
+	    <div class="overflow-hidden">
+
+	        <table class="min-w-full">
+	          <thead class="bg-light border-b">
+	            <tr>
+
+	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
+	               Param
+	              </th>
+	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
+	                Type
+	              </th>
+	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
+	                Description
+	              </th>
+	            </tr>
+	          </thead>
+	          <tbody>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">uploadURL</td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> String </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The absolute/relative path of HTTP POST
+endpoint </td>
+		   </tr>
+
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">filesName</td>
+	              <td class="text-sm text-dark-900 font-light px-6 py-4 whitespace-nowrap"> String </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The name of files configured in backend </td>
+		   </tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">HTTP auth </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Checkbox </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Enable it if your backend requires auth</td>
+		   </tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">HTTP auth type</td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Select option </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Choose one of Digest/Basic HTTP auth </td>
+		   </tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">Auth username</td>
+	              <td class="text-sm text-dark-900 font-light px-6 py-4 whitespace-nowrap"> String </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Username configured in backend for auth </td>
+		   </tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">Password</td>
+	              <td class="text-sm text-dark-900 font-light px-6 py-4 whitespace-nowrap"> String </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Password configured in backend for auth </td>
+		   </tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">Progress Indicator</td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Select option</td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> See below for possible options </td>
+		   </tr>
+		   </tbody>
+	        </table>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<img src="images/progress-types.png" alt="Progress-up types" />
+
+       <ul class='marker:text-green list-outside'>
+         <li class='pb-2'> There is also the ability to perform a test Upload to validate the endpoint.  </li>
+         <li>
+       	Remember that the configuration is active only for the session.
+         </li>
+       
+         <li>
+       	There is also statistics for upload and profiling available.
+         </li>
+         <li>
+       	If using absolute URL please ensure <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS is enabled</a>.
+         </li>
+       </ul>
+  </div>
+
   </div>
 </div>
+<!-- XXX tabs -->
+
+<div id="progress-up-progressArea"> 
+  <div *ngFor="let file of uploadFileInfos; index as id " >
+    <section class="m-4 p-4 mt-4 mb-4 transition-colors
+    text-light-100 dark:text-white mx-auto">
+     <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
+    border-gray-300 text-gray-600 dark:text-white relative">
+    
+      <div (click)="delItem(id)" title="Delete" class="absolute
+    cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
+    	<img width="25" height="25" src="assets/icons/misc/trash-icon.svg" />
+      </div>
+    
+      <div class="flex flex-wrap -mx-2 mb-8">
+          <!--first col -->
+          <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+             <div class="h-12 text-sm text-grey-dark flex items-left
+    justify-left">
+                 <img width="125" height="125" src="{{file.imagesrc}}"
+title="{{file.name}}" alt="{{file.name}}" class="w-12 h-12" />
+             </div>
+          </div>
+    
+          <!--second col -->
+          <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+            <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
+              <ul>
+          	    <li  class="text-xl font-light leading-relaxed text-gray-800
+    dark:text-white">
+          	    Name: {{file.name}}
+          	    </li>
+          	    <li class="text-xl font-light leading-relaxed text-gray-800
+    dark:text-white">
+          	    Date: {{file.ts}}
+          	    </li>
+          	    <li class="text-xl font-light leading-relaxed text-gray-800
+    dark:text-white">
+          	    Type: {{file.mime}}
+          	    </li>
+          	    <li class="text-xl font-light leading-relaxed text-gray-800
+    dark:text-white">
+          	    Size: {{file.size}} 
+          	    </li>
+              </ul>
+            </div>
+           </div>
+      </div>
+          <div class='ldBar bottom-0 right-0 pb-8' id="{{file.id}}" ></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+
 

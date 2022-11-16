@@ -4,9 +4,7 @@ import {
     ElementRef,
     ViewEncapsulation
 } from '@angular/core';
-//import {ldBar} from 'assets/progressBar/loading-bar.js';
-
-//import * as loadingBar from 'assets/progressBar/loading-bar.js';
+import { FormsModule } from '@angular/forms';
 
 declare var ldBar: any;
 
@@ -57,8 +55,7 @@ export class ProgressUpComponent {
     extra = '';
 
     upBut = this.el.nativeElement.querySelector("#upBut"); 
-
-
+  
     fileTypeIcons: {
         [key: string]: string
     } = {
@@ -91,6 +88,12 @@ export class ProgressUpComponent {
     pass = '';
     progType = 'line';
 
+
+    configVals = '<h2 class="leading-tight pb-2"> &#128202; Progress type <span class="text-sm">' 
+	+ this.preset + '</span>  &#128228; Upload URL <span class="text-sm">' 
+	+ this.uploadURL + "</span> &#128218; FilesName <span class='text-sm'>" 
+	+ this.filesName + "</span> </h2> ";
+
     uploadFileList: any = [];
     uploadFileInfos: fileInfo[] = [];
     disableUpload = true;
@@ -112,6 +115,12 @@ export class ProgressUpComponent {
 
     constructor(private el:ElementRef, private uploadService: ProgressUpService) {}
 
+  openTab = 1;
+  toggleTabs($tabNumber: number){
+    this.openTab = $tabNumber;
+  }
+   darkMode() {
+   }
     uploadOneFile(file: File, idx: number) {
         let self = this;
 
@@ -181,8 +190,8 @@ export class ProgressUpComponent {
         this.setupUpload();
     }
 
-    fileSelectFinish(target: any) {
-        let selectedFiles = target.files;
+    fileSelectFinish(event: any) {
+        let selectedFiles = event.target.files;
         this.uploadFileList = selectedFiles;
         this.setupUpload();
     }
@@ -194,24 +203,25 @@ export class ProgressUpComponent {
         return (ret);
     }
 
-    buildThumb(f: File, type: string) {
+     buildThumb(f, type, cb ) {
         type = type.split('/')[0];
+	console.log(type);
 
-        if (type != 'image') {
-            var fileIcon = this.fileTypeIcons[type];
+        if (type != "image") {
+            var fileIcon = this.fileTypes[type];
             if (fileIcon == undefined) {
                 fileIcon = "file.svg";
             }
-            return 'assets/icons/filetypes/' + fileIcon;
+            cb("src/assets/icons/filetypes/" + fileIcon);
         } else {
+	    console.log("here");
             var reader = new FileReader();
             reader.onload = (function(theFile) {
                 return function(e) {
-                    return e.target ? e.target.result : '';
+                    cb(e.target.result);
                 };
             })(f);
             reader.readAsDataURL(f);
-            return;
         }
     }
 
@@ -219,32 +229,32 @@ export class ProgressUpComponent {
         for (var i = 0; i < this.uploadFileList.length; i++) {
             let f = this.uploadFileList[i];
             let ts = f.lastModifiedDate.toLocaleDateString();
-            let name = f.name;
+            let fname = f.name;
             let size = this.humanFileSize(f.size);
             let mime = f.type;
-            let id = 'a' + i;
-            let imagesrc = String(this.buildThumb(f, mime));
+            let id = "a" + i;
+	    this.buildThumb(f, mime, (src) => {
+               let imagesrc = src;
             this.uploadFileInfos.push({
-                ts,
-                name,
-                size,
-                mime,
-                id,
-                imagesrc
+                ts:ts,
+                name:fname,
+                size:size,
+                mime:mime,
+                id: id,
+                imagesrc:imagesrc
             });
 
-            var bar = new ldBar('#' + id, {
-                preset: this.preset
+            var bar = new ldBar("#" + id, {
+                preset: this.form.preset
             });
             bar.set(0);
+	    });
 
             this.progressBars.push(bar);
-            this.totalsize += f.size;
-            this.totalfiles += 1;
+            totalsize += f.size;
+            totalfiles += 1;
         }
-        this.disableUpload = false;
-	this.upBut.classList.remove('opacity-20'); 
-
+        disableUpload = false;
     }
 
     delItem(index: number) {
