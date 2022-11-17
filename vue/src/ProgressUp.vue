@@ -60,13 +60,13 @@ Help</a>
 
 
 	<div id='progress-up-form' class="bg-light p-4 rounded mx-auto">
-    	  <div :class="{'bg-blue-400': dragging, 'bg-white': !dragging}"
+    	  <div @click="openFileBrowser" :class="{'bg-blue-400': dragging, 'bg-white': !dragging}"
 @dragenter="onDragEnter" @dragleave="onDragLeave"
 @dragover.prevent @drop.stop.prevent @drop="onDrop" @dragover="dragover" class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
 	   <form class='flex p-8 justify-center'>
 		<img class="stroke-white dark:bg-white" width="100" height="100"
 src="./assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" />
-	       <input id="progress-up-fileInput" name="uploadFiles" type="file" multiple hidden>
+	       <input ref="fileInput" @change="fileSelectFinish" name="uploadFiles" type="file" multiple hidden>
 	   </form>
 	   <h2 class="flex justify-center text-dark-500 text-xl font-medium mb-2"> 
 	     Drop files or click to select</h2>
@@ -368,10 +368,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 <!-- XXX tabs -->
 
 
-<div 
-
-@valueChanged="createProgressBars" id="progress-up-progressArea"> 
- 
+<div v-if="uploadFileInfos" id="progress-up-progressArea"> 
   <div v-for="(file,id) in uploadFileInfos" :key = "id" >
     <section class="m-4 p-4 mt-4 mb-4 transition-colors
     text-light-100 dark:text-white mx-auto">
@@ -415,7 +412,8 @@ py-4 whitespace-nowrap"> See below for possible options </td>
             </div>
            </div>
       </div>
-          <div class='ldBar bottom-0 right-0 pb-8' :id="file.id" ></div>
+          <div class='ldBar bottom-0 right-0 pb-8' :id="file.id" >
+	  </div>
       </div>
     </section>
   </div>
@@ -426,8 +424,9 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 
 <script>
 import axios from "axios";
-
+import {onUpdated} from 'vue';
 import ldBar from "./assets/progressBar/loading-bar.js";
+
 
 export default {
   data() {
@@ -441,7 +440,7 @@ form : {
 authType: '',
 user : '',
 pass : '',
-progType: 'Line'
+progType: 'line'
   },
 
     fileTypes: {
@@ -466,8 +465,15 @@ progType: 'Line'
       uploadFileList: [],
       statsTable: [],
     disableUpload : true,
+    progressBars : [],
       details: "",
     };
+  },
+
+updated() {
+      this.$nextTick(() => {
+          this.createProgressBars();
+      });
   },
 
   methods: {
@@ -492,19 +498,19 @@ progType: 'Line'
 spitStatistics(idx) {
     if (idx == this.uploadFileList.length - 1) {
         let endUploadts = Date.now();
-        totaltime = `${endUploadts - startUploadts}`;
-        totalsize = this.humanFileSize(totalsize);
+        this.totaltime = `${endUploadts - startUploadts}`;
+        this.totalsize = this.humanFileSize(this.totalsize);
         
         var ts = new Date().toLocaleString();
         var tot = this.uploadFileList.length;
         var status = totalfiles == tot ?
             "<img src='./assets/icons/misc/success-icon.svg' >" :
             "<img src='./assets/icons/misc/failure-icon.svg' >";
-        var details = `${totalfiles}/${tot} files size ${totalsize} sent in
+        var details = `${totalfiles}/${tot} files size ${this.totalsize} sent in
 ${totaltime} ms`;
         var id = statsTable.length + 1;
       
-        disableUpload = true;
+        this.disableUpload = true;
         this.progressBars = [];
         this.totalfiles = 0;
         this.totalsize = 0;
@@ -619,7 +625,7 @@ setIndicator() {
     this.startUploadts = 0;
     this.endUploadts = 0;
 
-    disableUpload = true;
+    this.disableUpload = true;
     console.log("Cleared");
 
  },
@@ -657,7 +663,7 @@ fileSelectFinish(evt) {
 },
 
 delItem(index) {
-    let list = [...uploadFileList];
+    let list = [...this.uploadFileList];
     list.splice(index, 1);
     this.uploadFileList = list;
 },
@@ -681,7 +687,6 @@ humanFileSize(size) {
             }
             cb("src/assets/icons/filetypes/" + fileIcon);
         } else {
-	    console.log("here");
             var reader = new FileReader();
             reader.onload = (function(theFile) {
                 return function(e) {
@@ -693,17 +698,15 @@ humanFileSize(size) {
     },
 
     createProgressBars() {
-	  nextTick(() => {
-
-	for(let j = 0; j < this.uploadFileList.length;j++) {
-            let id = 'a' + j;
+        for (var i = 0; i < this.uploadFileList.length; i++) {
+	    let id = "a" + i;
+	    console.log(id);
             let bar = new ldBar('#' + id, {
-                preset: progType
+                preset: this.form.progType
             });
             bar.set(0);
             this.progressBars.push(bar);
-          }
-	});
+	}
    },
 
     setupUpload() {
@@ -725,15 +728,12 @@ humanFileSize(size) {
                 imagesrc:imagesrc
             });
 
-            totalsize += f.size;
-            totalfiles += 1;
-	    if(i == files.length - 1) {
-  	    	this.createProgressBars();
-	     }
+            this.totalsize += f.size;
+            this.totalfiles += 1;
 	    });
 
         }
-        disableUpload = false;
+        this.disableUpload = false;
  },
 
     toggleTabs: function(tabNumber){
@@ -747,22 +747,4 @@ humanFileSize(size) {
 
 <style scoped>
 @import url("https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/progress-up.css");
-.ldBar {
-  position: relative;
-}
-.ldBar.label-center > .ldBar-label {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  text-shadow: 0 0 3px #fff;
-}
-.ldBar-label:after {
-  content: "%";
-  display: inline;
-}
-.ldBar.no-percent .ldBar-label:after {
-  content: "";
-}
 </style>
