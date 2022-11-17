@@ -10,7 +10,7 @@ export class ProgressUpService {
 
   constructor(private http: HttpClient) { }
 
-  upload(url: string, fname: string, file: File): Observable<HttpEvent<any>> {
+  upload(idx: number, url: string, fname: string, file: File): Observable<HttpEvent<any>> {
     const formData: FormData = new FormData();
 
     formData.append(fname, file);

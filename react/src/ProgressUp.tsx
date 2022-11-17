@@ -88,16 +88,6 @@ function ProgressUp() {
     let progress: any = {};
     let showProgress: boolean = true;
 
-
-
-
-    /* XXX these are backend variables */
-    ///uploadURL = 'https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34';
-    let uploadURL = 'https://localhost:2324/uploadmultiple';
-    let filesName = "uploadFiles";
-    let user = '';
-    let pass = '';
-
     const handleChange = (event) => {
         const name = event.target.name;
         const value = event.target.value;
@@ -126,9 +116,11 @@ function ProgressUp() {
 
     const uploadOneFile = async (file: File, idx: Number) => {
         let formData = new FormData();
-        formData.append(filesName, file);
+        formData.append(inputs.filesName, file);
         let fname = file.name;
-        await axios.post(url, formData, {
+	console.log("Uploading to " + inputs.uploadURL);
+	console.log("Uploading file name" + inputs.filesName);
+        await axios.post(inputs.uploadURL, formData, {
             headers: {
                 "Content-Type": "multipart/form-data"
             },
@@ -136,20 +128,9 @@ function ProgressUp() {
                 let perc: number;
                 if (progEvent.total) {
                     perc = (progEvent.loaded / progEvent.total) * 100;
-                    //progressBars[idx].set(perc);
-		    //setProgress(idx => [...progressBars[idx]]);
+                    progressBars[idx].set(perc);
                     console.log(perc);
                 }
-
-                setProg((upl: any) => {
-                    return upl.map((p: any) => {
-                        if (p.fileName === fname) {
-                            p.progressPercent = perc;
-                        }
-                        return p;
-                    });
-                });
-
             },
         }).then(function() {
             console.log("All files uploaded");
@@ -248,6 +229,7 @@ function ProgressUp() {
         let list = [...uploadFileInfos];
         list.splice(index, 1);
         setFileInfos(list);
+        setUpload(list);
     };
 
     const spitStatistics = (idx: number) => {
@@ -309,7 +291,7 @@ function ProgressUp() {
         const blob = new Blob(['Test upload DELETE'], {
             type: 'plain/text'
         });
-        testForm.append(filesName, blob, 'progress-up-test.txt');
+        testForm.append(inputs.filesName, blob, 'progress-up-test.txt');
         let options = {};
         if (authEnabled) {
             var username = 'user';
@@ -322,14 +304,12 @@ function ProgressUp() {
             };
         }
 
-        /*
-        await axios.post(uploadURL, testForm, options).then((resp) => {
+        await axios.post(inputs.uploadURL, testForm, options).then((resp) => {
             alert("Test succeeded");
         }).catch((error) => {
             alert("Upload failed. Please check endpoint in Setup");
             alert(error);
         });
-	*/
     };
 
 
@@ -386,6 +366,9 @@ function ProgressUp() {
 
   <Fragment>
 
+
+<section className="dark:bg-gray-800 dark:text-white">
+
 <div className="flex justify-end items-center space-x-2 mx-auto relative">
   <div className="w-14 h-8">
 
@@ -394,7 +377,7 @@ function ProgressUp() {
     <span className="inline dark:hidden">&#127769; </span>
   </label>
 
-  <input type="checkbox" id="dark-mode" className='hidden'
+  <input  type="checkbox" name="darkMode" className='hidden'
 onChange={darkMode} />
   </div>
 </div>
@@ -402,8 +385,11 @@ onChange={darkMode} />
 
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 
-<h2 className="text-5xl leading-tight mb-4 pb-4 border-b">  HTML5 Multiple File Upload with Progress Bar 
+<h2 className="text-5xl leading-tight">  HTML5 Multiple File Upload with Progress Bar 
 </h2>
+	<h3 className="flex justify-center text-3xl text-gray-100 mb-4
+pb-4">React plugin </h3>
+
 
 
 <div className="bg-light p7 rounded w-9/12 mx-auto">
@@ -485,15 +471,32 @@ onChange={darkMode} />
 	   <form className='flex p-8  justify-center'>
 		<img className="stroke-white dark:bg-white" width="100" height="100"
 src={uploadIcon} alt="progress-up file submit icon" />
-	       <input {...getInputProps()} id="progress-up-fileInput" name="uploadFiles"
-type="file" multiple hidden />
+	       <input onChange={fileSelectFinish} {...getInputProps()} name="uploadFiles" type="file" multiple hidden />
 	   </form>
 	   <h2 className="flex justify-center text-dark-500 text-xl font-medium mb-2"> 
 	     Drop files or click to select</h2>
 	  </div>
 	</div>
 
-	<div id='progress-up-configSummary'></div>
+
+	<div id="config">
+
+    {inputs.uploadURL ? (
+		<h2 className="leading-tight pb-2">
+	&#128202; Progress type <span
+className='text-sm'>{inputs.progType}</span>  
+			 &#128228; Upload URL <span
+className='text-sm'>{inputs.uploadURL}</span> 
+		&#128218; FilesName <span
+className='text-sm'>{inputs.filesName}</span>
+		</h2>
+      ) : (
+		<h2 className="leading-tight pb-2">
+	Please configure first
+		</h2>
+      )}
+
+	</div>
 
 	<button disabled={isUploadDisabled} onClick={uploadAll} className={"inline-block px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out " +  (isUploadDisabled ? " opacity-20" : "")}
 >Begin Uploading files </button>
@@ -516,10 +519,10 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	     <div className="flex flex-wrap -mx-3 mb-6">
 	       <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
 	         <label className="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" htmlFor="progress-up-uploadURL">
+	   font-bold mb-2" htmlFor="inputs.uploadURL">
 	          POST endpoint  
 	         </label>
-	         <input value={inputs.uploadURL || ""} 
+	         <input name="uploadURL" value={inputs.uploadURL || ""} 
         onChange={handleChange}
 className="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
@@ -534,7 +537,7 @@ CORS]" />
 	   font-bold mb-2" htmlFor="progress-up-filesName">
 	   	Name of files input field
 	         </label>
-	         <input value={inputs.filesName || ""} onChange={handleChange} id='filesName' className="appearance-none block w-full bg-gray-200
+	         <input name="filesName" value={inputs.filesName || ""} onChange={handleChange} id='filesName' className="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	    type="text" placeholder="Name of files input field" />
@@ -575,7 +578,7 @@ CORS]" />
 	         <span className="text-sm">
 	           HTTP Auth required?
 	         </span>
-	         <input id='authEnabled' onChange={needsAuth} value={inputs.authEnabled || false}
+	         <input name='authEnabled' onChange={needsAuth} value={inputs.authEnabled || false}
 className="mr-2 leading-tight"
 type="checkbox" />
 	       </label>
@@ -592,7 +595,7 @@ text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	            </label>
 	            <div className="relative">
 	              <select id='authType' onChange={setAuth} value={inputs.authType || ""} className="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
-	                <option>HTTP basic auth</option>
+	                <option defaultValue>HTTP basic auth</option>
 	                <option>HTTP digest auth</option>
 	              </select>
 	       
@@ -607,7 +610,7 @@ text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	      font-bold mb-2" htmlFor="user">
 	             Username  
 	            </label>
-	            <input id='user' value={inputs.user || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
+	            <input name='user' value={inputs.user || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	      focus:outline-none focus:bg-light"  type="text"
 	      placeholder="username" />
@@ -619,7 +622,7 @@ text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	      font-bold mb-2" htmlFor="progress-up-pass">
 	      	Password
 	            </label>
-	            <input id='pass' value={inputs.pass || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
+	            <input name='pass' value={inputs.pass || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	      focus:outline-none focus:bg-light focus:border-gray-500"
 	       type="password" placeholder="Password" />
@@ -872,6 +875,7 @@ dark:text-white">
 
   </div>
 
+</section>
  </Fragment>
   );
 }

@@ -89,11 +89,17 @@ export class ProgressUpComponent {
     };
     progType = 'line';
 
+   darkControls = `
+    <span class="hidden dark:inline">&#127774;</span>
+    <span class="inline dark:hidden">&#127769; </span>
+  `;
 
-    configVals = '<h2 class="leading-tight pb-2"> &#128202; Progress type <span class="text-sm">' 
+    configVals = this.form.uploadURL ? '<h2 class="leading-tight pb-2"> &#128202; Progress type <span class="text-sm">' 
 	+ this.preset + '</span>  &#128228; Upload URL <span class="text-sm">' 
 	+ this.form.uploadURL + "</span> &#128218; FilesName <span class='text-sm'>" 
-	+ this.form.filesName + "</span> </h2> ";
+	+ this.form.filesName + "</span> </h2> " :
+'<h2 class="leading-tight pb-2"> &#128202; Progress type <span class="text-sm"> Please configure first </h2>';
+
 
     uploadFileList: any = [];
     uploadFileInfos: fileInfo[] = [];
@@ -122,6 +128,7 @@ export class ProgressUpComponent {
     this.openTab = $tabNumber;
   }
    darkMode() {
+	document.body.classList.toggle('dark');
    }
     uploadOneFile(file: File, idx: number) {
         let self = this;
@@ -130,6 +137,7 @@ export class ProgressUpComponent {
         let options = {
             onUploadProgress: function(e: any) {
                 let perc: number = Number(e.progress * 100);
+		console.log(perc);
                 self.progressBars[idx].set(perc);
             }
         };
@@ -153,13 +161,15 @@ export class ProgressUpComponent {
         });
 	*/
 
-        this.uploadService.upload(this.form.uploadURL, fname, file).subscribe(
+        this.uploadService.upload(idx, this.form.uploadURL,
+this.form.filesName, file).subscribe(
             (event: HttpEvent < any > ) => {
                 if (event.type === HttpEventType.UploadProgress) {
                     if (event.total) {
                         const total: number = event.total;
-                        //this.progress[file.name] = 
                         let perc = Math.round(100 * event.loaded / total);
+			console.log(perc + "% got uploaded");
+			console.log(idx);
                         self.progressBars[idx].set(perc);
                     }
                 } else if (event instanceof HttpResponse) {
@@ -193,12 +203,14 @@ export class ProgressUpComponent {
     onDrop(event: any) {
         event.preventDefault();
 	this.isDragged = false;
+	this.clearAll();
         let files = event.dataTransfer.files;
         this.uploadFileList = files;
         this.setupUpload();
     }
 
     fileSelectFinish(event: any) {
+	this.clearAll();
         let selectedFiles = event.target.files;
         this.uploadFileList = selectedFiles;
         this.setupUpload();
@@ -238,6 +250,7 @@ export class ProgressUpComponent {
                 preset: this.form.progType
             });
             bar.set(0);
+	    console.log("Creating progress bar::" + id);
             this.progressBars.push(bar);
    }
 
@@ -272,6 +285,7 @@ export class ProgressUpComponent {
         let list = [...this.uploadFileList];
         list.splice(index, 1);
         this.uploadFileList = list;
+        this.uploadFileInfos = list;
     }
 
     spitStatistics(idx: number) {

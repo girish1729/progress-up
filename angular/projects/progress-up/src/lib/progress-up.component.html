@@ -1,7 +1,22 @@
+<section class="dark:bg-gray-800 dark:text-white">
+
+<div class="flex justify-end items-center space-x-2 mx-auto relative">
+  <div class="w-14 h-8">
+
+  <label for="dark-mode" class="w-full h-full rounded-full p-1 flex justify-between cursor-pointer">
+	<span [innerHTML]="darkControls"></span>
+  </label>
+
+  <input type="checkbox" id="dark-mode" class='hidden' (change)="darkMode()" />
+  </div>
+</div>
+
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 
-<h2 class="text-5xl leading-tight mb-4 pb-4 border-b">  HTML5 Multiple File Upload with Progress Bar 
+<h2 class="text-5xl leading-tight">  HTML5 Multiple File Upload with Progress Bar 
 </h2>
+
+<h3 class="flex justify-center text-3xl text-gray-100 mb-4 pb-4">Angular plugin </h3>
 
 <!-- XXX tabs -->
 <div class="bg-light p7 rounded w-9/12 mx-auto">
@@ -423,3 +438,4 @@ title="{{file.name}}" alt="{{file.name}}" class="w-12 h-12" />
     </section>
   </div>
 </div>
+</section>
