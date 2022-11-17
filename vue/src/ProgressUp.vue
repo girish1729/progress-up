@@ -53,11 +53,17 @@ Help</a>
 
  <div :class="{'hidden': openTab !== 1, 'block': openTab === 1}">
 <!-- XXX drag drop -->
-	<div id='progress-up-statsArea'></div>
+
+	<div id='progress-up-statsArea'>
+		<h2 className="text-5xl leading-tight border-b">{{details}} </h2>
+	</div>
+
 
 	<div id='progress-up-form' class="bg-light p-4 rounded mx-auto">
-    	  <div class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
-	   <form class='flex p-8  justify-center'>
+    	  <div :class="{'bg-blue-400': dragging, 'bg-white': !dragging}"
+@dragenter="onDragEnter" @dragleave="onDragLeave"
+@dragover.prevent @drop.stop.prevent @drop="onDrop" @dragover="dragover" class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
+	   <form class='flex p-8 justify-center'>
 		<img class="stroke-white dark:bg-white" width="100" height="100"
 src="./assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" />
 	       <input id="progress-up-fileInput" name="uploadFiles" type="file" multiple hidden>
@@ -362,7 +368,10 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 <!-- XXX tabs -->
 
 
-<div id="progress-up-progressArea"> 
+<div 
+
+@valueChanged="createProgressBars" id="progress-up-progressArea"> 
+ 
   <div v-for="(file,id) in uploadFileInfos" :key = "id" >
     <section class="m-4 p-4 mt-4 mb-4 transition-colors
     text-light-100 dark:text-white mx-auto">
@@ -424,6 +433,7 @@ export default {
   data() {
     return {
     openTab: 1,
+    dragging: false,
     authEnabled: false,
 form : {
    uploadURL : '',
@@ -466,6 +476,12 @@ progType: 'Line'
       e.preventDefault();
     },
 
+    onDragEnter() {
+	this.dragging = true;
+    },
+    onDragLeave() {
+	this.dragging = false;
+    },
     onDrop(evt, list) {
       const files = evt.dataTransfer.files;
 	console.log(files);
@@ -474,13 +490,13 @@ progType: 'Line'
     },
 
 spitStatistics(idx) {
-    if (idx == uploadFileList.length - 1) {
+    if (idx == this.uploadFileList.length - 1) {
         let endUploadts = Date.now();
         totaltime = `${endUploadts - startUploadts}`;
         totalsize = this.humanFileSize(totalsize);
         
         var ts = new Date().toLocaleString();
-        var tot = uploadFileList.length;
+        var tot = this.uploadFileList.length;
         var status = totalfiles == tot ?
             "<img src='./assets/icons/misc/success-icon.svg' >" :
             "<img src='./assets/icons/misc/failure-icon.svg' >";
@@ -526,9 +542,9 @@ async uploadOneFile(file, idx) {
 uploadAll() {
     console.log("Starting upload...");
     startUploadts = Date.now();
-    for (i = 0; i < uploadFileList.length; i++) {
-        f = uploadFileList[i].name;
-        uploadOneFile(f, i);
+    for (i = 0; i < this.uploadFileList.length; i++) {
+        f = this.uploadFileList[i].name;
+        this.uploadOneFile(f, i);
     }
 },
 saveConfig() {
@@ -607,11 +623,6 @@ setIndicator() {
     console.log("Cleared");
 
  },
-
-  drop(evt) {
-	this.uploadFileList = evt.DataTransfer.files;
-	this.setupUpload();
-  },
   openFileBrowser() {
       this.$refs.fileInput.click();
   },
@@ -681,6 +692,20 @@ humanFileSize(size) {
         }
     },
 
+    createProgressBars() {
+	  nextTick(() => {
+
+	for(let j = 0; j < this.uploadFileList.length;j++) {
+            let id = 'a' + j;
+            let bar = new ldBar('#' + id, {
+                preset: progType
+            });
+            bar.set(0);
+            this.progressBars.push(bar);
+          }
+	});
+   },
+
     setupUpload() {
         for (var i = 0; i < this.uploadFileList.length; i++) {
             let f = this.uploadFileList[i];
@@ -700,15 +725,13 @@ humanFileSize(size) {
                 imagesrc:imagesrc
             });
 
-            var bar = new ldBar("#" + id, {
-                preset: this.form.preset
-            });
-            bar.set(0);
-	    });
-
-            this.progressBars.push(bar);
             totalsize += f.size;
             totalfiles += 1;
+	    if(i == files.length - 1) {
+  	    	this.createProgressBars();
+	     }
+	    });
+
         }
         disableUpload = false;
  },

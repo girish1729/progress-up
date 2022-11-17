@@ -98,6 +98,7 @@ export class ProgressUpComponent {
     uploadFileList: any = [];
     uploadFileInfos: fileInfo[] = [];
     disableUpload = true;
+    isDragged = false;
 
     progressBars: any[] = [];
     details = '';
@@ -181,11 +182,17 @@ export class ProgressUpComponent {
 
     onDragOver(event: any) {
         event.preventDefault();
+	this.isDragged = true;
     }
 
-    // From drag and drop
-    onDropSuccess(event: any) {
+    onDragLeave(event: any) {
         event.preventDefault();
+	this.isDragged = false;
+    }
+ 
+    onDrop(event: any) {
+        event.preventDefault();
+	this.isDragged = false;
         let files = event.dataTransfer.files;
         this.uploadFileList = files;
         this.setupUpload();
@@ -206,16 +213,14 @@ export class ProgressUpComponent {
 
      buildThumb(f:File, type:string, cb:Function ) {
         type = type.split('/')[0];
-	console.log(type);
-
+	//console.log(type);
         if (type != "image") {
             var fileIcon = this.fileTypeIcons[type];
             if (fileIcon == undefined) {
                 fileIcon = "file.svg";
             }
-            cb("src/assets/icons/filetypes/" + fileIcon);
+            cb("assets/icons/filetypes/" + fileIcon);
         } else {
-	    console.log("here");
             var reader = new FileReader();
             reader.onload = (function(theFile) {
                 return function(e) {
@@ -227,6 +232,14 @@ export class ProgressUpComponent {
             reader.readAsDataURL(f);
         }
     }
+
+    createBar(id:string)  { 
+            let bar = new ldBar('#' + id, {
+                preset: this.form.progType
+            });
+            bar.set(0);
+            this.progressBars.push(bar);
+   }
 
     setupUpload() {
         for (var i = 0; i < this.uploadFileList.length; i++) {
@@ -247,14 +260,9 @@ export class ProgressUpComponent {
                 imagesrc:imagesrc
             });
 
-            let bar = new ldBar("#" + id, {
-                preset: this.preset
-            });
-            bar.set(0);
-
-            this.progressBars.push(bar);
             this.totalsize += f.size;
             this.totalfiles += 1;
+
 	    });
         }
         this.disableUpload = false;

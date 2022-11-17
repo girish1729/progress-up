@@ -56,7 +56,7 @@ function ProgressUp() {
         setupUpload(files);
     };
 
-  const {getRootProps, getInputProps} = useDropzone({onDrop})
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
     const fileTypes = {
         "video": avi,
@@ -423,7 +423,7 @@ onChange={darkMode} />
               </a>
             </li>
 
-    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
+    <li className="px-4 text-dark-800 font-semibold py-2 rounded-t">
               <a
                 className={
                   (openTab === 2 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
@@ -440,7 +440,7 @@ onChange={darkMode} />
               </a>
             </li>
 
-    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
+    <li className="px-4 text-dark-800 font-semibold py-2 rounded-t">
               <a
 
                 className={ (openTab === 3 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
@@ -457,7 +457,7 @@ onChange={darkMode} />
             </li>
 
 
-    <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
+    <li className="px-4 text-dark-800 font-semibold py-2 rounded-t">
               <a className={ (openTab === 4 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
                 onClick={e => {
                   e.preventDefault();
@@ -480,8 +480,8 @@ onChange={darkMode} />
 		<h2 className="text-5xl leading-tight border-b">{details} </h2>
 	</div>
 
-	<div {...getRootProps()} className="bg-light p-4 rounded mx-auto">
-    	  <div className="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
+	<div {...getRootProps()} className=" p-4 rounded mx-auto bg-light"> 
+    	  <div className={"text-gold-400 border border-red-800 border-dashed rounded cursor-pointer" + (isDragActive ? " bg-blue-400" : "bg-light")} >
 	   <form className='flex p-8  justify-center'>
 		<img className="stroke-white dark:bg-white" width="100" height="100"
 src={uploadIcon} alt="progress-up file submit icon" />
@@ -495,13 +495,9 @@ type="file" multiple hidden />
 
 	<div id='progress-up-configSummary'></div>
 
-	<button id="upButton" onClick={uploadAll} className="inline-block px-6
-	py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight
-	uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg
-	focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0
-	active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out
-	opacity-20" disabled>Begin Uploading files
-	</button>
+	<button disabled={isUploadDisabled} onClick={uploadAll} className={"inline-block px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out " +  (isUploadDisabled ? " opacity-20" : "")}
+>Begin Uploading files </button>
+	
 	
 	<button type="button" onClick={clearAll} className="inline-block
 px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
@@ -832,7 +828,7 @@ border-gray-300 text-gray-600 dark:text-white relative">
 
   <div  onClick={() => delItem(id)} title="Delete" className="absolute
 cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
-	<img width="25" height="25" src="assets/icons/misc/trash-icon.svg" />
+	<img width="25" height="25" src={trashIcon} />
   </div>
 
   <div className="flex flex-wrap -mx-2 mb-8">

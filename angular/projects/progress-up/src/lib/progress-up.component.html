@@ -46,9 +46,9 @@ File upload</a>
 
 	</div>
 
-	<div (dragover)="onDragOver($event)" (drop)="onDropSuccess($event)"
-(click)="fileInput.click()" id='progress-up-form' class="bg-light p-4 rounded mx-auto">
-    	  <div class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
+	<div  id='progress-up-form' class="bg-light p-4 rounded mx-auto">
+    	  <div (click)="fileInput.click()"
+(dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" [ngClass]=" isDragged ? 'bg-blue-400': ''" class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
 	   <form class='flex p-8  justify-center'>
 		<img class="stroke-white dark:bg-white" width="100"
 height="100" src="assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" />
@@ -56,15 +56,15 @@ height="100" src="assets/icons/upload/file-submit.svg" alt="progress-up file sub
 (change)="fileSelectFinish($event)" type="file" multiple hidden>
 	   </form>
 	   <h2 class="flex justify-center text-dark-500 text-xl font-medium mb-2"> 
-	     Drop files or click to select</h2>
+	     Drop files or select</h2>
 	  </div>
 	</div>
 
 	<div [innerHTML]="configVals" id="config">
 	</div>
 	
-
-	<button [ngClass]="{ 'opacity-20': disableUpload}" [disabled]="disableUpload" (click)="uploadAll()" class="inline-block px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out " >Begin Uploading files
+	<button [ngClass]=" disableUpload ? 'opacity-20': ''"
+ [disabled]="disableUpload" (click)="uploadAll()" class="inline-block px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out " >Begin Uploading files
 	</button>
 	
 	<button type="button" (click)="clearAll()" class="inline-block
@@ -349,7 +349,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 	  </div>
 	</div>
 
-	<img src="images/progress-types.png" alt="Progress-up types" />
+	<img src="assets/progress-types.png" alt="Progress-up types" />
 
        <ul class='marker:text-green list-outside'>
          <li class='pb-2'> There is also the ability to perform a test Upload to validate the endpoint.  </li>
@@ -416,7 +416,9 @@ title="{{file.name}}" alt="{{file.name}}" class="w-12 h-12" />
             </div>
            </div>
       </div>
-          <div class='ldBar bottom-0 right-0 pb-8' id="{{file.id}}" ></div>
+          <div  class='ldBar bottom-0 right-0 pb-8' id="{{file.id}}" >
+		<span *ngIf="createBar(file.id)"></span>
+	   </div>
       </div>
     </section>
   </div>

@@ -18,6 +18,9 @@ tabTogglers.forEach(function(toggler) {
     });
 });
 
+
+
+
 /* XXX File upload tab functions */
 
 var fileTypeIcons = {
@@ -54,6 +57,13 @@ var endUploadts = 0;
 const uplform = document.querySelector("#progress-up-form form");
 uplform.addEventListener("dragover", dragOver, false);
 uplform.addEventListener("drop", drop, false);
+
+uplform.addEventListener('dragenter', (e) =>
+  e.target.classList.add('bg-blue-400')
+);
+uplform.addEventListener('dragleave', (e) =>
+  e.target.classList.remove('bg-blue-400')
+);
 
 const fileInput = document.getElementById("progress-up-fileInput");
 const progressArea = document.getElementById("progress-up-progressArea");
