@@ -6,6 +6,7 @@ import React, {
     Component
 } from "react";
 import {useDropzone} from 'react-dropzone';
+import './assets/style.css';
 import axios from "axios";
 
 import ldBar from './assets/progressBar/loading-bar.js';
@@ -119,7 +120,8 @@ function ProgressUp() {
    }, [uploadFileInfos]);
 
    const darkMode = () => {
-	document.body.classList.toggle('dark');
+	console.log("dark mode change");
+	document.documentElement.classList.toggle('dark');
   };
 
     const uploadOneFile = async (file: File, idx: number) => {
@@ -381,13 +383,12 @@ function ProgressUp() {
 <div className="flex justify-end items-center space-x-2 mx-auto relative">
   <div className="w-14 h-8">
 
-  <label htmlFor="dark-mode" className="w-full h-full rounded-full p-1 flex justify-between cursor-pointer">
+  <label onClick={darkMode} htmlFor="dark-mode" className="w-full h-full rounded-full p-1 flex justify-between cursor-pointer">
     <span className="hidden dark:inline">&#127774;</span>
     <span className="inline dark:hidden">&#127769; </span>
   </label>
 
-  <input  type="checkbox" name="darkMode" className='hidden'
-onChange={darkMode} />
+  <input  type="checkbox" name="darkMode" className='hidden' />
   </div>
 </div>
 

@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "progress-up": "*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
