@@ -79,7 +79,7 @@ src="./assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" /
 
 	<div id="config">
 		<h2 className="leading-tight pb-2">
-	  <div v-if="form.uploadURL">
+	  <div v-if="form.uploadURL && form.filesName">
 			&#128202; Progress type <span
 className='text-sm'>{{form.progType}}</span>  
 			 &#128228; Upload URL <span
@@ -262,6 +262,20 @@ px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-ti
 	            </tr>
 	          </thead>
 	          <tbody id="progress-up-statsTable">
+
+
+	            <tr v-for="(stat,id) in statsTable" :key="id" class="bg-gray-100 border-b">
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"> {{stat.id}}</td>
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+			   {{stat.ts}}
+	              </td>
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+			   <span v-html="stat.status"></span>
+	              </td>
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+			   {{stat.details}}
+	              </td>
+	            </tr>
 
 		   </tbody>
 	        </table>
@@ -490,6 +504,9 @@ progType: 'Line'
 updated() {
       this.$nextTick(() => {
           this.createProgressBars();
+	  if(this.form.uploadURL == undefined || this.form.filesName == undefined) {
+		this.disableUpload = true;
+	  }
       });
   },
 
@@ -510,7 +527,6 @@ updated() {
     this.clearAll();
 	console.log(files);
     this.uploadFileList = files;
-
     this.setupUpload();
     },
 
@@ -523,10 +539,9 @@ spitStatistics(self, idx) {
         var ts = new Date().toLocaleString();
         var tot = self.uploadFileList.length;
         var status = self.totalfiles == tot ?
-            "<img src='./assets/icons/misc/success-icon.svg' >" :
-            "<img src='./assets/icons/misc/failure-icon.svg' >";
-        self.details = `${self.totalfiles}/${tot} files size ${this.totalsize} sent in
-${self.totaltime} ms`;
+            "<img src='src/assets/icons/misc/success-icon.svg' >" :
+            "<img src='src/assets/icons/misc/failure-icon.svg' >";
+        self.details = `${self.totalfiles}/${tot} files of size ${this.totalsize} sent in ${self.totaltime} ms`;
         var id = self.statsTable.length + 1;
 
 	 let stat = {
@@ -654,8 +669,6 @@ setIndicator() {
     this.totalfiles = 0;
     this.totalsize = 0;
     this.totaltime = 0;
-    this.startUploadts = 0;
-    this.endUploadts = 0;
 
     this.disableUpload = true;
     console.log("Cleared");
@@ -702,13 +715,14 @@ delItem(index) {
     this.uploadFileInfos = list;
 },
 
-humanFileSize(size) {
-    const i = Math.floor(Math.log(size) / Math.log(1024));
-    return (
-        (size / Math.pow(1024, i)).toFixed(2) * 1 +
-        " " + ["B", "kB", "MB", "GB", "TB"][i]
-    );
-},
+    humanFileSize(size ) {
+        const i = Math.floor(Math.log(size) / Math.log(1024));
+	let t2 = size / Math.pow(1024, i);
+        let t = t2.toFixed(2) * 1;
+        const ret= t + " " + ["B", "kB", "MB", "GB", "TB"][i];
+        return (ret);
+    },
+
 
     buildThumb(f, type, cb ) {
         type = type.split('/')[0];
@@ -761,10 +775,9 @@ humanFileSize(size) {
                 imagesrc:imagesrc
             });
 
+	    });
             this.totalsize += f.size;
             this.totalfiles += 1;
-	    });
-
         }
         this.disableUpload = false;
  },

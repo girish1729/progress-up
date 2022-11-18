@@ -49,10 +49,6 @@ interface fileInfo {
 
 export class ProgressUpComponent {
 
-    /* XXX Globals */
-
-    preset = "line";
-    extra = '';
 
     fileTypeIcons: {
         [key: string]: string
@@ -85,25 +81,22 @@ export class ProgressUpComponent {
     authType : "Basic",
     user : '',
     pass : '',
-    progType : 'line'
+    progType : 'Line'
     };
-    progType = 'line';
 
    darkControls = `
     <span class="hidden dark:inline">&#127774;</span>
     <span class="inline dark:hidden">&#127769; </span>
   `;
 
-    configVals = this.form.uploadURL ? '<h2 class="leading-tight pb-2"> &#128202; Progress type <span class="text-sm">' 
-	+ this.preset + '</span>  &#128228; Upload URL <span class="text-sm">' 
-	+ this.form.uploadURL + "</span> &#128218; FilesName <span class='text-sm'>" 
-	+ this.form.filesName + "</span> </h2> " :
-'<h2 class="leading-tight pb-2"> &#128202; Progress type <span class="text-sm"> Please configure first </h2>';
-
+    configVals1 = ' &#128202; Progress type ';
+    configVals2 = '&#128228; Upload URL ';
+    configVals3 = '&#128218; FilesName';
 
     uploadFileList: any = [];
     uploadFileInfos: fileInfo[] = [];
     disableUpload = true;
+    thumbNailsDone = false;
     isDragged = false;
 
     progressBars: any[] = [];
@@ -116,6 +109,7 @@ export class ProgressUpComponent {
     totaltime = 0;
     startUploadts = 0;
     endUploadts = 0;
+    extra = "";
 
 
     progress: any = {};
@@ -133,33 +127,16 @@ export class ProgressUpComponent {
     uploadOneFile(file: File, idx: number) {
         let self = this;
 
-        let fname = file.name;
-        let options = {
-            onUploadProgress: function(e: any) {
-                let perc: number = Number(e.progress * 100);
-		console.log(perc);
-                self.progressBars[idx].set(perc);
-            }
-        };
-
         if (this.form.authEnabled) {
             var username = 'user';
             var password = 'password';
             var basicAuth = 'Basic ' + btoa(username + ':' + password);
-		/*
-            options['headers'] = {
+            var options = {
+	'headers' : {
                 'Authorization': +basicAuth
+            }
             };
-		*/
         }
-        /*
-        await axios.post(this.uploadURL, uplFormData, options).then((resp) => {
-            this.spitStatistics(idx);
-        }).catch((error) => {
-            alert("Upload failed. Please check endpoint in Setup");
-            alert(error);
-        });
-	*/
 
         this.uploadService.upload(idx, this.form.uploadURL,
 this.form.filesName, file).subscribe(
@@ -169,10 +146,10 @@ this.form.filesName, file).subscribe(
                         const total: number = event.total;
                         let perc = Math.round(100 * event.loaded / total);
 			console.log(perc + "% got uploaded");
-			console.log(idx);
                         self.progressBars[idx].set(perc);
                     }
                 } else if (event instanceof HttpResponse) {
+            	   self.spitStatistics(self, idx);
                     console.log(event);
                 }
             },
@@ -182,6 +159,7 @@ this.form.filesName, file).subscribe(
     }
 
     uploadAll() {
+	this.startUploadts = Date.now();
         if (this.uploadFileList) {
             for (let i = 0; i < this.uploadFileList.length; i++) {
                 let file = this.uploadFileList[i];
@@ -218,14 +196,31 @@ this.form.filesName, file).subscribe(
 
     humanFileSize(size: number) {
         const i: any = Math.floor(Math.log(size) / Math.log(1024));
-        let t: any = size / Number(Math.pow(1024, i).toFixed(2)) * 1;
+	let t2:any = size / Math.pow(1024, i);
+        let t: any = t2.toFixed(2) * 1;
         const ret: string = t + " " + ["B", "kB", "MB", "GB", "TB"][i];
         return (ret);
     }
 
-     buildThumb(f:File, type:string, cb:Function ) {
+    createBars()  { 
+	if(!this.thumbNailsDone) {
+		return;
+	}
+	this.progressBars = [];
+        for (var i = 0; i < this.uploadFileInfos.length; i++) {
+	    let id = 'a' + i;
+            let bar = new ldBar('#' + id, {
+                preset: this.form.progType.toLowerCase()
+            });
+            bar.set(0);
+	    console.log("Creating progress bar::" + id);
+            this.progressBars.push(bar);
+	}
+	this.thumbNailsDone = false;
+   }
+
+   buildThumb(f:File, type:string, cb:Function ) {
         type = type.split('/')[0];
-	//console.log(type);
         if (type != "image") {
             var fileIcon = this.fileTypeIcons[type];
             if (fileIcon == undefined) {
@@ -245,14 +240,6 @@ this.form.filesName, file).subscribe(
         }
     }
 
-    createBar(id:string)  { 
-            let bar = new ldBar('#' + id, {
-                preset: this.form.progType
-            });
-            bar.set(0);
-	    console.log("Creating progress bar::" + id);
-            this.progressBars.push(bar);
-   }
 
     setupUpload() {
         for (var i = 0; i < this.uploadFileList.length; i++) {
@@ -272,11 +259,14 @@ this.form.filesName, file).subscribe(
                 id: id,
                 imagesrc:imagesrc
             });
+		if(this.uploadFileInfos.length == this.uploadFileList.length) {
+			this.thumbNailsDone = true;
+		}
+
+	    });
 
             this.totalsize += f.size;
             this.totalfiles += 1;
-
-	    });
         }
         this.disableUpload = false;
     }
@@ -288,29 +278,35 @@ this.form.filesName, file).subscribe(
         this.uploadFileInfos = list;
     }
 
-    spitStatistics(idx: number) {
-        if (idx == this.uploadFileList.length - 1) {
+    spitStatistics(self:any, idx: number) {
+        if (idx == self.uploadFileList.length - 1) {
             let endUploadts = Date.now();
-            let totaltime = endUploadts - this.startUploadts;
-            let totalsize: any = this.humanFileSize(this.totalsize);
+            self.totaltime = endUploadts - self.startUploadts;
+            let totalsize: any = self.humanFileSize(self.totalsize);
 
             var ts = new Date().toLocaleString();
-            var tot = this.uploadFileList.length;
-            var status = this.totalfiles == tot ?
-                '<img src="/icons/misc/success-icon.svg" >' :
-                '<img src="/icons/misc/failure-icon.svg" >';
-            this.details = this.totalfiles / tot + "files size " + totalsize +
-                "sent in " + totaltime + " ms";
+            var tot = self.uploadFileList.length;
+            var status = self.totalfiles == tot ?
+                '<img src="assets/icons/misc/success-icon.svg" >' :
+                '<img src="assets/icons/misc/failure-icon.svg" >';
+            self.details = self.totalfiles + '/' +  tot 
+		+ " files of size " + totalsize +
+                " sent in " + self.totaltime + " ms";
 
-            var id = this.statsTable.length + 1;
+            var id = self.statsTable.length + 1;
+	    self.statsTable.push({
+		id: id,
+	        ts: ts,
+		status: status,
+		details: self.details	
+	    });
 
-            this.disableUpload = true;
-            this.progressBars = [];
-            this.totalfiles = 0;
-            this.totalsize = 0;
-            this.totaltime = 0;
-            this.startUploadts = 0;
-            this.endUploadts = 0;
+            self.disableUpload = true;
+            self.totalfiles = 0;
+            self.totalsize = 0;
+            self.totaltime = 0;
+            self.startUploadts = 0;
+            self.endUploadts = 0;
         }
     }
 
@@ -355,12 +351,11 @@ this.form.filesName, file).subscribe(
 
     setIndicator() {
         console.log(this.form.progType);
-        this.preset = this.form.progType.toLowerCase()
-        switch (this.progType) {
-            case "bubble":
+        switch (this.form.progType) {
+            case "Bubble":
                 this.extra = 'data-img-size="100,100"';
                 break;
-            case "rainbow":
+            case "Rainbow":
                 this.extra = 'data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"';
                 break;
             default:
@@ -381,6 +376,7 @@ this.form.filesName, file).subscribe(
         this.endUploadts = 0;
 
         this.disableUpload = true;
+	this.thumbNailsDone = false;
         console.log("Cleared");
 
     }

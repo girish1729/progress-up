@@ -75,7 +75,23 @@ height="100" src="assets/icons/upload/file-submit.svg" alt="progress-up file sub
 	  </div>
 	</div>
 
-	<div [innerHTML]="configVals" id="config">
+	<div  id="config">
+	    <div *ngIf="form.uploadURL;else El" >
+		<span [innerHTML]="configVals1"></span>
+			<span class="text-sm">{{form.progType}}</span>
+		<span [innerHTML]="configVals2"> </span>
+			<span class="text-sm">{{form.uploadURL}}</span>
+		<span [innerHTML]="configVals3"> </span>
+			<span class="text-sm">{{form.filesName}}</span>
+	    </div>
+	    <ng-template #El>
+		<h2 class="leading-tight pb-2">
+		Please configure first 
+		</h2>
+	    </ng-template>
+	    
+	
+	
 	</div>
 	
 	<button [ngClass]=" disableUpload ? 'opacity-20': ''"
@@ -246,23 +262,19 @@ px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-ti
 	          </thead>
 	          <tbody id="progress-up-statsTable">
 
-     <div *ngFor="let stat of statsTable;">
-
-	            <tr class="bg-gray-100 border-b">
-	              <td class="px-6 py-4 whitespace-nowrap text-sm
-font-medium text-gray-900">{{stat.id}}</td>
+	            <tr *ngFor="let stat of statsTable;" class="bg-gray-100 border-b">
+	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"> {{stat.id}}</td>
 	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
 			   {{stat.ts}}
 	              </td>
 	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-			   {{stat.status}}
+			   <span [innerHTML]="stat.status">
+			   </span>
 	              </td>
 	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
 			   {{stat.details}}
 	              </td>
 	            </tr>
-	</div>
-
 		   </tbody>
 	        </table>
 	      </div>
@@ -386,7 +398,8 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 <!-- XXX tabs -->
 
 <div id="progress-up-progressArea"> 
-  <div *ngFor="let file of uploadFileInfos; index as id " >
+  <div *ngFor="let file of uploadFileInfos; last as lastTime;index as id " 
+>
     <section class="m-4 p-4 mt-4 mb-4 transition-colors
     text-light-100 dark:text-white mx-auto">
      <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
@@ -432,8 +445,8 @@ title="{{file.name}}" alt="{{file.name}}" class="w-12 h-12" />
            </div>
       </div>
           <div  class='ldBar bottom-0 right-0 pb-8' id="{{file.id}}" >
-		<span *ngIf="createBar(file.id)"></span>
 	   </div>
+	   <span *ngIf="lastTime">  {{createBars()}} </span>
       </div>
     </section>
   </div>

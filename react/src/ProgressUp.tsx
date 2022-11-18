@@ -48,6 +48,9 @@ function ProgressUp() {
     const [authEnabled, enableAuth] = useState(false);
     const [authType, setAuthType] = useState("Basic");
     const [details, setDetails] = useState('');
+    const [totalfiles, setNumberFiles] = useState(0);
+    const [totalsize, setSize] = useState(0);
+    let startUploadts = 0;
 
     // From drag and drop
     const onDrop = (files: FileList) => {
@@ -78,13 +81,6 @@ function ProgressUp() {
     };
 
 
-    let totalfiles = 0;
-    let totalsize = 0;
-    let totaltime = 0;
-    let startUploadts = 0;
-    let endUploadts = 0;
-
-
     let progress: any = {};
     let showProgress: boolean = true;
 
@@ -103,11 +99,13 @@ function ProgressUp() {
   };
 
    useEffect(() => {
-	console.log("Updated");
+	console.log("DOM Updated");
 	console.log(uploadFileInfos);
 	createProgressBars();
-
-
+        if(inputs.uploadURL == undefined || inputs.filesName == undefined) {
+	    console.log('Disable upload without configuration');
+            setIsUploadDisabled(true);
+	}
    }, [uploadFileInfos]);
 
    const darkMode = () => {
@@ -133,11 +131,13 @@ function ProgressUp() {
                 }
             },
         }).then(function() {
+	    spitStatistics(idx);
             console.log("All files uploaded");
         });
     };
 
     const uploadAll = () => {
+	startUploadts = Date.now();
         if (uploadFileList) {
             for (let i = 0; i < uploadFileList.length; i++) {
                 let file = uploadFileList[i];
@@ -153,12 +153,15 @@ function ProgressUp() {
         setupUpload(files);
     };
 
-    const humanFileSize = (size: number) => {
+
+    const humanFileSize = (size )  => {
         const i: any = Math.floor(Math.log(size) / Math.log(1024));
-        let t: any = size / Number(Math.pow(1024, i).toFixed(2)) * 1;
+	let t2:any = size / Math.pow(1024, i);
+        let t: any = t2.toFixed(2) * 1;
         const ret: string = t + " " + ["B", "kB", "MB", "GB", "TB"][i];
         return (ret);
     };
+
 
     const buildThumb = (f: File, type: string, cb) => {
         type = type.split('/')[0];
@@ -214,13 +217,13 @@ function ProgressUp() {
             };
 	    allInfos.push(fInfo);
 
-            totalsize += f.size;
-            totalfiles += 1;
 	    if(i == files.length - 1) {
 	    console.log("Setting uploadinfo");
   	    	setFileInfos(allInfos);
 	     }
 	    });
+            setSize(totalsize + f.size);
+	    setNumberFiles(totalfiles + 1);
 	}
         setIsUploadDisabled(false);
     };
@@ -236,16 +239,15 @@ function ProgressUp() {
         if (idx == uploadFileList.length - 1) {
             let endUploadts = Date.now();
             let totaltime = endUploadts - startUploadts;
-            totalsize = humanFileSize(totalsize);
+            let tsize = humanFileSize(totalsize);
 
             var ts = new Date().toLocaleString();
             var tot = uploadFileList.length;
-            var status = totalfiles == tot ?
-                "<img src={successIcon} >" :
-                "<img src={failureIcon} >";
+            var status = totalfiles == tot ?  true: false;
 
-	   var details = totalfiles / tot + "files size " + totalsize +
-                "sent in " + totaltime + " ms";
+	   var details = totalfiles + '/' + tot 
+		+ " files size " + tsize +
+                " sent in " + totaltime + " ms";
             setDetails(details);
 
             var id = statsTable.length + 1;
@@ -262,11 +264,8 @@ function ProgressUp() {
 
             setIsUploadDisabled(true);
 	    setProgress([]);
-            totalfiles = 0;
-            totalsize = 0;
-            totaltime = 0;
-            startUploadts = 0;
-            endUploadts = 0;
+            setSize(0);
+            setNumberFiles(0);
         }
     };
 
@@ -347,16 +346,8 @@ function ProgressUp() {
     const clearAll = () => {
         setDetails("");
         setUpload([]);
-	setStats([]);
 	setFileInfos([]);
 	setProgress([]);
-        
-        totalfiles = 0;
-        totalsize = 0;
-        totaltime = 0;
-        startUploadts = 0;
-        endUploadts = 0;
-
         setIsUploadDisabled(true);
         console.log("Cleared");
 
@@ -481,10 +472,10 @@ src={uploadIcon} alt="progress-up file submit icon" />
 
 	<div id="config">
 
-    {inputs.uploadURL ? (
+    {inputs.uploadURL || inputs.filesNames ? (
 		<h2 className="leading-tight pb-2">
 	&#128202; Progress type <span
-className='text-sm'>{inputs.progType}</span>  
+className='text-sm'>{progType}</span>  
 			 &#128228; Upload URL <span
 className='text-sm'>{inputs.uploadURL}</span> 
 		&#128218; FilesName <span
@@ -677,22 +668,25 @@ ease-in-out" >
   {statsTable.length > 0 ? 
    (statsTable.map(({id, ts, status, details}) => (
 
-     <div key={id}>
-	            <tr className="bg-gray-100 border-b">
+	            <tr key={id} className="bg-gray-100 border-b">
 	              <td className="px-6 py-4 whitespace-nowrap text-sm
 font-medium text-gray-900">{id}</td>
 	              <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
 			   {ts}
 	              </td>
 	              <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-			   {status}
+
+    {status ? (
+                <img src={successIcon} /> 
+      ) : (
+                <img src={failureIcon} />
+      )}
 	              </td>
 	              <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
 			   {details}
 	              </td>
 	            </tr>
-	</div>
-   )
+   	)
    )):<tr><td> No data </td></tr>}
 
 		   </tbody>
