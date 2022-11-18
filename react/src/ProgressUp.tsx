@@ -1,12 +1,13 @@
 import React, {
     Fragment,
     useState,
+    useRef,
     useEffect,
-    setState,
     Component
 } from "react";
 import {useDropzone} from 'react-dropzone';
 import axios from "axios";
+
 import ldBar from './assets/progressBar/loading-bar.js';
 import uploadIcon from './assets/icons/upload/file-submit.svg';
 import progressTypes from './assets/progress-types.png';
@@ -38,12 +39,20 @@ import zip from './assets/icons/filetypes/zip.svg';
 function ProgressUp() {
 
     let [uploadFileInfos, setFileInfos] = useState<[]>([]);
-    let [uploadFileList, setUpload] = useState<File[]>([]);
+    let [uploadFileList, setUpload] = useState<FileList>();
     let [progressBars, setProgress] = useState<[]>([]);
-    let [statsTable, setStats] = useState<Array[]>([]);
+    let [statsTable, setStats] = useState<[]>([]);
     const [openTab, setOpenTab] = useState(1);
     const [isUploadDisabled, setIsUploadDisabled] = useState(true);
-    const [inputs, setInputs] = useState({});
+    const [inputs, setInputs] = useState({
+	uploadURL: "",
+	filesName: "",	
+	progType: "",
+	authEnabled: false,
+	authType: "",
+	user: "",
+	pass: ""
+	});
     const [progType, setProgType] = useState("line");
     const [authEnabled, enableAuth] = useState(false);
     const [authType, setAuthType] = useState("Basic");
@@ -51,9 +60,10 @@ function ProgressUp() {
     const [totalfiles, setNumberFiles] = useState(0);
     const [totalsize, setSize] = useState(0);
     let startUploadts = 0;
+    const inputRef:any = useRef();
 
     // From drag and drop
-    const onDrop = (files: FileList) => {
+    const onDrop = (files: any) => {
 	console.log("Dnd" + files);
 	setUpload(files);
         setupUpload(files);
@@ -61,7 +71,7 @@ function ProgressUp() {
 
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
-    const fileTypes = {
+    const fileTypes:any = {
         "video": avi,
         "css": css,
         "csv": csv,
@@ -84,7 +94,7 @@ function ProgressUp() {
     let progress: any = {};
     let showProgress: boolean = true;
 
-    const handleChange = (event) => {
+    const handleChange = (event:any) => {
         const name = event.target.name;
         const value = event.target.value;
         setInputs(values => ({
@@ -93,7 +103,7 @@ function ProgressUp() {
         }));
     };
 
- const handleSubmit = (event) => {
+ const handleSubmit = (event:any) => {
     event.preventDefault();
     console.log(inputs);
   };
@@ -112,7 +122,7 @@ function ProgressUp() {
 	document.body.classList.toggle('dark');
   };
 
-    const uploadOneFile = async (file: File, idx: Number) => {
+    const uploadOneFile = async (file: File, idx: number) => {
         let formData = new FormData();
         formData.append(inputs.filesName, file);
         let fname = file.name;
@@ -126,7 +136,8 @@ function ProgressUp() {
                 let perc: number;
                 if (progEvent.total) {
                     perc = (progEvent.loaded / progEvent.total) * 100;
-                    progressBars[idx].set(perc);
+		    let obj:any = progressBars[idx];
+                    obj.set(perc);
                     console.log(perc);
                 }
             },
@@ -154,7 +165,7 @@ function ProgressUp() {
     };
 
 
-    const humanFileSize = (size )  => {
+    const humanFileSize = (size:number )  => {
         const i: any = Math.floor(Math.log(size) / Math.log(1024));
 	let t2:any = size / Math.pow(1024, i);
         let t: any = t2.toFixed(2) * 1;
@@ -163,7 +174,7 @@ function ProgressUp() {
     };
 
 
-    const buildThumb = (f: File, type: string, cb) => {
+    const buildThumb = (f: File, type: string, cb: any) => {
         type = type.split('/')[0];
 
         if (type != 'image') {
@@ -176,7 +187,9 @@ function ProgressUp() {
             let reader = new FileReader();
             reader.onload = (function(theFile) {
                 return function(e) {
+		   if(e.target) {
                     cb(e.target.result); 
+		   }
                 };
             })(f);
             reader.readAsDataURL(f);
@@ -184,7 +197,8 @@ function ProgressUp() {
     };
 
     const createProgressBars = () => {
-	const allBars = [];
+	const allBars:any = [];
+	if(uploadFileList) {
 	for(let j = 0; j < uploadFileList.length;j++) {
             let id = 'a' + j;
             let bar = new ldBar('#' + id, {
@@ -194,18 +208,19 @@ function ProgressUp() {
 	    allBars.push(bar);
           }
 	    setProgress(allBars);
+	}
    };
 
-    const setupUpload = (files) => {
-	const allInfos = [];
+    const setupUpload = (files: FileList) => {
+	const allInfos:any = [];
 	for(let i = 0; i < files.length;i++) {
 	    let f = files[i];
-            let ts = f.lastModifiedDate.toLocaleDateString();
+            let ts = f.lastModified.toLocaleString();
             let name = f.name;
             let size = humanFileSize(f.size);
             let mime = f.type;
             let id = 'a' + i;
-            buildThumb(f, mime, function(src) { 
+            buildThumb(f, mime, function(src: string) { 
 		let imagesrc = src; 
 	    let fInfo = {
                 ts:ts,
@@ -229,14 +244,14 @@ function ProgressUp() {
     };
 
     const delItem = (index: number) => {
-        let list = [...uploadFileInfos];
+        let list:any = [...uploadFileInfos];
         list.splice(index, 1);
         setFileInfos(list);
         setUpload(list);
     };
 
     const spitStatistics = (idx: number) => {
-        if (idx == uploadFileList.length - 1) {
+        if (uploadFileList && idx == uploadFileList.length - 1) {
             let endUploadts = Date.now();
             let totaltime = endUploadts - startUploadts;
             let tsize = humanFileSize(totalsize);
@@ -258,7 +273,7 @@ function ProgressUp() {
 		details: details
 	    };
 
-	    let st = [...statsTable];
+	    let st:any = [...statsTable];
 	    st.push(stat);
 	    setStats(st);
 
@@ -269,7 +284,7 @@ function ProgressUp() {
         }
     };
 
-   const needsAuth = (event) => {
+   const needsAuth = (event:any) => {
     enableAuth(event.target.checked);
 };
     const saveConfig = () => {
@@ -312,18 +327,19 @@ function ProgressUp() {
     };
 
 
-    const setAuth = (event) => {
+    const setAuth = (event:any) => {
 	let auth = event.target.value;
         setAuthType(auth);
         console.log(auth);
     };
 
 
-    const setIndicator = (event) => {
+    const setIndicator = (event:any) => {
 
 	let ind = event.target.value;
 	ind = ind.toLowerCase()
         setProgType(ind);
+	let extra;
         console.log(ind);
         switch (ind) {
             case "bubble":
@@ -345,7 +361,9 @@ function ProgressUp() {
 
     const clearAll = () => {
         setDetails("");
-        setUpload([]);
+	if(inputRef.current) {
+		inputRef.current.value = "";
+	}
 	setFileInfos([]);
 	setProgress([]);
         setIsUploadDisabled(true);
@@ -462,7 +480,7 @@ pb-4">React plugin </h3>
 	   <form className='flex p-8  justify-center'>
 		<img className="stroke-white dark:bg-white" width="100" height="100"
 src={uploadIcon} alt="progress-up file submit icon" />
-	       <input onChange={fileSelectFinish} {...getInputProps()} name="uploadFiles" type="file" multiple hidden />
+	       <input ref={inputRef} onChange={fileSelectFinish} {...getInputProps()} name="uploadFiles" type="file" multiple hidden />
 	   </form>
 	   <h2 className="flex justify-center text-dark-500 text-xl font-medium mb-2"> 
 	     Drop files or click to select</h2>
@@ -472,7 +490,7 @@ src={uploadIcon} alt="progress-up file submit icon" />
 
 	<div id="config">
 
-    {inputs.uploadURL || inputs.filesNames ? (
+    {inputs.uploadURL || inputs.filesName ? (
 		<h2 className="leading-tight pb-2">
 	&#128202; Progress type <span
 className='text-sm'>{progType}</span>  
@@ -513,7 +531,7 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	   font-bold mb-2" htmlFor="inputs.uploadURL">
 	          POST endpoint  
 	         </label>
-	         <input name="uploadURL" value={inputs.uploadURL || ""} 
+	         <input name="inputs.uploadURL" value={inputs.uploadURL || ""} 
         onChange={handleChange}
 className="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
@@ -528,7 +546,7 @@ CORS]" />
 	   font-bold mb-2" htmlFor="progress-up-filesName">
 	   	Name of files input field
 	         </label>
-	         <input name="filesName" value={inputs.filesName || ""} onChange={handleChange} id='filesName' className="appearance-none block w-full bg-gray-200
+	         <input name="inputs.filesName" value={inputs.filesName || ""} onChange={handleChange} id='filesName' className="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	    type="text" placeholder="Name of files input field" />
@@ -546,7 +564,7 @@ CORS]" />
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	   >
-	   			<option defaultValue>Line</option>
+	   			<option>Line</option>
 	   			<option>Fan</option>
 	   			<option>Bubble</option>
 	   			<option>Energy</option>
@@ -569,9 +587,8 @@ CORS]" />
 	         <span className="text-sm">
 	           HTTP Auth required?
 	         </span>
-	         <input name='authEnabled' onChange={needsAuth} value={inputs.authEnabled || false}
-className="mr-2 leading-tight"
-type="checkbox" />
+	         <input name='inputs.authEnabled' onChange={needsAuth}
+checked={inputs.authEnabled || false} className="mr-2 leading-tight" type="checkbox" />
 	       </label>
 	      </div>
 	     </div>
@@ -586,7 +603,7 @@ text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	            </label>
 	            <div className="relative">
 	              <select id='authType' onChange={setAuth} value={inputs.authType || ""} className="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
-	                <option defaultValue>HTTP basic auth</option>
+	                <option>HTTP basic auth</option>
 	                <option>HTTP digest auth</option>
 	              </select>
 	       
@@ -601,7 +618,7 @@ text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	      font-bold mb-2" htmlFor="user">
 	             Username  
 	            </label>
-	            <input name='user' value={inputs.user || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
+	            <input name='inputs.user' value={inputs.user || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	      focus:outline-none focus:bg-light"  type="text"
 	      placeholder="username" />
@@ -613,7 +630,7 @@ text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	      font-bold mb-2" htmlFor="progress-up-pass">
 	      	Password
 	            </label>
-	            <input name='pass' value={inputs.pass || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
+	            <input name='inputs.pass' value={inputs.pass || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	      focus:outline-none focus:bg-light focus:border-gray-500"
 	       type="password" placeholder="Password" />

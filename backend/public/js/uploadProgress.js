@@ -19,8 +19,6 @@ tabTogglers.forEach(function(toggler) {
 });
 
 
-
-
 /* XXX File upload tab functions */
 
 var fileTypeIcons = {
@@ -55,6 +53,7 @@ var startUploadts = 0;
 var endUploadts = 0;
 
 const uplform = document.querySelector("#progress-up-form form");
+const upBut = document.getElementById("upButton");
 uplform.addEventListener("dragover", dragOver, false);
 uplform.addEventListener("drop", drop, false);
 
@@ -79,9 +78,13 @@ fileInput.onchange = ({
 }) => fileSelectFinish(target);
 
 function enableUploadButton() {
-    upBut = document.getElementById("upButton");
     upBut.removeAttribute('disabled');
     upBut.classList.remove('opacity-20');
+}
+
+function disableUploadButton() {
+    upBut.addAttribute('disabled');
+    upBut.classList.add('opacity-20');
 }
 
 function clearAll() {
@@ -94,8 +97,6 @@ function clearAll() {
     totalfiles = 0;
     totalsize = 0;
     totaltime = 0;
-    startUploadts = 0;
-    endUploadts = 0;
 
     upBut = document.getElementById("upButton");
     upBut.disabled = true;
@@ -240,7 +241,7 @@ dark:text-white">
     for (var i = 0; i < uploadFileList.length; i++) {
         var selector = '#a' + i;
         var bar = new ldBar(selector, {
-            preset: preset
+            preset: progType.toLowerCase()
         });
         bar.set(0);
         progressBars.push(bar);
@@ -259,11 +260,21 @@ function delItem(index) {
 }
 
 function dumpConfigSummary() {
+	if(uploadURL === undefined || filesName === undefined) {
+configSummary.innerHTML = `
+	<div id="config">
+		<h2 class="leading-tight pb-2">
+		Please configure first
+		</h2>
+	</div>
+	`;
+	disableUploadButton();
+	} else {
 configSummary.innerHTML = `
 	<div id="config">
 		<h2 class="leading-tight pb-2">
 			&#128202; Progress type <span
-class='text-sm'>${preset}</span>  
+class='text-sm'>${progType}</span>  
 			 &#128228; Upload URL <span
 class='text-sm'>${uploadURL}</span> 
 		&#128218; FilesName <span
@@ -271,6 +282,7 @@ class='text-sm'>${filesName}</span>
 		</h2>
 	</div>
 	`;
+	}
 }
 
 function spitStatistics(idx) {
@@ -278,21 +290,16 @@ function spitStatistics(idx) {
         endUploadts = Date.now();
         totaltime = `${endUploadts - startUploadts}`;
         totalsize = humanFileSize(totalsize);
-        statsArea.innerHTML = `
-	<div id="uploadStats">
-	<h2 class="text-5xl leading-tight border-b">
-		${totalfiles} file(s) uploaded ${totalsize} sent in ${totaltime} milliseconds</h2>
-	</div>
-	`;
-
+ 	tot = uploadFileList.length;
 
         var ts = new Date().toLocaleString();
         var tot = uploadFileList.length;
         var status = totalfiles == tot ?
             '<img src="icons/misc/success-icon.svg" >' :
             '<img src="icons/misc/failure-icon.svg" >';
-        var details = `${totalfiles}/${tot} files size ${totalsize} sent in
+        var details = `${totalfiles}/${tot} files of size ${totalsize} sent in
 ${totaltime} ms`;
+        statsArea.innerHTML = details;
 
         var id = statsTable.length + 1;
         statsTable.push(`
@@ -372,7 +379,7 @@ function uploadAll() {
 
 /* XXX Globals */
 
-var preset = "line";
+var progType = "Line";
 var extra = '';
 
 /* XXX these are backend variables */
@@ -401,6 +408,9 @@ function saveConfig() {
 
     uploadURL = document.getElementById("progress-up-uploadURL").value;
     filesName = document.getElementById("progress-up-filesName").value;
+    if(uploadURL && filesName) {
+	enableUploadButton();
+    }
     authEnabled = document.getElementById("progress-up-authenable").value;
     authType = document.getElementById("progress-up-authtype").value;
     user = document.getElementById("progress-up-username").value;
@@ -446,15 +456,11 @@ function testEP() {
 function setIndicator() {
     var progType = document.getElementById("progress-up-indicator").value;
     console.log(progType);
-    progType = progType.toLowerCase()
-    preset = progType;
     switch (progType) {
-        case "bubble":
-            preset = progType;
+        case "Bubble":
             extra = 'data-img-size="100,100"';
             break;
-        case "rainbow":
-            preset = progType;
+        case "Rainbow":
             extra = 'data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"';
             break;
         default:

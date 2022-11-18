@@ -455,7 +455,6 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 
 <script>
 import axios from "axios";
-import {onUpdated} from 'vue';
 import ldBar from "./assets/progressBar/loading-bar.js";
 
 

@@ -8,7 +8,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "progress-up": "*",
     "vue": "^3.2.41"
   },
   "devDependencies": {
