@@ -1,4 +1,5 @@
 var presets, simpleStr, wrap, slice$ = [].slice, toString$ = {}.toString;
+
 presets = {
   rainbow: {
     "type": 'stroke',
@@ -792,8 +793,10 @@ wrap = function(content){
     return results$;
   }, false);
 })();
+//module.exports = {ldBar};
 function import$(obj, src){
   var own = {}.hasOwnProperty;
   for (var key in src) if (own.call(src, key)) obj[key] = src[key];
   return obj;
 }
+export default ldBar;

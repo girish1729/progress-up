@@ -16,7 +16,8 @@ export default defineConfig({
       external: ['react', 'react-dropzone'],
       output: {
         globals: {
-          react: 'React'
+          react: 'react',
+          "react-dropzone": 'react-dropzone',
         }
       }
     }
