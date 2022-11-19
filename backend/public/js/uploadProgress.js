@@ -140,7 +140,7 @@ function setIconImage(name, type) {
     }
     var icon = [
         '<img width="125" height="125" src="',
-        'icons/filetypes/' + fileIcon,
+        'https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/' + fileIcon,
         '" title="', name,
         '" alt="', name,
         '" class="h-9 w-9" />'
@@ -191,7 +191,7 @@ text-light-100 dark:text-white">
  <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
 
     <div  onClick="delItem(${i})" title="Delete" class="absolute cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
-          <img width="25" height="25" src="icons/misc/trash-icon.svg" />
+          <img width="25" height="25" src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/trash-icon.svg" />
     </div>
 
     <div class="flex flex-wrap -mx-2 mb-8">
@@ -295,8 +295,8 @@ function spitStatistics(idx) {
         var ts = new Date().toLocaleString();
         var tot = uploadFileList.length;
         var status = totalfiles == tot ?
-            '<img src="icons/misc/success-icon.svg" >' :
-            '<img src="icons/misc/failure-icon.svg" >';
+            '<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/success-icon.svg" >' :
+            '<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg" >' ;
         var details = `${totalfiles}/${tot} files of size ${totalsize} sent in
 ${totaltime} ms`;
         statsArea.innerHTML = details;

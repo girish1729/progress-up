@@ -226,7 +226,7 @@ this.form.filesName, file).subscribe(
             if (fileIcon == undefined) {
                 fileIcon = "file.svg";
             }
-            cb("assets/icons/filetypes/" + fileIcon);
+            cb("https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" + fileIcon);
         } else {
             var reader = new FileReader();
             reader.onload = (function(theFile) {
@@ -287,8 +287,8 @@ this.form.filesName, file).subscribe(
             var ts = new Date().toLocaleString();
             var tot = self.uploadFileList.length;
             var status = self.totalfiles == tot ?
-                '<img src="assets/icons/misc/success-icon.svg" >' :
-                '<img src="assets/icons/misc/failure-icon.svg" >';
+                '<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/success-icon.svg" >' :
+                '<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg" >';
             self.details = self.totalfiles + '/' +  tot 
 		+ " files of size " + totalsize +
                 " sent in " + self.totaltime + " ms";
