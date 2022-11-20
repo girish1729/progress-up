@@ -58,10 +58,10 @@ uplform.addEventListener("dragover", dragOver, false);
 uplform.addEventListener("drop", drop, false);
 
 uplform.addEventListener('dragenter', (e) =>
-  e.target.classList.add('bg-blue-400')
+    e.target.classList.add('bg-blue-400')
 );
 uplform.addEventListener('dragleave', (e) =>
-  e.target.classList.remove('bg-blue-400')
+    e.target.classList.remove('bg-blue-400')
 );
 
 const fileInput = document.getElementById("progress-up-fileInput");
@@ -150,24 +150,52 @@ function setIconImage(name, type) {
 
 function showThumbnails() {
     for (var i = 0, f; f = uploadFileList[i]; i++) {
-        if (!f.type.match('image.*')) {
-            setIconImage(f.name, f.type);
-        } else {
-            var reader = new FileReader();
-            // Closure to capture the file information.  
-            reader.onload = (function(theFile) {
-                return function(e) {
-                    var thumb = [
-                        '<img width="125" height="125" src="',
-                        e.target.result,
-                        '" title="', theFile.name,
-        		'" alt="', theFile.name,
-        		'" class="w-12 h-12" />'
-                    ].join('');
-		    document.getElementById(theFile.name).innerHTML = thumb;
-                };
-            })(f);
-            reader.readAsDataURL(f);
+        switch (f.type) {
+            case /image/:
+                var reader = new FileReader();
+                // Closure to capture the file information.  
+                reader.onload = (function(theFile) {
+                    return function(e) {
+                        var thumb = [
+                            '<img width="125" height="125" src="',
+                            e.target.result,
+                            '" title="', theFile.name,
+                            '" alt="', theFile.name,
+                            '" class="w-12 h-12" />'
+                        ].join('');
+                        document.getElementById(theFile.name).innerHTML = thumb;
+                    };
+                })(f);
+                reader.readAsDataURL(f);
+                break;
+            case /video/:
+                var videoUrl = window.URL.createObjectURL(f);
+
+                var icon = [
+                    '<video width="125" height="125" src="',
+                    videoUrl,
+                    '" title="', name,
+                    '" alt="', name,
+                    '" class="h-9 w-9" />'
+                ].join('');
+                document.getElementById(f.name).innerHTML = icon;
+                break;
+            case /pdf/:
+
+                var pdfUrl = window.URL.createObjectURL(f);
+                /*
+        '<img width="125" height="125" src="',
+        '" title="', name,
+        '" alt="', name,
+        '" class="h-9 w-9" />'
+	*/
+                var loc = document.getElementById(f.name);
+                PDFObject.embed(fileURL, loc);
+
+                break;
+            default:
+                setIconImage(f.name, f.type);
+                break;
         }
     }
 }
@@ -260,17 +288,17 @@ function delItem(index) {
 }
 
 function dumpConfigSummary() {
-	if(uploadURL === undefined || filesName === undefined) {
-configSummary.innerHTML = `
+    if (uploadURL === undefined || filesName === undefined) {
+        configSummary.innerHTML = `
 	<div id="config">
 		<h2 class="leading-tight pb-2">
 		Please configure first
 		</h2>
 	</div>
 	`;
-	disableUploadButton();
-	} else {
-configSummary.innerHTML = `
+        disableUploadButton();
+    } else {
+        configSummary.innerHTML = `
 	<div id="config">
 		<h2 class="leading-tight pb-2">
 			&#128202; Progress type <span
@@ -282,7 +310,7 @@ class='text-sm'>${filesName}</span>
 		</h2>
 	</div>
 	`;
-	}
+    }
 }
 
 function spitStatistics(idx) {
@@ -290,13 +318,13 @@ function spitStatistics(idx) {
         endUploadts = Date.now();
         totaltime = `${endUploadts - startUploadts}`;
         totalsize = humanFileSize(totalsize);
- 	tot = uploadFileList.length;
+        tot = uploadFileList.length;
 
         var ts = new Date().toLocaleString();
         var tot = uploadFileList.length;
         var status = totalfiles == tot ?
             '<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/success-icon.svg" >' :
-            '<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg" >' ;
+            '<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg" >';
         var details = `${totalfiles}/${tot} files of size ${totalsize} sent in
 ${totaltime} ms`;
         statsArea.innerHTML = details;
@@ -354,9 +382,9 @@ async function uploadOneFile(name, idx) {
         var username = 'user';
         var password = 'password';
         var basicAuth = 'Basic ' + btoa(username + ':' + password);
-        options['headers'] =  {
-                'Authorization': +basicAuth
-         };
+        options['headers'] = {
+            'Authorization': +basicAuth
+        };
     }
     await axios.post(uploadURL, uplFormData, options).then((resp) => {
         spitStatistics(idx)
@@ -408,8 +436,8 @@ function saveConfig() {
 
     uploadURL = document.getElementById("progress-up-uploadURL").value;
     filesName = document.getElementById("progress-up-filesName").value;
-    if(uploadURL && filesName) {
-	enableUploadButton();
+    if (uploadURL && filesName) {
+        enableUploadButton();
     }
     authEnabled = document.getElementById("progress-up-authenable").value;
     authType = document.getElementById("progress-up-authtype").value;
@@ -482,7 +510,6 @@ function populateStats() {
 /* XXX ---------------------------------- XXX */
 
 /* XXX Not used */
-
 
 function dataFileDnD() {
     return {

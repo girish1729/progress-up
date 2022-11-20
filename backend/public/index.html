@@ -8,8 +8,10 @@ indicator</title>
   <meta description="HTML5 multiple file upload progress bar plugin for
 Vue,js, React and Angular" />
 
-<script type="text/javascript"
-src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/progressBars/loading-bar.js"></script>
+<script
+src="https://cdn.jsdelivr.net/npm/pdfobject@2.2.8/pdfobject.min.js"></script>
+<script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/progressBar/loading-bar.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
   <link rel="stylesheet" href="progress-up.css" />
 </head>
@@ -68,6 +70,9 @@ src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/pr
 <!-- XXX drag drop -->
 	   <h2 id='progress-up-statsArea' class="text-5xl leading-tight border-b"> </h2>
 
+
+<canvas id="pdfViewer"></canvas>
+<video src="http://www.w3schools.com/html/mov_bbb.mp4#t=5"></video>
 
 	<div id='progress-up-form' class="bg-light p-4 rounded mx-auto">
     	  <div class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
