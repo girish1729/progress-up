@@ -8,11 +8,16 @@ indicator</title>
   <meta description="HTML5 multiple file upload progress bar plugin for
 Vue,js, React and Angular" />
 
+
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 <script
-src="https://cdn.jsdelivr.net/npm/pdfobject@2.2.8/pdfobject.min.js"></script>
-<script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/progressBar/loading-bar.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+src="https://cdn.jsdelivr.net/npm/pdfobject@2.2.8/pdfobject.min.js"
+defer></script>
+<script type="module"
+src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/progressBar/loading-bar.js"
+defer></script>
+<script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"
+defer></script>
   <link rel="stylesheet" href="progress-up.css" />
 </head>
 
@@ -71,15 +76,12 @@ src="https://cdn.jsdelivr.net/npm/pdfobject@2.2.8/pdfobject.min.js"></script>
 	   <h2 id='progress-up-statsArea' class="text-5xl leading-tight border-b"> </h2>
 
 
-<canvas id="pdfViewer"></canvas>
-<video src="http://www.w3schools.com/html/mov_bbb.mp4#t=5"></video>
-
 	<div id='progress-up-form' class="bg-light p-4 rounded mx-auto">
     	  <div class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
 	   <form class='flex p-8  justify-center'>
 		<img class="stroke-white dark:bg-white" width="100" height="100"
 src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" />
-	       <input id="progress-up-fileInput" name="uploadFiles" type="file" multiple hidden>
+	       <input id="progress-up-fileInput" type="file" multiple hidden>
 	   </form>
 	   <h2 class="flex justify-center text-dark-500 text-xl font-medium mb-2"> 
 	     Drop files or click to select</h2>
@@ -161,17 +163,75 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	       </div>
 	      </div>
 	
-
-	     <div class="flex flex-wrap -mx-3 mb-6">
+	      <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
-	       <label class="md:w-2/3 block text-dark-500 font-bold">
-	         <span class="text-sm">
-	           HTTP Auth required?
-	         </span>
-	         <input onChange="toggleAuthQ(this)" id='progress-up-authenable' class="mr-2 leading-tight" type="checkbox">
-	       </label>
+<label class="relative flex justify-between items-center p-2 text-xl"
+for="fileSizeLimit" >
+<span id='progress-up-filterLabel'>File Size Limit (MB)</span>
+  <input id="fileSizeLimit" class='m-6 p-6 form-range'
+type="range"  name="rangeInput" min="10" max="1000"
+step=10 value="0" oninput="sizeLimit.value=rangeInput.value">                      
+<output id="sizeLimit" name="sizeLimit" for="fileSizeLimit">100</output>
+	</div>
+	</div>
+
+	      <div class="flex flex-wrap -mx-3 mb-6">
+	       <div class="w-full px-3">
+
+<label class="relative flex justify-between items-center p-2 text-xl"
+for="sizeToggle" >
+<span id='progress-up-sizeToggle'>Single file limit </span>
+  <input id="sizeToggle" onChange="toggleSizeQ(this)" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
+bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
+</label>
+	</div>
+	</div>
+
+
+
+	      <div class="flex flex-wrap -mx-3 mb-6">
+	       <div class="w-full px-3">
+	         <label class="block uppercase tracking-wide text-dark-700 text-xs
+	   font-bold mb-2" for="progress-up-indicator">
+	          File type Filters 
+	         </label>
+	         <div class="relative">
+	           <select id='progress-up-filter'
+ class="block appearance-none w-full bg-gray-200 border
+	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
+	   focus:outline-none focus:bg-light focus:border-gray-500"
+	   >
+	   			<option default>All</option>
+	   			<option>PDF only</option>
+	   			<option>Image only</option>
+	   			<option>Video only</option>
+	   			<option>Zip only</option>
+	   			<option>Text only</option>
+	           </select>
+	           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-dark-700">
+	             <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+	           </div>
+	         </div>
+	       </div>
 	      </div>
-	     </div>
+
+<label class="relative flex justify-between items-center p-2 text-xl"
+for="filterAction" >
+<span id='progress-up-filterLabel'>Deny file type </span>
+  <input id="filterAction" onChange="toggleFilterQ(this)" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
+bg-green-600 rounded-full duration-300 ease-in-out peer-checked:bg-red-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
+</label>
+
+
+<label class="relative flex justify-between items-center p-2 text-xl"
+for="filterAction" >
+<span>HTTP Auth required</span>
+  <input id="progress-up-authenable" onChange="toggleAuthQ(this)" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1 bg-gray-300 rounded-full duration-300 ease-in-out peer-checked:bg-green-400 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
+</label>
+
 	   
              <div id='progress-up-authsection' class="hidden">
 	        <div class="flex flex-wrap -mx-3 mb-6">

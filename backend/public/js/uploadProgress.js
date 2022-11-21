@@ -200,20 +200,112 @@ function showThumbnails() {
     }
 }
 
+function printBannedBanner(name, mime, ts, size, msg) {
+
+        progressHTML.push(
+`
+<section  class="m-4 p-4 mt-4 mb-4 transition-colors
+text-light-100 dark:text-white">
+ <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
+
+    <div class="flex flex-wrap -mx-2 mb-8">
+      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+         <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
+		<div id="${name}"></div>
+         </div>
+      </div>
+      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+        <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
+         <ul>
+      	    <li  class="text-xl font-light leading-relaxed text-gray-800
+dark:text-white">
+      	    Name: ${name}
+      	    </li>
+      	    <li class="text-xl font-light leading-relaxed text-gray-800
+dark:text-white">
+      	    Date: ${ts}
+      	    </li>
+      	    <li class="text-xl font-light leading-relaxed text-gray-800
+dark:text-white">
+      	    Type: ${mime}
+      	    </li>
+      	    <li class="text-xl font-light leading-relaxed text-gray-800
+dark:text-white">
+      	    Size: ${size} 
+      	    </li>
+         </ul>
+        </div>
+       </div>
+
+      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+         <div class="h-12 text-lg text-grey-dark flex items-left justify-left">
+		${msg}
+         </div>
+	 
+      </div>
+    </div>
+
+ </div>
+</section>
+`);
+
+
+}
+
+function checkFilter(mime) {
+	if(mime == filtFiles.type && filtFiles.action == "allow") {
+		return true;
+	}
+	return false;
+}
+
+function checkSize(size) {
+	if(size < allowedSize * 1024 * 1024) {
+		return true;
+	}
+	return false;
+}
+
+function checkTotalSize(size) {
+	if(totalsize < allowedTotalSize * 1024 * 1024) {
+		return true;
+	}
+	return false;
+}
+
 function setupUpload() {
     var progressHTML = [];
     for (var i = 0; i < uploadFileList.length; i++) {
         let f = uploadFileList[i];
-        let ts = f.lastModifiedDate.toLocaleDateString();
+        let mime = f.type;
         let name = f.name;
+        let ts = f.lastModifiedDate.toLocaleDateString();
         totalsize += f.size;
         let size = humanFileSize(f.size);
-        let mime = f.type;
         let id = 'a' + i;
+	if(checkSize(size)) {
+		msg = `${name} too big for upload`;
+		printBannedBanner(name, mime, ts, size, msg);
+		continue;
+	}
+	if(checkFilter(mime)) {
+		msg = `${name} cannot be uploaded due to policy.`;
+		printBannedBanner(name, mime, ts, size, msg);
+		continue;
+	}
+	if(i == uploadFileList.length - 1) {
+		if(checkTotalSize(size)) {
+			msg = `Total size exceeds policy`;
+			printBannedBanner(name, mime, ts, size, msg);
+			continue;
+		}
+		
+	}
         totalfiles += 1;
 
         progressHTML.push(
             `
+
 <section id="${id}-section" class="m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white">
  <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
@@ -255,6 +347,10 @@ dark:text-white">
          <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
     		<div class='ldBar' id="${id}" ></div>
          </div>
+         <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
+		<span class='sentBytes'>${bytesSent} of ${size} sent</span>
+         </div>
+	 
       </div>
     </div>
 
@@ -360,8 +456,10 @@ font-medium text-gray-900">${id}</td>
 }
 
 
-async function uploadOneFile(name, idx) {
-    let uplFormData = new FormData(uplform);
+async function uploadOneFile(f, idx) {
+    let uplForm = new FormData();
+    uplForm.append(filesName, f);
+    let size = f.size;
     let options = {
         onUploadProgress: function(e) {
             /*{
@@ -375,6 +473,7 @@ async function uploadOneFile(name, idx) {
             }*/
             let perc = parseInt(e.progress * 100);
             progressBars[idx].set(perc);
+	    let bytesSent = humanFileSize(e.progress * size);
         }
     };
 
@@ -398,7 +497,7 @@ function uploadAll() {
     console.log("Starting upload...");
     startUploadts = Date.now();
     for (i = 0; i < uploadFileList.length; i++) {
-        f = uploadFileList[i].name;
+        f = uploadFileList[i];
         uploadOneFile(f, i);
     }
 }
@@ -419,17 +518,84 @@ var authType = "Basic";
 var user = '';
 var pass = '';
 
+function initApp() {
+    document.getElementById("progress-up-uploadURL").value = uploadURL;
+    document.getElementById("progress-up-filesName").value = filesName;
+    dumpConfigSummary();
+}
+
+function applyFilter() {
+	filt = document.querySelector('#progress-up-filter');
+	filtType = document.querySelector('#filterAction');
+	if(filtType.checked) {
+		action = "deny";
+	} else {
+		action = "allow";
+	}
+	switch(filt) {
+		case "All":
+			break;
+		case "PDF only":
+			filtFiles = { 
+			"type": "application/pdf",
+			"action": action 
+			};
+			break;
+		case "Image only":
+			filtFiles = {
+			"type": "image/*",		
+			"action": action
+			};
+			break;
+		case "Video only":
+			filtFiles = {
+			"type": "video/*",
+			"action": action
+			};
+			break;
+		case "Zip only":
+			filtFiles = {
+			"type": "application/zip",
+			"action": action
+			};
+			break;
+		case "Text only":
+			filtFiles = {
+			"type": "text/*",
+			"action": action
+			};
+			break;
+		default:
+			console.log("Filter not understood");
+			break;
+	}
+
+}
+
+function toggleSizeQ(val) {
+    console.log(val.checked);
+    const label = document.querySelector("#progress-up-sizeToggle");
+    if(val.checked === true) {
+    	label.innerHTML = "Total limit";
+    } else {
+    	label.innerHTML = "Single file limit";
+    }
+}
+
+function toggleFilterQ(val) {
+    console.log(val.checked);
+    const label = document.querySelector("#progress-up-filterLabel");
+    if(val.checked === true) {
+    	label.innerHTML = "Deny file type";
+    } else {
+    	label.innerHTML = "Allow file type";
+    }
+}
 
 
 function toggleAuthQ(val) {
     const authSection = document.querySelector("#progress-up-authsection");
     authSection.classList.toggle("hidden");
-}
-
-function initApp() {
-    document.getElementById("progress-up-uploadURL").value = uploadURL;
-    document.getElementById("progress-up-filesName").value = filesName;
-    dumpConfigSummary();
 }
 
 function saveConfig() {
@@ -444,6 +610,7 @@ function saveConfig() {
     user = document.getElementById("progress-up-username").value;
     pass = document.getElementById("progress-up-pass").value;
 
+    applyFilter();
     console.log(uploadURL, filesName, authEnabled, authType, user, pass);
     dumpConfigSummary();
 }
@@ -574,7 +741,7 @@ function dataFileDnD() {
 
 function upload(event) {
     console.log("Uploading using HTML5 File API...");
-    let data = new FormData(uplform);
+    let data = new FormData();
     fetch(uploadURL, {
             method: 'POST',
             body: data
