@@ -52,6 +52,8 @@ var totaltime = 0;
 var startUploadts = 0;
 var endUploadts = 0;
 var bytesSent = 0;
+var rate = 0;
+var eta = 0;
 
 const uplform = document.querySelector("#progress-up-form form");
 var upBut = document.getElementById("upButton");
@@ -378,13 +380,14 @@ text-light-100 dark:text-white">
           <img width="25" height="25" src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/trash-icon.svg" />
     </div>
 
-    <div class="flex flex-wrap -mx-2 mb-8">
-      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+    <div class="flex -mx-2 mb-8">
+      <div class="w-1/3 md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
 		<div id="${name}"></div>
          </div>
       </div>
-      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+
+      <div class="w-1/3 md:w-1/3 lg:w-1/4 px-2 mb-4">
         <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
          <ul>
       	    <li  class=" font-light leading-relaxed text-gray-800
@@ -405,19 +408,19 @@ dark:text-white">
       	    </li>
       	    <li id="${id}-meta" class="font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    
+      	    </li>
+      	    <li id="${id}-prog" class="font-light leading-relaxed text-gray-800
+dark:text-white">
       	    </li>
          </ul>
         </div>
        </div>
 
-      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
-         <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
+      <div class="w-1/3 md:w-1/3 lg:w-1/4 px-2 mb-4">
+         <div class="text-sm text-grey-dark flex items-left justify-left">
     		<div class='ldBar' id="${id}" ></div>
          </div>
-         <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
-		<span class='sentBytes'>${bytesSent} of ${size} sent</span>
-         </div>
+      </div>
 	 
       </div>
     </div>
@@ -451,11 +454,11 @@ function delUploadList(index) {
 
 function delItem(index) {
     let list = [...uploadFileList];
+    totalsize -= upLoadFileList[index].size;
     list.splice(index, 1);
     uploadFileList = list;
     el = document.getElementById('a' + index + '-section');
     el.remove();
-    totalsize -= upLoadFileList[index].size;
     checkTotalSize();
 }
 
@@ -533,9 +536,12 @@ font-medium text-gray-900">${id}</td>
 
 
 async function uploadOneFile(f, idx) {
+
+    let id = 'a' + idx;
     let uplForm = new FormData();
     uplForm.append(filesName, f);
     let size = f.size;
+    let p = document.getElementById(id + '-prog');
     let options = {
         onUploadProgress: function(e) {
             /*{
@@ -550,6 +556,14 @@ async function uploadOneFile(f, idx) {
             let perc = parseInt(e.progress * 100);
             progressBars[idx].set(perc);
 	    bytesSent = humanFileSize(e.progress * size);
+	    Mysize = humanFileSize(size);
+	    eta = e.estimated;
+	    rate = (e.rate / 1024 / 1024).toFixed(2);
+
+	    p.innerHTML = `
+		<span>${bytesSent} of ${Mysize} uploaded  ${rate} MB/s ETA ${eta} s</span>
+		`;
+	
         }
     };
 
@@ -561,10 +575,10 @@ async function uploadOneFile(f, idx) {
             'Authorization': +basicAuth
         };
     }
-    await axios.post(uploadURL, uplFormData, options).then((resp) => {
+    await axios.post(uploadURL, uplForm, options).then((resp) => {
         spitStatistics(idx)
     }).catch((error) => {
-        alert("Upload failed. Please check endpoint in Setup");
+        alert("Upload failed to (" + uploadURL + "). Please check endpoint in Setup");
         alert(error);
     });
 }
@@ -854,4 +868,37 @@ reader.onprogress = function(progressEvent) {
     }
     console.log("total: " + progressEvent.total + ", loaded: " +
         progressEvent.loaded + "(" + percentLoaded + "%)");
+}
+
+
+function tusUploadFile(f, filesName, endpoint) {
+    var upload = new tus.Upload(file, {
+        endpoint: endpoint,
+        retryDelays: [0, 3000, 5000, 10000, 20000],
+        metadata: {
+            filename: filesName,
+            filetype: file.type
+        },
+        onError: function(error) {
+            console.log("Failed because: " + error)
+        },
+        onProgress: function(bytesUploaded, bytesTotal) {
+            var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2)
+            console.log(bytesUploaded, bytesTotal, percentage + "%")
+        },
+        onSuccess: function() {
+            console.log("Download %s from %s", upload.file.name, upload.url)
+        }
+    })
+
+    // Check if there are any previous uploads to continue.
+    upload.findPreviousUploads().then(function (previousUploads) {
+        // Found previous uploads so we select the first one. 
+        if (previousUploads.length) {
+            upload.resumeFromPreviousUpload(previousUploads[0])
+        }
+
+        // Start the upload
+        upload.start()
+    })
 }
