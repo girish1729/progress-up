@@ -51,9 +51,10 @@ var totalsize = 0;
 var totaltime = 0;
 var startUploadts = 0;
 var endUploadts = 0;
+var bytesSent = 0;
 
 const uplform = document.querySelector("#progress-up-form form");
-const upBut = document.getElementById("upButton");
+var upBut = document.getElementById("upButton");
 uplform.addEventListener("dragover", dragOver, false);
 uplform.addEventListener("drop", drop, false);
 
@@ -66,6 +67,7 @@ uplform.addEventListener('dragleave', (e) =>
 
 const fileInput = document.getElementById("progress-up-fileInput");
 const progressArea = document.getElementById("progress-up-progressArea");
+const errArea = document.getElementById("progress-up-errArea");
 const statsArea = document.getElementById("progress-up-statsArea");
 const configSummary = document.getElementById("progress-up-configSummary");
 
@@ -83,13 +85,14 @@ function enableUploadButton() {
 }
 
 function disableUploadButton() {
-    upBut.addAttribute('disabled');
+    upBut.setAttribute('disabled');
     upBut.classList.add('opacity-20');
 }
 
 function clearAll() {
     progressArea.innerHTML = '';
     statsArea.innerHTML = '';
+    errArea.innerHTML = '';
     configSummary.innerHTML = '';
     uploadFileList = [];
     uploadFileList = [];
@@ -98,7 +101,6 @@ function clearAll() {
     totalsize = 0;
     totaltime = 0;
 
-    upBut = document.getElementById("upButton");
     upBut.disabled = true;
     console.log("Cleared");
 }
@@ -131,7 +133,7 @@ function humanFileSize(size) {
     );
 }
 
-function setIconImage(name, type) {
+function setIconImage(name, type, title) {
     type = type.split('/')[0];
     console.log(type);
     var fileIcon = fileTypeIcons[type];
@@ -141,17 +143,53 @@ function setIconImage(name, type) {
     var icon = [
         '<img width="125" height="125" src="',
         'https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/' + fileIcon,
-        '" title="', name,
         '" alt="', name,
+        '" title="', title,
         '" class="h-9 w-9" />'
     ].join('');
     document.getElementById(name).innerHTML = icon;
 }
 
+
+function wordCount(val) {
+  var wom = val.match(/\S+/g);
+  return {
+    chars: val.length,
+    words: wom ? wom.length : 0,
+    lines: val.split(/\r*\n/).length
+  };
+}
+
 function showThumbnails() {
     for (var i = 0, f; f = uploadFileList[i]; i++) {
-        switch (f.type) {
-            case /image/:
+        let id = 'a' + i;
+        switch (true) {
+            case /text/.test(f.type):
+		console.log("Text type detected");
+                var reader = new FileReader();
+                reader.onload = (function(f) {
+                    return function(e) {
+                        txt = e.target.result;
+			wc = wordCount(txt);
+                        meta = document.getElementById(`${id}-meta`);
+			meta.innerHTML = (`
+			Metadata: 
+   			Chars : ${wc.chars}
+   			Words: ${wc.words}
+   			Lines: ${wc.lines}
+  			`);
+
+			
+var dataArray = txt.split("\n");
+dataArray = dataArray.slice(0,20);
+txt = dataArray.join("\n");
+                	setIconImage(f.name, f.type, txt);
+                    };
+                })(f);
+                reader.readAsText(f);
+                break;
+            case /image/.test(f.type):
+		console.log("Image type detected");
                 var reader = new FileReader();
                 // Closure to capture the file information.  
                 reader.onload = (function(theFile) {
@@ -168,41 +206,49 @@ function showThumbnails() {
                 })(f);
                 reader.readAsDataURL(f);
                 break;
-            case /video/:
-                var videoUrl = window.URL.createObjectURL(f);
+            case /audio/.test(f.type):
+		console.log("Audio type detected");
+                var audioUrl = window.URL.createObjectURL(f);
 
                 var icon = [
-                    '<video width="125" height="125" src="',
-                    videoUrl,
+                    '<audio controls width="125" height="125"><source src="',
+                    audioUrl,
                     '" title="', name,
                     '" alt="', name,
-                    '" class="h-9 w-9" />'
+                    '" class="h-9 w-9" </source> </audio>'
                 ].join('');
                 document.getElementById(f.name).innerHTML = icon;
                 break;
-            case /pdf/:
+            case /video/.test(f.type):
+		console.log("Video type detected");
+                var videoUrl = window.URL.createObjectURL(f);
 
-                var pdfUrl = window.URL.createObjectURL(f);
-                /*
-        '<img width="125" height="125" src="',
-        '" title="', name,
-        '" alt="', name,
-        '" class="h-9 w-9" />'
-	*/
+                var icon = [
+                    '<video controls width="125" height="125"><source src="',
+                    videoUrl,
+                    '" title="', name,
+                    '" alt="', name,
+                    '" class="h-9 w-9"</source> </video>'
+                ].join('');
+                document.getElementById(f.name).innerHTML = icon;
+                break;
+            case /pdf/.test(f.type):
+		console.log("PDF type detected");
+                var pdfURL = window.URL.createObjectURL(f);
                 var loc = document.getElementById(f.name);
-                PDFObject.embed(fileURL, loc);
-
+                PDFObject.embed(pdfURL, loc);
                 break;
             default:
-                setIconImage(f.name, f.type);
+		console.log("default type detected");
+                setIconImage(f.name, f.type, f.name);
                 break;
         }
     }
 }
 
-function printBannedBanner(name, mime, ts, size, msg) {
+function printBannedBanner(errHTML, name, mime, ts, size, msg) {
 
-        progressHTML.push(
+        errHTML.push(
 `
 <section  class="m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white">
@@ -215,21 +261,21 @@ text-light-100 dark:text-white">
          </div>
       </div>
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
-        <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
+        <div class="h-12  text-grey-dark flex items-left justify-left">
          <ul>
-      	    <li  class="text-xl font-light leading-relaxed text-gray-800
+      	    <li  class="font-light leading-relaxed text-gray-800
 dark:text-white">
       	    Name: ${name}
       	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800
+      	    <li class=" font-light leading-relaxed text-gray-800
 dark:text-white">
       	    Date: ${ts}
       	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800
+      	    <li class=" font-light leading-relaxed text-gray-800
 dark:text-white">
       	    Type: ${mime}
       	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800
+      	    <li class="font-light leading-relaxed text-gray-800
 dark:text-white">
       	    Size: ${size} 
       	    </li>
@@ -253,21 +299,31 @@ dark:text-white">
 }
 
 function checkFilter(mime) {
-	if(mime == filtFiles.type && filtFiles.action == "allow") {
+       type = mime.split('/')[0];
+	console.log(mime);
+	/* No filter XXX */
+	if(filtFiles.type == 'all') {
+		return true;
+	}
+	if(type == filtFiles.type && filtFiles.action == "allow") {
+		return true;
+	}
+	if(type !== filtFiles.type && filtFiles.action == "deny") {
 		return true;
 	}
 	return false;
 }
 
 function checkSize(size) {
-	if(size < allowedSize * 1024 * 1024) {
+	if(size <= (allowedSize * 1024 * 1024)) {
 		return true;
 	}
 	return false;
 }
 
-function checkTotalSize(size) {
-	if(totalsize < allowedTotalSize * 1024 * 1024) {
+function checkTotalSize() {
+	if(totalsize <= (allowedTotalSize * 1024 * 1024)) {
+		enableUploadButton();
 		return true;
 	}
 	return false;
@@ -275,6 +331,7 @@ function checkTotalSize(size) {
 
 function setupUpload() {
     var progressHTML = [];
+    var errHTML = [];
     for (var i = 0; i < uploadFileList.length; i++) {
         let f = uploadFileList[i];
         let mime = f.type;
@@ -283,20 +340,27 @@ function setupUpload() {
         totalsize += f.size;
         let size = humanFileSize(f.size);
         let id = 'a' + i;
-	if(checkSize(size)) {
+	if(!checkSize(f.size)) {
+		console.log("Size check:: size is " + f.size);
 		msg = `${name} too big for upload`;
-		printBannedBanner(name, mime, ts, size, msg);
+		console.log(msg);
+		printBannedBanner(errHTML, name, mime, ts, size, msg);
+		delUploadList(i);
 		continue;
 	}
-	if(checkFilter(mime)) {
+	if(!checkFilter(mime)) {
+		console.log("Hit banned file type:: filter issue");
 		msg = `${name} cannot be uploaded due to policy.`;
-		printBannedBanner(name, mime, ts, size, msg);
+		delUploadList(i);
+		printBannedBanner(errHTML, name, mime, ts, size, msg);
 		continue;
 	}
 	if(i == uploadFileList.length - 1) {
-		if(checkTotalSize(size)) {
-			msg = `Total size exceeds policy`;
-			printBannedBanner(name, mime, ts, size, msg);
+		console.log("Total size check:: total size is " + totalsize);
+		if(!checkTotalSize()) {
+			msg = `Total size exceeds policy, delete some`;
+			printBannedBanner(errHTML, name, mime, ts, size, msg);
+			disableUploadButton();
 			continue;
 		}
 		
@@ -323,21 +387,25 @@ text-light-100 dark:text-white">
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
         <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
          <ul>
-      	    <li  class="text-xl font-light leading-relaxed text-gray-800
+      	    <li  class=" font-light leading-relaxed text-gray-800
 dark:text-white">
       	    Name: ${name}
       	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800
+      	    <li class="font-light leading-relaxed text-gray-800
 dark:text-white">
       	    Date: ${ts}
       	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800
+      	    <li class="font-light leading-relaxed text-gray-800
 dark:text-white">
       	    Type: ${mime}
       	    </li>
-      	    <li class="text-xl font-light leading-relaxed text-gray-800
+      	    <li class="font-light leading-relaxed text-gray-800
 dark:text-white">
       	    Size: ${size} 
+      	    </li>
+      	    <li id="${id}-meta" class="font-light leading-relaxed text-gray-800
+dark:text-white">
+      	    
       	    </li>
          </ul>
         </div>
@@ -361,6 +429,7 @@ dark:text-white">
 
     }
     progressArea.innerHTML = progressHTML.join('');
+    errArea.innerHTML = errHTML.join('');
 
     for (var i = 0; i < uploadFileList.length; i++) {
         var selector = '#a' + i;
@@ -374,13 +443,20 @@ dark:text-white">
     enableUploadButton();
 }
 
+function delUploadList(index) {
+    let list = [...uploadFileList];
+    list.splice(index, 1);
+    uploadFileList = list;
+}
+
 function delItem(index) {
     let list = [...uploadFileList];
     list.splice(index, 1);
     uploadFileList = list;
     el = document.getElementById('a' + index + '-section');
     el.remove();
-
+    totalsize -= upLoadFileList[index].size;
+    checkTotalSize();
 }
 
 function dumpConfigSummary() {
@@ -473,7 +549,7 @@ async function uploadOneFile(f, idx) {
             }*/
             let perc = parseInt(e.progress * 100);
             progressBars[idx].set(perc);
-	    let bytesSent = humanFileSize(e.progress * size);
+	    bytesSent = humanFileSize(e.progress * size);
         }
     };
 
@@ -517,6 +593,14 @@ var authEnabled = false;
 var authType = "Basic";
 var user = '';
 var pass = '';
+/* Default 100 MB limit for uploads. Total as well as individual */
+var allowedSize = 100;
+var allowedTotalSize = 100;
+var filtFiles = { 
+	"type": "all",
+	"action": "allow"
+};
+
 
 function initApp() {
     document.getElementById("progress-up-uploadURL").value = uploadURL;
@@ -543,13 +627,19 @@ function applyFilter() {
 			break;
 		case "Image only":
 			filtFiles = {
-			"type": "image/*",		
+			"type": "image",		
 			"action": action
 			};
 			break;
 		case "Video only":
 			filtFiles = {
-			"type": "video/*",
+			"type": "video",
+			"action": action
+			};
+			break;
+		case "Audio only":
+			filtFiles = {
+			"type": "audio",
 			"action": action
 			};
 			break;
@@ -561,7 +651,7 @@ function applyFilter() {
 			break;
 		case "Text only":
 			filtFiles = {
-			"type": "text/*",
+			"type": "text",
 			"action": action
 			};
 			break;
@@ -572,7 +662,8 @@ function applyFilter() {
 
 }
 
-function toggleSizeQ(val) {
+function toggleSizeQ() {
+    val = document.querySelector('#sizeToggle');
     console.log(val.checked);
     const label = document.querySelector("#progress-up-sizeToggle");
     if(val.checked === true) {
@@ -582,7 +673,8 @@ function toggleSizeQ(val) {
     }
 }
 
-function toggleFilterQ(val) {
+function toggleFilterQ() {
+    val = document.querySelector('#filterAction');
     console.log(val.checked);
     const label = document.querySelector("#progress-up-filterLabel");
     if(val.checked === true) {

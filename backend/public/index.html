@@ -167,7 +167,7 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	       <div class="w-full px-3">
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="fileSizeLimit" >
-<span id='progress-up-filterLabel'>File Size Limit (MB)</span>
+<span>File Size Limit (MB)</span>
   <input id="fileSizeLimit" class='m-6 p-6 form-range'
 type="range"  name="rangeInput" min="10" max="1000"
 step=10 value="0" oninput="sizeLimit.value=rangeInput.value">                      
@@ -181,7 +181,7 @@ step=10 value="0" oninput="sizeLimit.value=rangeInput.value">
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="sizeToggle" >
 <span id='progress-up-sizeToggle'>Single file limit </span>
-  <input id="sizeToggle" onChange="toggleSizeQ(this)" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <input id="sizeToggle" onChange="toggleSizeQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
 bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
 </label>
@@ -206,6 +206,7 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 	   			<option>PDF only</option>
 	   			<option>Image only</option>
 	   			<option>Video only</option>
+	   			<option>Audio only</option>
 	   			<option>Zip only</option>
 	   			<option>Text only</option>
 	           </select>
@@ -219,7 +220,7 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="filterAction" >
 <span id='progress-up-filterLabel'>Deny file type </span>
-  <input id="filterAction" onChange="toggleFilterQ(this)" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <input id="filterAction" onChange="toggleFilterQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
 bg-green-600 rounded-full duration-300 ease-in-out peer-checked:bg-red-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
 </label>
@@ -440,6 +441,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 <!-- XXX tabs -->
 
 
+<div id="progress-up-errArea"> </div>
 <div id="progress-up-progressArea"> </div>
 
 <script src="js/uploadProgress.js"></script>
