@@ -174,7 +174,7 @@ for="fileSizeLimit" >
   <input id="fileSizeLimit" class='m-6 p-6 form-range'
 type="range"  name="rangeInput" min="10" max="1000"
 step=10 value="0" oninput="sizeLimit.value=rangeInput.value">                      
-<output id="sizeLimit" name="sizeLimit" for="fileSizeLimit">100</output>
+<output id="sizeLimit" name="sizeLimit" for="fileSizeLimit">10</output>
 	</div>
 	</div>
 
@@ -222,7 +222,7 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="filterAction" >
-<span id='progress-up-filterLabel'>Deny file type </span>
+<span id='progress-up-filterLabel'>Allow file type </span>
   <input id="filterAction" onChange="toggleFilterQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
 bg-green-600 rounded-full duration-300 ease-in-out peer-checked:bg-red-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
@@ -444,8 +444,8 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 <!-- XXX tabs -->
 
 
-<div id="progress-up-errArea"> </div>
 <div id="progress-up-progressArea"> </div>
+<div id="progress-up-errArea"> </div>
 
 <script src="js/uploadProgress.js"></script>
 </body>

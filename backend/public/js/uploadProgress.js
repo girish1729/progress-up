@@ -162,8 +162,7 @@ function wordCount(val) {
   };
 }
 
-function showThumbnails() {
-    for (var i = 0, f; f = uploadFileList[i]; i++) {
+function showThumbnail(f, i) {
         let id = 'a' + i;
         switch (true) {
             case /text/.test(f.type):
@@ -245,16 +244,51 @@ txt = dataArray.join("\n");
                 setIconImage(f.name, f.type, f.name);
                 break;
         }
-    }
 }
 
-function printBannedBanner(errHTML, name, mime, ts, size, msg) {
+function checkFilter(mime) {
+	/* No filter XXX */
+	if(filtFiles.type == 'all') {
+		console.log("No file type filters active");
+		return true;
+	}
+	if(mime.match(filtFiles.type) && filtFiles.action == "allow") {
+		return true;
+	}
+	if(mime.match(filtFiles.type) && filtFiles.action == "deny") {
+		return true;
+	}
+	return false;
+}
+
+function checkSize(size) {
+	if(size <= (allowedSize * 1024 * 1024)) {
+		return true;
+	}
+	return false;
+}
+
+function checkTotalSize() {
+	if(totalsize <= (allowedTotalSize * 1024 * 1024)) {
+		enableUploadButton();
+		return true;
+	}
+	return false;
+}
+
+
+function printBannedBanner(errHTML, id, name, mime, ts, size, msg) {
 
         errHTML.push(
 `
-<section  class="m-4 p-4 mt-4 mb-4 transition-colors
+<section class="bg-red-200 m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white">
- <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
+ <div class="bg-red-600 dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
+
+    <div title="Removed from uploads" class="absolute cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
+          <img width="25" height="25"
+src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg" />
+    </div>
 
     <div class="flex flex-wrap -mx-2 mb-8">
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
@@ -281,6 +315,9 @@ dark:text-white">
 dark:text-white">
       	    Size: ${size} 
       	    </li>
+      	    <li id="${id}-meta" class="font-light leading-relaxed text-gray-800
+dark:text-white">
+      	    </li>
          </ul>
         </div>
        </div>
@@ -297,79 +334,28 @@ dark:text-white">
 </section>
 `);
 
-
 }
 
-function checkFilter(mime) {
-       type = mime.split('/')[0];
-	console.log(mime);
-	/* No filter XXX */
-	if(filtFiles.type == 'all') {
-		return true;
-	}
-	if(type == filtFiles.type && filtFiles.action == "allow") {
-		return true;
-	}
-	if(type !== filtFiles.type && filtFiles.action == "deny") {
-		return true;
-	}
-	return false;
-}
-
-function checkSize(size) {
-	if(size <= (allowedSize * 1024 * 1024)) {
-		return true;
-	}
-	return false;
-}
-
-function checkTotalSize() {
-	if(totalsize <= (allowedTotalSize * 1024 * 1024)) {
-		enableUploadButton();
-		return true;
-	}
-	return false;
-}
-
-function setupUpload() {
-    var progressHTML = [];
-    var errHTML = [];
+function createBars() {
     for (var i = 0; i < uploadFileList.length; i++) {
-        let f = uploadFileList[i];
-        let mime = f.type;
-        let name = f.name;
-        let ts = f.lastModifiedDate.toLocaleDateString();
-        totalsize += f.size;
-        let size = humanFileSize(f.size);
-        let id = 'a' + i;
-	if(!checkSize(f.size)) {
-		console.log("Size check:: size is " + f.size);
-		msg = `${name} too big for upload`;
-		console.log(msg);
-		printBannedBanner(errHTML, name, mime, ts, size, msg);
-		delUploadList(i);
-		continue;
-	}
-	if(!checkFilter(mime)) {
-		console.log("Hit banned file type:: filter issue");
-		msg = `${name} cannot be uploaded due to policy.`;
-		delUploadList(i);
-		printBannedBanner(errHTML, name, mime, ts, size, msg);
-		continue;
-	}
-	if(i == uploadFileList.length - 1) {
-		console.log("Total size check:: total size is " + totalsize);
-		if(!checkTotalSize()) {
-			msg = `Total size exceeds policy, delete some`;
-			printBannedBanner(errHTML, name, mime, ts, size, msg);
-			disableUploadButton();
-			continue;
-		}
-		
-	}
-        totalfiles += 1;
+        var selector = '#a' + i;
+        var bar = new ldBar(selector, {
+            preset: progType.toLowerCase()
+        });
+        bar.set(0);
+        progressBars.push(bar);
+    }
+}
 
-        progressHTML.push(
+function createThumbnails() {
+    for (var i = 0; i < uploadFileList.length; i++) {
+	f = uploadFileList[i];
+        showThumbnail(f, i);
+    }
+}
+
+function createSection(prog, id, i, name, ts, mime, size ) {
+        prog.push(
             `
 
 <section id="${id}-section" class="m-4 p-4 mt-4 mb-4 transition-colors
@@ -428,21 +414,54 @@ dark:text-white">
  </div>
 </section>
 `);
+}
 
-
+function setupUpload() {
+    var progressHTML = [];
+    var errHTML = [];
+    var delQ = [];
+    for (var i = 0; i < uploadFileList.length; i++) {
+        let f = uploadFileList[i];
+        let mime = f.type;
+        let name = f.name;
+        let ts = f.lastModifiedDate.toLocaleDateString();
+        totalsize += f.size;
+        let size = humanFileSize(f.size);
+        let id = 'a' + i;
+	if(!checkSize(f.size)) {
+		console.log("Size check:: size is " + f.size);
+		msg = `${name} too big for upload`;
+		console.log(msg);
+		printBannedBanner(errHTML, id, name, mime, ts, size, msg);
+		delQ.push(i);
+		continue;
+	}
+	if(!checkFilter(mime)) {
+		console.log("Hit banned file type:: filter issue");
+		msg = `${name} cannot be uploaded due to policy.`;
+		printBannedBanner(errHTML, id, name, mime, ts, size, msg);
+		delQ.push(i);
+		continue;
+	}
+	if(i == uploadFileList.length - 1) {
+		console.log("Total size check:: total size is " + totalsize);
+		if(!checkTotalSize()) {
+			msg = `Total size exceeds policy, delete some`;
+			disableUploadButton();
+		}
+	} 
+        totalfiles += 1;
+        createSection(progressHTML, id, i, name, ts, mime, size);
     }
+
     progressArea.innerHTML = progressHTML.join('');
     errArea.innerHTML = errHTML.join('');
-
-    for (var i = 0; i < uploadFileList.length; i++) {
-        var selector = '#a' + i;
-        var bar = new ldBar(selector, {
-            preset: progType.toLowerCase()
-        });
-        bar.set(0);
-        progressBars.push(bar);
+    createThumbnails();
+    for(j=0;j < delQ.length;j++) {
+	var item = delQ[j];
+	delUploadList(item);
     }
-    showThumbnails();
+    createBars();
     enableUploadButton();
 }
 
@@ -623,13 +642,15 @@ function initApp() {
 }
 
 function applyFilter() {
-	filt = document.querySelector('#progress-up-filter');
+	f = document.querySelector('#progress-up-filter')
+	filt = f.value;
 	filtType = document.querySelector('#filterAction');
 	if(filtType.checked) {
 		action = "deny";
 	} else {
 		action = "allow";
 	}
+	console.log(filt, action);
 	switch(filt) {
 		case "All":
 			break;
@@ -711,13 +732,27 @@ function saveConfig() {
     if (uploadURL && filesName) {
         enableUploadButton();
     }
-    authEnabled = document.getElementById("progress-up-authenable").value;
+    authEnabled = document.getElementById("progress-up-authenable").checked;
     authType = document.getElementById("progress-up-authtype").value;
     user = document.getElementById("progress-up-username").value;
     pass = document.getElementById("progress-up-pass").value;
+    fileSizeLimit = document.getElementById("fileSizeLimit").value;
+    sizeLimitType = document.getElementById("sizeToggle").checked;
+    fileTypeFilter = document.getElementById("progress-up-filter").value;
+    typeFilterAction = document.getElementById("filterAction").checked;
 
     applyFilter();
-    console.log(uploadURL, filesName, authEnabled, authType, user, pass);
+    console.log(uploadURL); 
+    console.log(filesName); 
+    console.log(authEnabled); 
+    if(authEnabled) {
+    console.log(authType); 
+    console.log(user, pass);
+    }
+    console.log(fileSizeLimit);
+    console.log(sizeLimitType);
+    console.log(fileTypeFilter);
+    console.log(typeFilterAction);
     dumpConfigSummary();
 }
 
