@@ -152,135 +152,134 @@ function setIconImage(name, type, title) {
     document.getElementById(name).innerHTML = icon;
 }
 
-
 function wordCount(val) {
-  var wom = val.match(/\S+/g);
-  return {
-    chars: val.length,
-    words: wom ? wom.length : 0,
-    lines: val.split(/\r*\n/).length
-  };
+    var wom = val.match(/\S+/g);
+    return {
+        chars: val.length,
+        words: wom ? wom.length : 0,
+        lines: val.split(/\r*\n/).length
+    };
 }
 
 function showThumbnail(f, i) {
-        let id = 'a' + i;
-        switch (true) {
-            case /text/.test(f.type):
-		console.log("Text type detected");
-                var reader = new FileReader();
-                reader.onload = (function(f) {
-                    return function(e) {
-                        txt = e.target.result;
-			wc = wordCount(txt);
-                        meta = document.getElementById(`${id}-meta`);
-			meta.innerHTML = (`
+    let id = 'a' + i;
+    switch (true) {
+        case /text/.test(f.type):
+            console.log("Text type detected");
+            var reader = new FileReader();
+            reader.onload = (function(f) {
+                return function(e) {
+                    txt = e.target.result;
+                    wc = wordCount(txt);
+                    meta = document.getElementById(`${id}-meta`);
+                    meta.innerHTML = (`
 			Metadata: 
    			Chars : ${wc.chars}
    			Words: ${wc.words}
    			Lines: ${wc.lines}
   			`);
 
-			
-var dataArray = txt.split("\n");
-dataArray = dataArray.slice(0,20);
-txt = dataArray.join("\n");
-                	setIconImage(f.name, f.type, txt);
-                    };
-                })(f);
-                reader.readAsText(f);
-                break;
-            case /image/.test(f.type):
-		console.log("Image type detected");
-                var reader = new FileReader();
-                // Closure to capture the file information.  
-                reader.onload = (function(theFile) {
-                    return function(e) {
-                        var thumb = [
-                            '<img width="125" height="125" src="',
-                            e.target.result,
-                            '" title="', theFile.name,
-                            '" alt="', theFile.name,
-                            '" class="w-12 h-12" />'
-                        ].join('');
-                        document.getElementById(theFile.name).innerHTML = thumb;
-                    };
-                })(f);
-                reader.readAsDataURL(f);
-                break;
-            case /audio/.test(f.type):
-		console.log("Audio type detected");
-                var audioUrl = window.URL.createObjectURL(f);
 
-                var icon = [
-                    '<audio controls width="125" height="125"><source src="',
-                    audioUrl,
-                    '" title="', name,
-                    '" alt="', name,
-                    '" class="h-9 w-9" </source> </audio>'
-                ].join('');
-                document.getElementById(f.name).innerHTML = icon;
-                break;
-            case /video/.test(f.type):
-		console.log("Video type detected");
-                var videoUrl = window.URL.createObjectURL(f);
+                    var dataArray = txt.split("\n");
+                    dataArray = dataArray.slice(0, 20);
+                    txt = dataArray.join("\n");
+                    setIconImage(f.name, f.type, txt);
+                };
+            })(f);
+            reader.readAsText(f);
+            break;
+        case /image/.test(f.type):
+            console.log("Image type detected");
+            var reader = new FileReader();
+            // Closure to capture the file information.  
+            reader.onload = (function(theFile) {
+                return function(e) {
+                    var thumb = [
+                        '<img width="125" height="125" src="',
+                        e.target.result,
+                        '" title="', theFile.name,
+                        '" alt="', theFile.name,
+                        '" class="w-12 h-12" />'
+                    ].join('');
+                    document.getElementById(theFile.name).innerHTML = thumb;
+                };
+            })(f);
+            reader.readAsDataURL(f);
+            break;
+        case /audio/.test(f.type):
+            console.log("Audio type detected");
+            var audioUrl = window.URL.createObjectURL(f);
 
-                var icon = [
-                    '<video controls width="125" height="125"><source src="',
-                    videoUrl,
-                    '" title="', name,
-                    '" alt="', name,
-                    '" class="h-9 w-9"</source> </video>'
-                ].join('');
-                document.getElementById(f.name).innerHTML = icon;
-                break;
-            case /pdf/.test(f.type):
-		console.log("PDF type detected");
-                var pdfURL = window.URL.createObjectURL(f);
-                var loc = document.getElementById(f.name);
-                PDFObject.embed(pdfURL, loc);
-                break;
-            default:
-		console.log("default type detected");
-                setIconImage(f.name, f.type, f.name);
-                break;
-        }
+            var icon = [
+                '<audio controls width="125" height="125"><source src="',
+                audioUrl,
+                '" title="', name,
+                '" alt="', name,
+                '" class="h-9 w-9" </source> </audio>'
+            ].join('');
+            document.getElementById(f.name).innerHTML = icon;
+            break;
+        case /video/.test(f.type):
+            console.log("Video type detected");
+            var videoUrl = window.URL.createObjectURL(f);
+
+            var icon = [
+                '<video controls width="125" height="125"><source src="',
+                videoUrl,
+                '" title="', name,
+                '" alt="', name,
+                '" class="h-9 w-9"</source> </video>'
+            ].join('');
+            document.getElementById(f.name).innerHTML = icon;
+            break;
+        case /pdf/.test(f.type):
+            console.log("PDF type detected");
+            var pdfURL = window.URL.createObjectURL(f);
+            var loc = document.getElementById(f.name);
+            PDFObject.embed(pdfURL, loc);
+            break;
+        default:
+            console.log("default type detected");
+            setIconImage(f.name, f.type, f.name);
+            break;
+    }
 }
 
 function checkFilter(mime) {
-	/* No filter XXX */
-	if(filtFiles.type == 'all') {
-		console.log("No file type filters active");
-		return true;
-	}
-	if(mime.match(filtFiles.type) && filtFiles.action == "allow") {
-		return true;
-	}
-	if(mime.match(filtFiles.type) && filtFiles.action == "deny") {
-		return true;
-	}
-	return false;
+    /* No filter XXX */
+    if (filtFiles.type == 'all') {
+        console.log("No file type filters active");
+        return true;
+    }
+    if (mime.match(filtFiles.type) && filtFiles.action == "allow") {
+        return true;
+    }
+    if (mime.match(filtFiles.type) && filtFiles.action == "deny") {
+        return true;
+    }
+    return false;
 }
 
 function checkSize(size) {
-	if(size <= (allowedSize * 1024 * 1024)) {
-		return true;
-	}
-	return false;
+    if (size <= (allowedSize * 1024 * 1024)) {
+        return true;
+    }
+    return false;
 }
 
 function checkTotalSize() {
-	if(totalsize <= (allowedTotalSize * 1024 * 1024)) {
-		enableUploadButton();
-		return true;
-	}
-	return false;
+    if (totalsize <= (allowedTotalSize * 1024 * 1024)) {
+        enableUploadButton();
+        return true;
+    }
+    return false;
 }
 
 
 function printBannedBanner(errHTML, id, name, mime, ts, size, msg) {
 
-        errHTML.push(
-`
+    errHTML.push(
+        `
 <section class="bg-red-200 m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white">
  <div class="bg-red-600 dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
@@ -349,14 +348,14 @@ function createBars() {
 
 function createThumbnails() {
     for (var i = 0; i < uploadFileList.length; i++) {
-	f = uploadFileList[i];
+        f = uploadFileList[i];
         showThumbnail(f, i);
     }
 }
 
-function createSection(prog, id, i, name, ts, mime, size ) {
-        prog.push(
-            `
+function createSection(prog, id, i, name, ts, mime, size) {
+    prog.push(
+        `
 
 <section id="${id}-section" class="m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white">
@@ -428,28 +427,28 @@ function setupUpload() {
         totalsize += f.size;
         let size = humanFileSize(f.size);
         let id = 'a' + i;
-	if(!checkSize(f.size)) {
-		console.log("Size check:: size is " + f.size);
-		msg = `${name} too big for upload`;
-		console.log(msg);
-		printBannedBanner(errHTML, id, name, mime, ts, size, msg);
-		delQ.push(i);
-		continue;
-	}
-	if(!checkFilter(mime)) {
-		console.log("Hit banned file type:: filter issue");
-		msg = `${name} cannot be uploaded due to policy.`;
-		printBannedBanner(errHTML, id, name, mime, ts, size, msg);
-		delQ.push(i);
-		continue;
-	}
-	if(i == uploadFileList.length - 1) {
-		console.log("Total size check:: total size is " + totalsize);
-		if(!checkTotalSize()) {
-			msg = `Total size exceeds policy, delete some`;
-			disableUploadButton();
-		}
-	} 
+        if (!checkSize(f.size)) {
+            console.log("Size check:: size is " + f.size);
+            msg = `${name} too big for upload`;
+            console.log(msg);
+            printBannedBanner(errHTML, id, name, mime, ts, size, msg);
+            delQ.push(i);
+            continue;
+        }
+        if (!checkFilter(mime)) {
+            console.log("Hit banned file type:: filter issue");
+            msg = `${name} cannot be uploaded due to policy.`;
+            printBannedBanner(errHTML, id, name, mime, ts, size, msg);
+            delQ.push(i);
+            continue;
+        }
+        if (i == uploadFileList.length - 1) {
+            console.log("Total size check:: total size is " + totalsize);
+            if (!checkTotalSize()) {
+                msg = `Total size exceeds policy, delete some`;
+                disableUploadButton();
+            }
+        }
         totalfiles += 1;
         createSection(progressHTML, id, i, name, ts, mime, size);
     }
@@ -457,9 +456,9 @@ function setupUpload() {
     progressArea.innerHTML = progressHTML.join('');
     errArea.innerHTML = errHTML.join('');
     createThumbnails();
-    for(j=0;j < delQ.length;j++) {
-	var item = delQ[j];
-	delUploadList(item);
+    for (j = 0; j < delQ.length; j++) {
+        var item = delQ[j];
+        delUploadList(item);
     }
     createBars();
     enableUploadButton();
@@ -574,15 +573,15 @@ async function uploadOneFile(f, idx) {
             }*/
             let perc = parseInt(e.progress * 100);
             progressBars[idx].set(perc);
-	    bytesSent = humanFileSize(e.progress * size);
-	    Mysize = humanFileSize(size);
-	    eta = e.estimated;
-	    rate = (e.rate / 1024 / 1024).toFixed(2);
+            bytesSent = humanFileSize(e.progress * size);
+            Mysize = humanFileSize(size);
+            eta = e.estimated;
+            rate = (e.rate / 1024 / 1024).toFixed(2);
 
-	    p.innerHTML = `
+            p.innerHTML = `
 		<span>${bytesSent} of ${Mysize} uploaded  ${rate} MB/s ETA ${eta} s</span>
 		`;
-	
+
         }
     };
 
@@ -627,11 +626,12 @@ var authType = "Basic";
 var user = '';
 var pass = '';
 /* Default 100 MB limit for uploads. Total as well as individual */
-var allowedSize = 100;
-var allowedTotalSize = 100;
-var filtFiles = { 
-	"type": "all",
-	"action": "allow"
+var fileSizeLimit = 100;
+var sizeLimitType = "Single file limit";
+
+var filtFiles = {
+    "type": "all",
+    "action": "allow"
 };
 
 
@@ -642,58 +642,58 @@ function initApp() {
 }
 
 function applyFilter() {
-	f = document.querySelector('#progress-up-filter')
-	filt = f.value;
-	filtType = document.querySelector('#filterAction');
-	if(filtType.checked) {
-		action = "deny";
-	} else {
-		action = "allow";
-	}
-	console.log(filt, action);
-	switch(filt) {
-		case "All":
-			break;
-		case "PDF only":
-			filtFiles = { 
-			"type": "application/pdf",
-			"action": action 
-			};
-			break;
-		case "Image only":
-			filtFiles = {
-			"type": "image",		
-			"action": action
-			};
-			break;
-		case "Video only":
-			filtFiles = {
-			"type": "video",
-			"action": action
-			};
-			break;
-		case "Audio only":
-			filtFiles = {
-			"type": "audio",
-			"action": action
-			};
-			break;
-		case "Zip only":
-			filtFiles = {
-			"type": "application/zip",
-			"action": action
-			};
-			break;
-		case "Text only":
-			filtFiles = {
-			"type": "text",
-			"action": action
-			};
-			break;
-		default:
-			console.log("Filter not understood");
-			break;
-	}
+    f = document.querySelector('#progress-up-filter')
+    filt = f.value;
+    filtType = document.querySelector('#filterAction');
+    if (filtType.checked) {
+        action = "deny";
+    } else {
+        action = "allow";
+    }
+    console.log(filt, action);
+    switch (filt) {
+        case "All":
+            break;
+        case "PDF only":
+            filtFiles = {
+                "type": "application/pdf",
+                "action": action
+            };
+            break;
+        case "Image only":
+            filtFiles = {
+                "type": "image",
+                "action": action
+            };
+            break;
+        case "Video only":
+            filtFiles = {
+                "type": "video",
+                "action": action
+            };
+            break;
+        case "Audio only":
+            filtFiles = {
+                "type": "audio",
+                "action": action
+            };
+            break;
+        case "Zip only":
+            filtFiles = {
+                "type": "application/zip",
+                "action": action
+            };
+            break;
+        case "Text only":
+            filtFiles = {
+                "type": "text",
+                "action": action
+            };
+            break;
+        default:
+            console.log("Filter not understood");
+            break;
+    }
 
 }
 
@@ -701,10 +701,10 @@ function toggleSizeQ() {
     val = document.querySelector('#sizeToggle');
     console.log(val.checked);
     const label = document.querySelector("#progress-up-sizeToggle");
-    if(val.checked === true) {
-    	label.innerHTML = "Total limit";
+    if (val.checked === true) {
+        label.innerHTML = "Total limit";
     } else {
-    	label.innerHTML = "Single file limit";
+        label.innerHTML = "Single file limit";
     }
 }
 
@@ -712,10 +712,10 @@ function toggleFilterQ() {
     val = document.querySelector('#filterAction');
     console.log(val.checked);
     const label = document.querySelector("#progress-up-filterLabel");
-    if(val.checked === true) {
-    	label.innerHTML = "Deny file type";
+    if (val.checked === true) {
+        label.innerHTML = "Deny file type";
     } else {
-    	label.innerHTML = "Allow file type";
+        label.innerHTML = "Allow file type";
     }
 }
 
@@ -742,12 +742,12 @@ function saveConfig() {
     typeFilterAction = document.getElementById("filterAction").checked;
 
     applyFilter();
-    console.log(uploadURL); 
-    console.log(filesName); 
-    console.log(authEnabled); 
-    if(authEnabled) {
-    console.log(authType); 
-    console.log(user, pass);
+    console.log(uploadURL);
+    console.log(filesName);
+    console.log(authEnabled);
+    if (authEnabled) {
+        console.log(authType);
+        console.log(user, pass);
     }
     console.log(fileSizeLimit);
     console.log(sizeLimitType);
@@ -927,7 +927,7 @@ function tusUploadFile(f, filesName, endpoint) {
     })
 
     // Check if there are any previous uploads to continue.
-    upload.findPreviousUploads().then(function (previousUploads) {
+    upload.findPreviousUploads().then(function(previousUploads) {
         // Found previous uploads so we select the first one. 
         if (previousUploads.length) {
             upload.resumeFromPreviousUpload(previousUploads[0])
