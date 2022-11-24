@@ -35,7 +35,7 @@ interface statsTableType {
 
 interface fileInfo {
     file: File,
-    id: string;
+        id: string;
     meta: string;
     bytesSent: string;
     rate: string;
@@ -44,7 +44,7 @@ interface fileInfo {
 
 interface errInfo {
     file: File,
-    meta: string;
+        meta: string;
     msg: string;
 };
 
@@ -173,8 +173,8 @@ export class ProgressUpComponent {
             var username = 'user';
             var password = 'password';
             var basicAuth = 'Basic ' + btoa(username + ':' + password);
-                options["headers"] = {
-                    'Authorization': +basicAuth
+            options["headers"] = {
+                'Authorization': +basicAuth
             };
         }
 
@@ -455,7 +455,7 @@ export class ProgressUpComponent {
 
     showThumbnail(f, i, cb) {
         let id = 'a' + i;
-	let target = id + '-thumb';
+        let target = id + '-thumb';
         switch (true) {
             case /text/.test(f.type):
                 console.log("Text type detected");
@@ -474,16 +474,16 @@ export class ProgressUpComponent {
                         let txt = dataArray.join("\n");
 
                         var fileIcon = this.fileTypeIcons[type];
-                        let pic = "src/assets/icons/filetypes/" 
-				+ fileIcon, 
-			f.thumb = [
-                 '<img width="125" height="125" src=',
-		pic,
-		'title="',
-		txt
-		'" alt="', 
-		f.name,
-		'" class="w-12 h-12" />'].join('');
+                        let pic = "src/assets/icons/filetypes/" +
+                            fileIcon,
+                            f.thumb = [
+                                '<img width="125" height="125" src=',
+                                pic,
+                                'title="',
+                                txt '" alt="',
+                                f.name,
+                                '" class="w-12 h-12" />'
+                            ].join('');
 
                     };
                 })(f);
@@ -497,16 +497,21 @@ export class ProgressUpComponent {
                     return function(e) {
                         e.target.result,
 
-			f.thumb = [
-                 '<img width="125" height="125" src=',
-		pic,
-		'title="',
-		txt
-		'" alt="', 
-		f.name,
-		'" class="w-12 h-12" />'].join('');
-                 <img width="125" height="125" src="{{file.imagesrc}}" title="{{file.name}}" alt="{{file.name}}" class="w-12 h-12" />
-			    f.meta = txt;
+                            f.thumb = [
+                                '<img width="125" height="125" src=',
+                                pic,
+                                'title="',
+                                txt '" alt="',
+                                f.name,
+                                '" class="w-12 h-12" />'
+                            ].join(''); <
+                        img width = "125"
+                        height = "125"
+                        src = "{{file.imagesrc}}"
+                        title = "{{file.name}}"
+                        alt = "{{file.name}}"
+                        class = "w-12 h-12" / >
+                            f.meta = txt;
                     };
                 })(f);
                 reader.readAsDataURL(f);
@@ -514,34 +519,36 @@ export class ProgressUpComponent {
             case /audio/.test(f.type):
                 console.log("Audio type detected");
                 var audioUrl = window.URL.createObjectURL(f);
-		f.thumb = [
-		'<audio controls width="125" height="125"> <source src="'
-		audioUrl,
-		'title="',
-		f.name,
-		'" alt="', 
-		f.name,
-		'" class="h-9 w-9"> </source> </audio> />'].join('');
-		f.meta = f.name;
+                f.thumb = [
+                    '<audio controls width="125" height="125"> <source src="'
+                    audioUrl,
+                    'title="',
+                    f.name,
+                    '" alt="',
+                    f.name,
+                    '" class="h-9 w-9"> </source> </audio> />'
+                ].join('');
+                f.meta = f.name;
                 break;
             case /video/.test(f.type):
                 console.log("Video type detected");
                 var videoUrl = window.URL.createObjectURL(f);
-		f.thumb = [
-		'<video controls width="125" height="125"> <source src="'
-		videoUrl,
-		'title="',
-		f.name,
-		'" alt="', 
-		f.name,
-		'" class="h-9 w-9"> </source> </video> />'].join('');
-		f.meta = f.name;
+                f.thumb = [
+                    '<video controls width="125" height="125"> <source src="'
+                    videoUrl,
+                    'title="',
+                    f.name,
+                    '" alt="',
+                    f.name,
+                    '" class="h-9 w-9"> </source> </video> />'
+                ].join('');
+                f.meta = f.name;
                 break;
             case /pdf/.test(f.type):
                 console.log("PDF type detected");
                 var pdfURL = window.URL.createObjectURL(f);
                 var id = id + '-pdf';
-			    f.meta = txt;
+                f.meta = txt;
                 PDFObject.embed(pdfURL, target);
                 break;
             default:
@@ -550,16 +557,16 @@ export class ProgressUpComponent {
                 if (fileIcon == undefined) {
                     fileIcon = "file.svg";
                 }
-		f.meta = f.name;
-                let pic = "src/assets/icons/filetypes/" + fileIcon; 
-		f.thumb = [
-                 '<img width="125" height="125" src=',
-		pic,
-		'title="',
-		f.name
-		'" alt="', 
-		f.name,
-		'" class="w-12 h-12" />'].join('');
+                f.meta = f.name;
+                let pic = "src/assets/icons/filetypes/" + fileIcon;
+                f.thumb = [
+                    '<img width="125" height="125" src=',
+                    pic,
+                    'title="',
+                    f.name '" alt="',
+                    f.name,
+                    '" class="w-12 h-12" />'
+                ].join('');
                 break;
         }
     }
@@ -570,7 +577,7 @@ export class ProgressUpComponent {
         }
         this.progressBars = [];
         for (var i = 0; i < this.uploadFileInfos.length; i++) {
-	    let f = this.uploadFileInfos[i];
+            let f = this.uploadFileInfos[i];
             let id = 'a' + i;
             let bar = new ldBar('#' + id, {
                 preset: this.form.progType.toLowerCase()
@@ -578,11 +585,15 @@ export class ProgressUpComponent {
             bar.set(0);
             console.log("Creating progress bar::" + id);
             this.progressBars.push(bar);
-	    this.showThumbnail(f,i);
+            this.showThumbnail(f, i);
+        }
+        for (var i = 0; i < this.errInfos.length; i++) {
+            let f = this.errInfos[i];
+            this.showThumbnail(f, i);
         }
         this.thumbNailsDone = false;
     }
-    
+
     printBannedBanner(file, msg) {
         this.errInfos.push({
             file: File,
@@ -633,11 +644,9 @@ export class ProgressUpComponent {
             });
             this.totalfiles += 1;
         }
-
-    this.uploadFileList = this.uploadFileList.filter(function(value, index) {
-        return delQ.indexOf(index) == -1;
-    });
-        createBars();
+        this.uploadFileList = this.uploadFileList.filter(function(value, index) {
+            return delQ.indexOf(index) == -1;
+        });
         this.disableUpload = false;
     }
 

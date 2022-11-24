@@ -9,10 +9,10 @@ export default {
             openTab: 1,
             dragging: false,
             authEnabled: false,
-    	    filtFiles = {
-        	"type": "all",
-        	"action": "allow"
-    	   },
+            filtFiles : {
+                "type": "all",
+                "action": "allow"
+            },
             form: {
                 uploadURL: 'https://localhost:2324/uploadmultiple',
                 filesName: 'uploadFiles',
@@ -56,7 +56,7 @@ export default {
 
     updated() {
         this.$nextTick(() => {
-            this.createProgressBars();
+            this.createBars();
             if (this.form.uploadURL == undefined || this.form.filesName == undefined) {
                 this.disableUpload = true;
             }
@@ -118,13 +118,13 @@ export default {
             let uplFormData = new FormData();
             uplFormData.append(this.form.filesName, file);
             console.log(uplFormData);
-        console.log("Uploading to " + this.form.uploadURL);
-        console.log("Uploading file name" + this.form.filesName);
+            console.log("Uploading to " + this.form.uploadURL);
+            console.log("Uploading file name" + this.form.filesName);
             let self = this;
             let options = {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            },
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                },
 
                 onUploadProgress: function(e) {
                     let perc = parseInt(e.progress * 100);
@@ -165,18 +165,18 @@ export default {
 
             e.preventDefault();
 
-        console.log(this.form.uploadURL);
-        console.log(this.form.filesName);
-        console.log(this.form.progType);
+            console.log(this.form.uploadURL);
+            console.log(this.form.filesName);
+            console.log(this.form.progType);
 
-        if (this.form.authEnabled) {
-            console.log(this.form.authType);
-            console.log(this.form.user, inputs.pass);
-        }
-        console.log(this.form.fileSizeLimit);
-        console.log(this.form.sizeLimitType);
-        console.log(this.form.fileTypeFilter);
-        console.log(this.form.fileTypeAction);
+            if (this.form.authEnabled) {
+                console.log(this.form.authType);
+                console.log(this.form.user, inputs.pass);
+            }
+            console.log(this.form.fileSizeLimit);
+            console.log(this.form.sizeLimitType);
+            console.log(this.form.fileTypeFilter);
+            console.log(this.form.fileTypeAction);
 
         },
 
@@ -370,206 +370,212 @@ export default {
             return false;
         },
 
-    checkSize(size) {
-        if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
-            return true;
-        }
-        return false;
-    },
-
-    checkTotalSize() {
-        if (this.sizeLimitType == "Total limit") {
-            if (totalsize <= (this.form.fileSizeLimit * 1024 * 1024)) {
+        checkSize(size) {
+            if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
                 return true;
             }
             return false;
-        }
-        return false;
-    },
+        },
 
-    showThumbnail(f, i) {
-        let id = 'a' + i;
-	let target = id + '-thumb';
-        switch (true) {
-            case /text/.test(f.type):
-                console.log("Text type detected");
-                var reader = new FileReader();
-                reader.onload = (function(f) {
-                    return function(e) {
-                        txt = e.target.result;
-                        let wc = this.wordCount(txt);
-                        f.meta = ` 
+        checkTotalSize() {
+            if (this.sizeLimitType == "Total limit") {
+                if (totalsize <= (this.form.fileSizeLimit * 1024 * 1024)) {
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        },
+
+        showThumbnail(file, i) {
+            let id = 'a' + i;
+            let target = id + '-thumb';
+            switch (true) {
+                case /text/.test(file.type):
+                    console.log("Text type detected");
+                    var reader = new FileReader();
+                    reader.onload = (function(f) {
+                        return function(e) {
+                            txt = e.target.result;
+                            let wc = this.wordCount(txt);
+                            file.meta = ` 
    			Chars : ${wc.chars}
    			Words: ${wc.words}
    			Lines: ${wc.lines}
 			`;
-                        var dataArray = txt.split("\n");
-                        dataArray = dataArray.slice(0, 20);
-                        let txt = dataArray.join("\n");
+                            var dataArray = txt.split("\n");
+                            dataArray = dataArray.slice(0, 20);
+                            let txt = dataArray.join("\n");
 
-                        var fileIcon = this.fileTypeIcons[type];
-                        let pic = "src/assets/icons/filetypes/" 
-				+ fileIcon, 
-			f.thumb = [
-                 '<img width="125" height="125" src=',
-		pic,
-		'title="',
-		txt
-		'" alt="', 
-		f.name,
-		'" class="w-12 h-12" />'].join('');
+                            var fileIcon = this.fileTypeIcons[type];
+                            let pic = "src/assets/icons/filetypes/" +
+                                fileIcon;
+                                file.thumb = [
+                                    '<img width="125" height="125" src=',
+                                    pic,
+                                    'title="',
+                                    txt,
+				    '" alt="',
+                                    file.name,
+                                    '" class="w-12 h-12" />'
+                                ].join('');
 
-                    };
-                })(f);
-                reader.readAsText(f);
-                break;
-            case /image/.test(f.type):
-                console.log("Image type detected");
-                var reader = new FileReader();
-                // Closure to capture the file information.  
-                reader.onload = (function(theFile) {
-                    return function(e) {
-                        e.target.result,
-
-			f.thumb = [
-                 '<img width="125" height="125" src=',
-		pic,
-		'title="',
-		txt
-		'" alt="', 
-		f.name,
-		'" class="w-12 h-12" />'].join('');
-                 <img width="125" height="125" src="{{file.imagesrc}}" title="{{file.name}}" alt="{{file.name}}" class="w-12 h-12" />
-			    f.meta = txt;
-                    };
-                })(f);
-                reader.readAsDataURL(f);
-                break;
-            case /audio/.test(f.type):
-                console.log("Audio type detected");
-                var audioUrl = window.URL.createObjectURL(f);
-		f.thumb = [
-		'<audio controls width="125" height="125"> <source src="'
-		audioUrl,
-		'title="',
-		f.name,
-		'" alt="', 
-		f.name,
-		'" class="h-9 w-9"> </source> </audio> />'].join('');
-		f.meta = f.name;
-                break;
-            case /video/.test(f.type):
-                console.log("Video type detected");
-                var videoUrl = window.URL.createObjectURL(f);
-		f.thumb = [
-		'<video controls width="125" height="125"> <source src="'
-		videoUrl,
-		'title="',
-		f.name,
-		'" alt="', 
-		f.name,
-		'" class="h-9 w-9"> </source> </video> />'].join('');
-		f.meta = f.name;
-                break;
-            case /pdf/.test(f.type):
-                console.log("PDF type detected");
-                var pdfURL = window.URL.createObjectURL(f);
-                var id = id + '-pdf';
-			    f.meta = txt;
-                PDFObject.embed(pdfURL, target);
-                break;
-            default:
-                console.log("default type detected");
-                var fileIcon = this.fileTypeIcons[type];
-                if (fileIcon == undefined) {
-                    fileIcon = "file.svg";
-                }
-		f.meta = f.name;
-                let pic = "src/assets/icons/filetypes/" + fileIcon; 
-		f.thumb = [
-                 '<img width="125" height="125" src=',
-		pic,
-		'title="',
-		f.name
-		'" alt="', 
-		f.name,
-		'" class="w-12 h-12" />'].join('');
-                break;
-        }
-    },
-
+                        };
+                    })(file);
+                    reader.readAsText(file);
+                    break;
+                case /image/.test(file.type):
+                    console.log("Image type detected");
+                    var reader = new FileReader();
+                    // Closure to capture the file information.  
+                    reader.onload = (function(theFile) {
+                        return function(e) {
+                            e.target.result,
+                             file.thumb = [
+                                    '<img width="125" height="125" src=',
+                                    pic,
+                                    'title="',
+                                    txt,
+				     '" alt="',
+                                    file.name,
+                                    '" class="w-12 h-12" />'
+                                ].join(''); 
+                             file.meta = txt;
+                        };
+                    })(file);
+                    reader.readAsDataURL(file);
+                    break;
+                case /audio/.test(file.type):
+                    console.log("Audio type detected");
+                    var audioUrl = window.URL.createObjectURL(file);
+                    file.thumb = [
+                     '<audio controls width="125" height="125">',
+			'<source src="',
+                        audioUrl,
+                        'title="',
+                        f.name,
+                        '" alt="',
+                        f.name,
+                        '" class="h-9 w-9"> </source> </audio> />'
+                    ].join('');
+                    file.meta = file.name;
+                    break;
+                case /video/.test(file.type):
+                    console.log("Video type detected");
+                    var videoUrl = window.URL.createObjectURL(file);
+                    file.thumb = [
+                        '<video controls width="125" height="125">', 
+			'<source src="',
+                        videoUrl,
+                        'title="',
+                        file.name,
+                        '" alt="',
+                        file.name,
+                        '" class="h-9 w-9"> </source> </video> />'
+                    ].join('');
+                    f.meta = file.name;
+                    break;
+                case /pdf/.test(file.type):
+                    console.log("PDF type detected");
+                    var pdfURL = window.URL.createObjectURL(file);
+                    f.meta = txt;
+                    PDFObject.embed(pdfURL, target);
+                    break;
+                default:
+                    console.log("default type detected");
+                    var fileIcon = this.fileTypeIcons[type];
+                    if (fileIcon == undefined) {
+                        fileIcon = "file.svg";
+                    }
+                    file.meta = file.name;
+                    let pic = "src/assets/icons/filetypes/" + fileIcon;
+                    file.thumb = [
+                        '<img width="125" height="125" src=',
+                        pic,
+                        'title="',
+                        file.name,
+			 '" alt="',
+                        file.name,
+                        '" class="w-12 h-12" />'
+                    ].join('');
+                    break;
+            }
+        },
 
 
         createBars() {
             for (var i = 0; i < uploadFileInfos.length; i++) {
-		f = uploadFileInfos[i];
+                f = uploadFileInfos[i];
                 var selector = '#a' + i;
                 var bar = new ldBar(selector, {
                     preset: progType.toLowerCase()
                 });
                 bar.set(0);
                 progressBars.push(bar);
-        	showThumbnail(f, i);
+                showThumbnail(f, i);
+            }
+            for (var i = 0; i < errInfos.length; i++) {
+                f = errInfos[i];
+                showThumbnail(f, i);
             }
         },
 
-    printBannedBanner(file, msg) {
-        this.errInfos.push({
-            file: File,
-            meta: '',
-            msg: msg
-        });
-    },
-
-setupUpload() {
-    var delQ = [];
-    for (var i = 0; i < uploadFileList.length; i++) {
-        let f = uploadFileList[i];
-        let mime = f.type;
-        let name = f.name;
-        let ts = f.lastModifiedDate.toLocaleDateString();
-        totalsize += f.size;
-        let size = humanFileSize(f.size);
-        let id = 'a' + i;
-        if (!checkSize(f.size)) {
-            console.log("Size check:: size is " + f.size);
-            msg = `${name} too big for upload`;
-            console.log(msg);
-            printBannedBanner(f, msg);
-            delQ.push(i);
-            continue;
-        }
-        if (!checkFilter(mime)) {
-            console.log("Hit banned file type:: filter issue");
-            msg = `${name} cannot be uploaded due to policy.`;
-            printBannedBanner(f, msg);
-            delQ.push(i);
-            continue;
-        }
-        if (i == uploadFileList.length - 1) {
-            console.log("Total size check:: total size is " +
-                totalsize);
-            if (!checkTotalSize()) {
-                msg = `Total size exceeds policy, delete some`;
-                this.disableUpload = true;
-            }
-        }
-        totalfiles += 1;
-        this.uploadFileInfos.push({
-                file: f,
-                id: id,
+        printBannedBanner(file, msg) {
+            this.errInfos.push({
+                file: File,
                 meta: '',
-                bytesSent: 0,
-                eta: 0,
-                rate: 0,
-        });
-    }
-    this.uploadFileList = this.uploadFileList.filter(function(value, index) {
-        return delQ.indexOf(index) == -1;
-    });
-    createBars();
-    this.disableUpload = false;
-},
+                msg: msg
+            });
+        },
+
+        setupUpload() {
+            var delQ = [];
+            for (var i = 0; i < uploadFileList.length; i++) {
+                let f = uploadFileList[i];
+                let mime = f.type;
+                let name = f.name;
+                let ts = f.lastModifiedDate.toLocaleDateString();
+                totalsize += f.size;
+                let size = humanFileSize(f.size);
+                let id = 'a' + i;
+                if (!checkSize(f.size)) {
+                    console.log("Size check:: size is " + f.size);
+                    msg = `${name} too big for upload`;
+                    console.log(msg);
+                    printBannedBanner(f, msg);
+                    delQ.push(i);
+                    continue;
+                }
+                if (!checkFilter(mime)) {
+                    console.log("Hit banned file type:: filter issue");
+                    msg = `${name} cannot be uploaded due to policy.`;
+                    printBannedBanner(f, msg);
+                    delQ.push(i);
+                    continue;
+                }
+                if (i == uploadFileList.length - 1) {
+                    console.log("Total size check:: total size is " +
+                        totalsize);
+                    if (!checkTotalSize()) {
+                        msg = `Total size exceeds policy, delete some`;
+                        this.disableUpload = true;
+                    }
+                }
+                totalfiles += 1;
+                this.uploadFileInfos.push({
+                    file: f,
+                    id: id,
+                    meta: '',
+                    bytesSent: 0,
+                    eta: 0,
+                    rate: 0,
+                });
+            }
+            this.uploadFileList = this.uploadFileList.filter(function(value, index) {
+                return delQ.indexOf(index) == -1;
+            });
+            this.disableUpload = false;
+        },
         delItem(index) {
             let list = [...this.uploadFileList];
             list.splice(index, 1);
@@ -580,7 +586,6 @@ setupUpload() {
         },
     }
 };
-
 </script>
 
 <template>
