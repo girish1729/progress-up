@@ -1,3 +1,545 @@
+<script>
+import axios from "axios";
+import ldBar from "./assets/progressBar/loading-bar.js";
+import pdf from 'vue-pdf'
+
+export default {
+    data() {
+        return {
+            openTab: 1,
+            dragging: false,
+            authEnabled: false,
+    	    filtFiles = {
+        	"type": "all",
+        	"action": "allow"
+    	   },
+            form: {
+                uploadURL: 'https://localhost:2324/uploadmultiple',
+                filesName: 'uploadFiles',
+                authType: '',
+                user: '',
+                pass: '',
+                progType: 'Line',
+                fileSizeLimit: 10,
+                sizeLimitType: "Single file limit",
+                fileTypeFilter: "All",
+                fileTypeAction: "Allow file type"
+            },
+
+            fileTypes: {
+                "video": "avi.svg",
+                "css": "css.svg",
+                "csv": "csv.svg",
+                "eps": "eps.svg",
+                "excel": "excel.svg",
+                "html": "html.svg",
+                "movie": "mov.svg",
+                "mp3": "mp3.svg",
+                "other": "other.svg",
+                "pdf": "pdf.svg",
+                "ppt": "ppt.svg",
+                "rar": "rar.svg",
+                "text": "txt.svg",
+                "audio": "wav.svg",
+                "word": "word.svg",
+                "zip": "zip.svg"
+            },
+            uploadFileInfos: [],
+            uploadFileList: [],
+            errInfos: [],
+            statsTable: [],
+            progressBars: [],
+            disableUpload: true,
+            details: "",
+        };
+    },
+
+    updated() {
+        this.$nextTick(() => {
+            this.createProgressBars();
+            if (this.form.uploadURL == undefined || this.form.filesName == undefined) {
+                this.disableUpload = true;
+            }
+        });
+    },
+
+    methods: {
+
+        dragover(e) {
+            e.preventDefault();
+        },
+
+        onDragEnter() {
+            this.dragging = true;
+        },
+        onDragLeave() {
+            this.dragging = false;
+        },
+        onDrop(evt, list) {
+            const files = evt.dataTransfer.files;
+            this.clearAll();
+            console.log(files);
+            this.uploadFileList = files;
+            this.setupUpload();
+        },
+
+        spitStatistics(self, idx) {
+            if (idx == self.uploadFileList.length - 1) {
+                let endUploadts = Date.now();
+                self.totaltime = `${endUploadts - this.startUploadts}`;
+                self.totalsize = this.humanFileSize(this.totalsize);
+
+                var ts = new Date().toLocaleString();
+                var tot = self.uploadFileList.length;
+                var status = self.totalfiles == tot ?
+                    "<img src='src/assets/icons/misc/success-icon.svg' >" :
+                    "<img src='src/assets/icons/misc/failure-icon.svg' >";
+                self.details = `${self.totalfiles}/${tot} files of size ${this.totalsize} sent in ${self.totaltime} ms`;
+                var id = self.statsTable.length + 1;
+
+                let stat = {
+                    id: id,
+                    ts: ts,
+                    status: status,
+                    details: self.details
+                };
+                self.statsTable.push(stat);
+
+                self.progresBars = [];
+                self.disableUpload = true;
+                self.totalfiles = 0;
+                self.totalsize = 0;
+                self.totaltime = 0;
+                self.startUploadts = 0;
+            }
+        },
+
+        uploadOneFile(file, idx) {
+            let uplFormData = new FormData();
+            uplFormData.append(this.form.filesName, file);
+            console.log(uplFormData);
+        console.log("Uploading to " + this.form.uploadURL);
+        console.log("Uploading file name" + this.form.filesName);
+            let self = this;
+            let options = {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+
+                onUploadProgress: function(e) {
+                    let perc = parseInt(e.progress * 100);
+                    console.log(perc + " is the percentage uploaded");
+                    self.progressBars[idx].set(perc);
+                    file.bytesSent = this.humanFileSize(event.progress * size);
+                    file.Mysize = this.humanFileSize(file.size);
+                    file.eta = event.estimated;
+                    file.rate = (event.rate / 1024 / 1024).toFixed(2);
+                }
+            };
+
+            if (this.authEnabled) {
+                var username = "user";
+                var password = "password";
+                var basicAuth = "Basic " + btoa(username + ":" + password);
+                options["headers"] = {
+                    "Authorization": +basicAuth
+                };
+            }
+            console.log("Uploading to " + this.form.uploadURL);
+            axios.post(this.form.uploadURL, uplFormData, options).then((resp) => {
+                this.spitStatistics(self, idx);
+            }).catch((error) => {
+                alert("Upload failed. Please check endpoint in Setup");
+                alert(error);
+            });
+        },
+
+        uploadAll() {
+            console.log("Starting upload...");
+            this.startUploadts = Date.now();
+            for (let i = 0; i < this.uploadFileList.length; i++) {
+                let f = this.uploadFileList[i];
+                this.uploadOneFile(f, i);
+            }
+        },
+        saveConfig(e) {
+
+            e.preventDefault();
+
+        console.log(this.form.uploadURL);
+        console.log(this.form.filesName);
+        console.log(this.form.progType);
+
+        if (this.form.authEnabled) {
+            console.log(this.form.authType);
+            console.log(this.form.user, inputs.pass);
+        }
+        console.log(this.form.fileSizeLimit);
+        console.log(this.form.sizeLimitType);
+        console.log(this.form.fileTypeFilter);
+        console.log(this.form.fileTypeAction);
+
+        },
+
+        async testUpload() {
+            console.log("Uploading using HTML5 File API...");
+            let testForm = new FormData();
+
+            const blob = new Blob(['Test upload DELETE'], {
+                type: "plain/text"
+            });
+            testForm.append(this.form.filesName, blob, "progress-up-test.txt");
+            let options = {};
+            if (this.authEnabled) {
+                var username = "user";
+                var password = "password";
+                var basicAuth = "Basic " + btoa(username + ":" + password);
+                options = {
+                    headers: {
+                        "Authorization": +basicAuth
+                    }
+                };
+            }
+
+            console.log("Upload test to " + this.form.uploadURL);
+            await axios.post(this.form.uploadURL, testForm, options).then((resp) => {
+                alert("Test succeeded");
+            }).catch((error) => {
+                alert("Upload failed. Please check endpoint in Setup");
+                alert(error);
+            });
+        },
+
+        testEP(e) {
+            e.preventDefault();
+            this.saveConfig(e);
+            this.testUpload();
+        },
+
+        setIndicator() {
+            var progType = this.form.progType;
+            console.log(progType);
+            switch (progType) {
+                case "Bubble":
+                    var extra = "data-img-size=\"100,100\"";
+                    break;
+                case "Rainbow":
+                    var extra = "data-stroke=\"data:ldbar/res,gradient(0,1,#f99,#ff9)\"";
+                    break;
+                default:
+                    break;
+            }
+        },
+        clearAll() {
+            this.details = "";
+            this.uploadFileList = [];
+            this.uploadFileInfos = [];
+            this.errInfos = [];
+            this.progressBars = [];
+            this.totalfiles = 0;
+            this.totalsize = 0;
+            this.totaltime = 0;
+
+            this.disableUpload = true;
+            console.log("Cleared");
+
+        },
+        openFileBrowser() {
+            this.$refs.fileInput.click();
+        },
+        uploadFile(file, onUploadProgress) {
+            let formData = new FormData();
+
+            formData.append(filesName, file);
+
+            return axios.post(uploadURL, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                },
+                onUploadProgress
+            });
+        },
+
+        fileSelectFinish(evt) {
+            let selectedFiles = evt.target.files;
+            this.clearAll();
+            this.uploadFileList = selectedFiles;
+            this.setupUpload();
+        },
+
+        humanFileSize(size) {
+            const i = Math.floor(Math.log(size) / Math.log(1024));
+            let t2 = size / Math.pow(1024, i);
+            let t = t2.toFixed(2) * 1;
+            const ret = t + " " + ["B", "kB", "MB", "GB", "TB"][i];
+            return (ret);
+        },
+        toggleTabs(tabNumber) {
+            this.openTab = tabNumber
+        },
+
+        applyFilter() {
+            filt = this.form.fileFilter.value;
+            filtType = this.form.filterAction;
+            console.log(filt, filtType);
+            switch (filt) {
+                case "All":
+                    break;
+                case "PDF only":
+                    filtFiles = {
+                        "type": "application/pdf",
+                        "action": action
+                    };
+                    break;
+                case "Image only":
+                    filtFiles = {
+                        "type": "image",
+                        "action": action
+                    };
+                    break;
+                case "Video only":
+                    filtFiles = {
+                        "type": "video",
+                        "action": action
+                    };
+                    break;
+                case "Audio only":
+                    filtFiles = {
+                        "type": "audio",
+                        "action": action
+                    };
+                    break;
+                case "Zip only":
+                    filtFiles = {
+                        "type": "application/zip",
+                        "action": action
+                    };
+                    break;
+                case "Text only":
+                    filtFiles = {
+                        "type": "text",
+                        "action": action
+                    };
+                    break;
+                default:
+                    console.log("Filter not understood");
+                    break;
+            }
+        },
+
+        toggleSizeQ() {
+            var sizeLabel = "Single file limit";
+            val = this.form.sizeLimitType;
+            if (val.checked === true) {
+                sizeLabel = "Total limit";
+            } else {
+                sizeLabel = "Single file limit";
+            }
+        },
+
+        toggleFilterQ() {
+            var filterLabel = "Allow file type";
+            val = this.form.fileTypeAction;
+            if (val.checked === true) {
+                filterLabel = "Deny file type";
+            } else {
+                filterLabel = "Allow file type";
+            }
+        },
+
+        wordCount(val) {
+            var wom = val.match(/\S+/g);
+            return {
+                chars: val.length,
+                words: wom ? wom.length : 0,
+                lines: val.split(/\r*\n/).length
+            };
+        },
+
+        checkFilter(mime) {
+            /* No filter XXX */
+            if (filtFiles.type == 'all') {
+                console.log("No file type filters active");
+                return true;
+            }
+            if (mime.match(filtFiles.type) && filtFiles.action == "allow") {
+                return true;
+            }
+            if (mime.match(filtFiles.type) && filtFiles.action == "deny") {
+                return true;
+            }
+            return false;
+        },
+
+    checkSize(size) {
+        if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
+            return true;
+        }
+        return false;
+    },
+
+    checkTotalSize() {
+        if (this.sizeLimitType == "Total limit") {
+            if (totalsize <= (this.form.fileSizeLimit * 1024 * 1024)) {
+                return true;
+            }
+            return false;
+        }
+        return false;
+    },
+
+
+        showThumbnail(f, i, cb) {
+            let id = "a" + i;
+            switch (true) {
+                case /text/.test(f.type):
+                    console.log("Text type detected");
+                    var reader = new FileReader();
+                    reader.onload = (function(f) {
+                        return function(e) {
+                            txt = e.target.result;
+                            wc = this.wordCount(txt);
+
+                            var dataArray = txt.split("\n");
+                            dataArray = dataArray.slice(0, 20);
+                            txt = dataArray.join("\n");
+
+                            var fileIcon = this.fileTypes[type];
+                            if (fileIcon == undefined) {
+                                fileIcon = "file.svg";
+                            }
+                            cb("src/assets/icons/filetypes/" + fileIcon, txt);
+                        };
+                    })(f);
+                    reader.readAsText(f);
+                    break;
+                case /image/.test(f.type):
+                    console.log("Image type detected");
+                    var reader = new FileReader();
+                    reader.onload = (function(theFile) {
+                        return function(e) {
+                            cb(e.target.result);
+                        };
+                    })(f);
+                    reader.readAsDataURL(f);
+                    break;
+                case /audio/.test(f.type):
+                    console.log("Audio type detected");
+                    var audioUrl = window.URL.createObjectURL(f);
+                    cb(audioUrl);
+                    break;
+                case /video/.test(f.type):
+                    console.log("Video type detected");
+                    var videoUrl = window.URL.createObjectURL(f);
+
+                    cb(audioUrl);
+                    break;
+                case /pdf/.test(f.type):
+                    console.log("PDF type detected");
+                    var pdfURL = window.URL.createObjectURL(f);
+                    cb(pdfURL);
+                    break;
+                default:
+                    console.log("default type detected");
+
+                    var fileIcon = this.fileTypes[type];
+                    if (fileIcon == undefined) {
+                        fileIcon = "file.svg";
+                    }
+                    cb("src/assets/icons/filetypes/" + fileIcon, f.name);
+                    break;
+            }
+        },
+
+        createBars() {
+            for (var i = 0; i < uploadFileList.length; i++) {
+                var selector = '#a' + i;
+                var bar = new ldBar(selector, {
+                    preset: progType.toLowerCase()
+                });
+                bar.set(0);
+                progressBars.push(bar);
+            }
+        },
+
+        printBannedBanner(id, name, mime, ts, size, msg) {
+            this.errInfos.push({
+                ts: ts,
+                name: name,
+                size: size,
+                mime: mime,
+                id: id,
+                msg: msg
+            });
+        },
+setupUpload() {
+    var delQ = [];
+    for (var i = 0; i < uploadFileList.length; i++) {
+        let f = uploadFileList[i];
+        let mime = f.type;
+        let name = f.name;
+        let ts = f.lastModifiedDate.toLocaleDateString();
+        totalsize += f.size;
+        let size = humanFileSize(f.size);
+        let id = 'a' + i;
+        if (!checkSize(f.size)) {
+            console.log("Size check:: size is " + f.size);
+            msg = `${name} too big for upload`;
+            console.log(msg);
+            printBannedBanner(, id, name, mime, ts, size, msg);
+            delQ.push(i);
+            continue;
+        }
+        if (!checkFilter(mime)) {
+            console.log("Hit banned file type:: filter issue");
+            msg = `${name} cannot be uploaded due to policy.`;
+            printBannedBanner(, id, name, mime, ts, size, msg);
+            delQ.push(i);
+            continue;
+        }
+        if (i == uploadFileList.length - 1) {
+            console.log("Total size check:: total size is " +
+                totalsize);
+            if (!checkTotalSize()) {
+                msg = `Total size exceeds policy, delete some`;
+                this.disableUpload = true;
+            }
+        }
+        totalfiles += 1;
+        let fInfo = {
+            ts: ts,
+            name: name,
+            size: size,
+            mime: mime,
+            id: id,
+            meta: '',
+            thumb: '',
+            bytesSent: 0,
+            eta: 0,
+            rate: 0
+        };
+        this.uploadFileInfos.push(fInfo);
+        showThumbnail(f, i);
+    }
+    this.uploadFileList = this.uploadFileList.filter(function(value, index) {
+        return delQ.indexOf(index) == -1;
+    });
+    createBars();
+    this.disableUpload = false;
+},
+        delItem(index) {
+            let list = [...this.uploadFileList];
+            list.splice(index, 1);
+            this.uploadFileList = list;
+            this.uploadFileInfos = list;
+            this.totalsize -= this.upLoadFileList[index].size;
+            this.checkTotalSize();
+        },
+    }
+};
+
+</script>
+
 <template>
 
 <section class="dark:bg-gray-800 dark:text-white">
@@ -166,6 +708,69 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	       </div>
 	      </div>
 	
+
+	
+	      <div class="flex flex-wrap -mx-3 mb-6">
+	       <div class="w-full px-3">
+<label class="relative flex justify-between items-center p-2 text-xl"
+for="fileSizeLimit" >
+<span>File Size Limit (MB)</span>
+  <input v-model="fileSizeLimit" class='m-6 p-6 form-range'
+type="range"  name="rangeInput" min="10" max="1000"
+step=10 value="0" @change="sizeLimit.value=rangeInput.value">                      
+<output id="sizeLimit" name="sizeLimit" for="fileSizeLimit">10</output>
+	</div>
+	</div>
+
+	      <div class="flex flex-wrap -mx-3 mb-6">
+	       <div class="w-full px-3">
+
+<label class="relative flex justify-between items-center p-2 text-xl"
+for="sizeToggle" >
+<span>{{sizeLabel}}</span>
+  <input v-model="sizeToggle" @change="toggleSizeQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
+bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
+</label>
+	</div>
+	</div>
+
+
+
+	      <div class="flex flex-wrap -mx-3 mb-6">
+	       <div class="w-full px-3">
+	         <label class="block uppercase tracking-wide text-dark-700 text-xs
+	   font-bold mb-2" for="progress-up-indicator">
+	          File type Filters 
+	         </label>
+	         <div class="relative">
+	           <select v-model='progress-up-filter'
+ class="block appearance-none w-full bg-gray-200 border
+	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
+	   focus:outline-none focus:bg-light focus:border-gray-500"
+	   >
+	   			<option default>All</option>
+	   			<option>PDF only</option>
+	   			<option>Image only</option>
+	   			<option>Video only</option>
+	   			<option>Audio only</option>
+	   			<option>Zip only</option>
+	   			<option>Text only</option>
+	           </select>
+	           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-dark-700">
+	             <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+	           </div>
+	         </div>
+	       </div>
+	      </div>
+
+<label class="relative flex justify-between items-center p-2 text-xl"
+for="filterAction" >
+<span>{{filterLabel}}</span>
+  <input v-model="filterAction" @change="toggleFilterQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
+bg-green-600 rounded-full duration-300 ease-in-out peer-checked:bg-red-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
+</label>
 
 	     <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
@@ -400,6 +1005,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 <!-- XXX tabs -->
 
 
+<div id="progress-up-progressArea"> 
   <div v-for="(file,id) in uploadFileInfos" :key = "id" >
     <section class="m-4 p-4 mt-4 mb-4 transition-colors
     text-light-100 dark:text-white mx-auto">
@@ -415,8 +1021,40 @@ py-4 whitespace-nowrap"> See below for possible options </td>
           <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
              <div class="h-12 text-sm text-grey-dark flex items-left
     justify-left">
+
+
+<div v-if="type === 'pdf'">
+  
+  <pdf src="./path/to/static/relativity.pdf"></pdf>
+</div>
+<div v-else-if="type === 'image'">
+  
                  <img width="125" height="125" :src="file.imagesrc"
 :title="file.name" :alt="file.name" class="w-12 h-12" />
+</div>
+<div v-else-if="type === 'video'">
+                <video controls width="125" height="125">
+		<source :src="file.audioUrl" :title="file.name" :alt="file.name" class="h-9 w-9"> 
+		</source> 
+		</video>
+  
+</div>
+<div v-else-if="type === 'audio'">
+                <audio controls width="125" height="125">
+		<source :src="file.audioUrl" :title="file.name" :alt="file.name" class="h-9 w-9"> 
+		</source> 
+		</audio>
+</div>
+<div v-else-if="type === 'text'">
+  
+</div>
+<div v-else>
+ 
+</div>
+
+
+
+
              </div>
           </div>
     
@@ -439,6 +1077,10 @@ py-4 whitespace-nowrap"> See below for possible options </td>
     dark:text-white">
           	    Size: {{file.size}} 
           	    </li>
+       	    <li class="font-light leading-relaxed text-gray-800
+dark:text-white">
+		    Metadata: {{file.meta}}
+
       	    <li class="text-xl font-light leading-relaxed text-gray-800
     dark:text-white">
 
@@ -454,650 +1096,101 @@ py-4 whitespace-nowrap"> See below for possible options </td>
       </div>
     </section>
   </div>
+</div>
+
+
+
+  <div id="progress-up-errArea"> 
+    <div v-for="(err,id) in errInfos; last as lastTime;index as id " >
+      <section class="bg-red-200 m-4 p-4 mt-4 mb-4 transition-colors
+  text-light-100 dark:text-white">
+   <div class="bg-red-600 dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
+  
+      <div title="Removed from uploads" class="absolute cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
+            <img width="25" height="25"
+  src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg" />
+      </div>
+  
+      <div class="flex flex-wrap -mx-2 mb-8">
+        <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+           <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
+
+
+
+<div v-if="type === 'pdf'">
+  
+  <pdf src="./path/to/static/relativity.pdf"></pdf>
+</div>
+<div v-else-if="type === 'image'">
+  
+                 <img width="125" height="125" :src="file.imagesrc"
+:title="file.name" :alt="file.name" class="w-12 h-12" />
+</div>
+<div v-else-if="type === 'video'">
+                <video controls width="125" height="125">
+		<source :src="file.audioUrl" :title="file.name" :alt="file.name" class="h-9 w-9"> 
+		</source> 
+		</video>
+  
+</div>
+<div v-else-if="type === 'audio'">
+                <audio controls width="125" height="125">
+		<source :src="file.audioUrl" :title="file.name" :alt="file.name" class="h-9 w-9"> 
+		</source> 
+		</audio>
+</div>
+<div v-else-if="type === 'text'">
+  
+</div>
+<div v-else>
+ 
+</div>
+
+
+           </div>
+        </div>
+        <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+          <div class="h-12  text-grey-dark flex items-left justify-left">
+           <ul>
+        	    <li  class="font-light leading-relaxed text-gray-800
+  dark:text-white">
+        	    Name: {{err.name}}
+        	    </li>
+        	    <li class=" font-light leading-relaxed text-gray-800
+  dark:text-white">
+        	    Date: {{err.ts}}
+        	    </li>
+        	    <li class=" font-light leading-relaxed text-gray-800
+  dark:text-white">
+        	    Type: {{err.mime}}
+        	    </li>
+        	    <li class="font-light leading-relaxed text-gray-800
+  dark:text-white">
+        	    Size: {{err.size}} 
+        	    </li>
+        	    <li class="font-light leading-relaxed text-gray-800
+  dark:text-white"> Metadata: {{err.meta}}
+        	    </li>
+           </ul>
+          </div>
+         </div>
+  
+        <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+           <div class="h-12 text-lg text-grey-dark flex items-left justify-left">
+  		{{err.msg}}
+           </div>
+  	 
+        </div>
+      </div>
+  
+      </section>
+    </div>
+  </div>
 
 </section>
+
 </template>
 
-
-<script>
-import axios from "axios";
-import ldBar from "./assets/progressBar/loading-bar.js";
-
-
-export default {
-  data() {
-    return {
-    openTab: 1,
-    dragging: false,
-    authEnabled: false,
-form : {
-   uploadURL : 'https://localhost:2324/uploadmultiple',
-   filesName: 'uploadFiles',
-authType: '',
-user : '',
-pass : '',
-progType: 'Line'
-  },
-
-    fileTypes: {
-        "video": "avi.svg",
-        "css": "css.svg",
-        "csv": "csv.svg",
-        "eps": "eps.svg",
-        "excel": "excel.svg",
-        "html": "html.svg",
-        "movie": "mov.svg",
-        "mp3": "mp3.svg",
-        "other": "other.svg",
-        "pdf": "pdf.svg",
-        "ppt": "ppt.svg",
-        "rar": "rar.svg",
-        "text": "txt.svg",
-        "audio": "wav.svg",
-        "word": "word.svg",
-        "zip": "zip.svg"
-    },
-      uploadFileInfos: [],
-      uploadFileList: [],
-      statsTable: [],
-    disableUpload : true,
-    progressBars : [],
-      details: "",
-    };
-  },
-
-updated() {
-      this.$nextTick(() => {
-          this.createProgressBars();
-	  if(this.form.uploadURL == undefined || this.form.filesName == undefined) {
-		this.disableUpload = true;
-	  }
-      });
-  },
-
-  methods: {
-
-    dragover(e) {
-      e.preventDefault();
-    },
-
-    onDragEnter() {
-	this.dragging = true;
-    },
-    onDragLeave() {
-	this.dragging = false;
-    },
-    onDrop(evt, list) {
-      const files = evt.dataTransfer.files;
-    this.clearAll();
-	console.log(files);
-    this.uploadFileList = files;
-    this.setupUpload();
-    },
-
-spitStatistics(self, idx) {
-    if (idx == self.uploadFileList.length - 1) {
-        let endUploadts = Date.now();
-        self.totaltime = `${endUploadts - this.startUploadts}`;
-        self.totalsize = this.humanFileSize(this.totalsize);
-        
-        var ts = new Date().toLocaleString();
-        var tot = self.uploadFileList.length;
-        var status = self.totalfiles == tot ?
-            "<img src='src/assets/icons/misc/success-icon.svg' >" :
-            "<img src='src/assets/icons/misc/failure-icon.svg' >";
-        self.details = `${self.totalfiles}/${tot} files of size ${this.totalsize} sent in ${self.totaltime} ms`;
-        var id = self.statsTable.length + 1;
-
-	 let stat = {
-		id: id,
-		ts: ts,
-		status: status,
-		details: self.details
-	 };
-	self.statsTable.push(stat);
-
-	self.progresBars = [];
-        self.disableUpload = true;
-        self.totalfiles = 0;
-        self.totalsize = 0;
-        self.totaltime = 0;
-        self.startUploadts = 0;
-    }
-},
-
-uploadOneFile(file, idx) {
-    let uplFormData = new FormData();
-    uplFormData.append(this.form.filesName, file);
-    console.log(uplFormData);
-    let self = this;
-    let options = {
-        onUploadProgress: function(e) {
-            let perc = parseInt(e.progress * 100);
-	    console.log(perc + " is the percentage uploaded");
-            self.progressBars[idx].set(perc);
-	    self.bytesSent = this.humanFileSize(event.progress * size);
-	    self.Mysize = this.humanFileSize(file.size);
-	    self.eta = event.estimated;
-	    self.rate = (event.rate / 1024 / 1024).toFixed(2);
-
-
-        }
-    };
-
-    if (this.authEnabled) {
-        var username = "user";
-        var password = "password";
-        var basicAuth = "Basic " + btoa(username + ":" + password);
-        options["headers"] =  {
-                "Authorization": +basicAuth
-         };
-    }
-    console.log("Uploading to " + this.form.uploadURL);
-    axios.post(this.form.uploadURL, uplFormData, options).then((resp) => {
-        this.spitStatistics(self, idx);
-    }).catch((error) => {
-        alert("Upload failed. Please check endpoint in Setup");
-        alert(error);
-    });
-},
-
-uploadAll() {
-    console.log("Starting upload...");
-    this.startUploadts = Date.now();
-    for (let i = 0; i < this.uploadFileList.length; i++) {
-        let f = this.uploadFileList[i];
-        this.uploadOneFile(f, i);
-    }
-},
-saveConfig(e) {
-    e.preventDefault();
-    console.log(this.form.uploadURL, this.form.filesName, this.authEnabled,
-this.form.authType, this.form.user,this.form.pass,this.form.progType);
-},
-
-async testUpload() {
-    console.log("Uploading using HTML5 File API...");
-    let testForm = new FormData();
-
-    const blob = new Blob(['Test upload DELETE'], {
-        type: "plain/text"
-    });
-    testForm.append(this.form.filesName, blob, "progress-up-test.txt");
-    let options = {};
-    if (this.authEnabled) {
-        var username = "user";
-        var password = "password";
-        var basicAuth = "Basic " + btoa(username + ":" + password);
-        options = {
-            headers: {
-                "Authorization": +basicAuth
-            }
-        };
-    }
-
-    console.log("Upload test to " + this.form.uploadURL);
-    await axios.post(this.form.uploadURL, testForm, options).then((resp) => {
-        alert("Test succeeded");
-    }).catch((error) => {
-        alert("Upload failed. Please check endpoint in Setup");
-        alert(error);
-    });
-},
-
-testEP(e) {
-    e.preventDefault();
-    this.saveConfig(e);
-    this.testUpload();
-},
-
-setIndicator() {
-    var progType = this.form.progType;
-    console.log(progType);
-    switch (progType) {
-        case "Bubble":
-            var extra = "data-img-size=\"100,100\"";
-            break;
-        case "Rainbow":
-            var extra = "data-stroke=\"data:ldbar/res,gradient(0,1,#f99,#ff9)\"";
-            break;
-        default:
-            break;
-    }
-},
-    uploadAllFiles() {
-      this.uploadFileInfos = []; 
-      for (let i = 0; i < this.uploadFileInfos.length; i++) {
-        uploadProgress(i, this.uploadFileInfos[i]);
-      }
-    },
- clearAll() {
-    this.details = "";
-    this.progressInfos = []; 
-    this.uploadFileList = [];
-    this.uploadFileInfos = [];
-    this.progressBars = [];
-    this.totalfiles = 0;
-    this.totalsize = 0;
-    this.totaltime = 0;
-
-    this.disableUpload = true;
-    console.log("Cleared");
-
- },
-  openFileBrowser() {
-      this.$refs.fileInput.click();
-  },
-  uploadFile(file, onUploadProgress) {
-    let formData = new FormData();
-
-    formData.append(filesName, file);
-
-    return axios.post(uploadURL, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data"
-      },
-      onUploadProgress
-    });
-  },
-
-    uploadProgress(idx, file) {
-      this.uploadFileInfos[idx] = { percentage: 0, fileName: file.name,
-size: file.size };
-
-      uploadFile(file, (event) => {
-        this.uploadFileInfos[idx].percentage = Math.round(100 * event.loaded / event.total);
-	    this.bytesSent = this.humanFileSize(event.progress * size);
-	    this.Mysize = this.humanFileSize(file.size);
-	    this.eta = event.estimated;
-	    this.rate = (event.rate / 1024 / 1024).toFixed(2);
-
-
-      })
-        .then((response) => {
-      });
-    },
-
-fileSelectFinish(evt) {
-    let selectedFiles = evt.target.files;
-	this.clearAll();
-    this.uploadFileList = selectedFiles;
-    this.setupUpload();
-},
-
-    humanFileSize(size ) {
-        const i = Math.floor(Math.log(size) / Math.log(1024));
-	let t2 = size / Math.pow(1024, i);
-        let t = t2.toFixed(2) * 1;
-        const ret= t + " " + ["B", "kB", "MB", "GB", "TB"][i];
-        return (ret);
-    },
-
-
-    toggleTabs(tabNumber){
-      this.openTab = tabNumber
-    },
-
-    applyFilter() {
-	filt = this.form.fileFilter.value;
-	filtType = this.form.filterAction;
-	if(filtType.checked) {
-		action = "deny";
-	} else {
-		action = "allow";
-	}
-	console.log(filt, action);
-	switch(filt) {
-		case "All":
-			break;
-		case "PDF only":
-			filtFiles = { 
-			"type": "application/pdf",
-			"action": action 
-			};
-			break;
-		case "Image only":
-			filtFiles = {
-			"type": "image",		
-			"action": action
-			};
-			break;
-		case "Video only":
-			filtFiles = {
-			"type": "video",
-			"action": action
-			};
-			break;
-		case "Audio only":
-			filtFiles = {
-			"type": "audio",
-			"action": action
-			};
-			break;
-		case "Zip only":
-			filtFiles = {
-			"type": "application/zip",
-			"action": action
-			};
-			break;
-		case "Text only":
-			filtFiles = {
-			"type": "text",
-			"action": action
-			};
-			break;
-		default:
-			console.log("Filter not understood");
-			break;
-	}
-
-},
-
-toggleSizeQ() {
-    const sizeLabel = "Single file limit";
-    val = this.form.sizeToggle;
-    if(val.checked === true) {
-    	sizeLabel = "Total limit";
-    } else {
-    	sizeLabel = "Single file limit";
-    }
-},
-
-toggleFilterQ() {
-    const filterLabel = "Allow file type";
-    val = this.form.filterAction;
-    if(val.checked === true) {
-    	filterLabel = "Deny file type";
-    } else {
-    	filterLabel = "Allow file type";
-    }
-},
-
-
-wordCount(val) {
-    var wom = val.match(/\S+/g);
-    return {
-        chars: val.length,
-        words: wom ? wom.length : 0,
-        lines: val.split(/\r*\n/).length
-    };
-},
-
-showThumbnail(f, i) {
-    let id = 'a' + i;
-    switch (true) {
-        case /text/.test(f.type):
-            console.log("Text type detected");
-            var reader = new FileReader();
-            reader.onload = (function(f) {
-                return function(e) {
-                    txt = e.target.result;
-                    wc = this.wordCount(txt);
-                    meta = document.getElementById(`${id}-meta`);
-                    meta.innerHTML = (`
-			Metadata: 
-   			Chars : ${wc.chars}
-   			Words: ${wc.words}
-   			Lines: ${wc.lines}
-  			`);
-
-
-                    var dataArray = txt.split("\n");
-                    dataArray = dataArray.slice(0, 20);
-                    txt = dataArray.join("\n");
-                    setIconImage(f.name, f.type, txt);
-                };
-            })(f);
-            reader.readAsText(f);
-            break;
-        case /image/.test(f.type):
-            console.log("Image type detected");
-            var reader = new FileReader();
-            // Closure to capture the file information.  
-            reader.onload = (function(theFile) {
-                return function(e) {
-                    var thumb = [
-                        '<img width="125" height="125" src="',
-                        e.target.result,
-                        '" title="', theFile.name,
-                        '" alt="', theFile.name,
-                        '" class="w-12 h-12" />'
-                    ].join('');
-                    document.getElementById(theFile.name).innerHTML = thumb;
-                };
-            })(f);
-            reader.readAsDataURL(f);
-            break;
-        case /audio/.test(f.type):
-            console.log("Audio type detected");
-            var audioUrl = window.URL.createObjectURL(f);
-
-            var icon = [
-                '<audio controls width="125" height="125"><source src="',
-                audioUrl,
-                '" title="', name,
-                '" alt="', name,
-                '" class="h-9 w-9" </source> </audio>'
-            ].join('');
-            document.getElementById(f.name).innerHTML = icon;
-            break;
-        case /video/.test(f.type):
-            console.log("Video type detected");
-            var videoUrl = window.URL.createObjectURL(f);
-
-            var icon = [
-                '<video controls width="125" height="125"><source src="',
-                videoUrl,
-                '" title="', name,
-                '" alt="', name,
-                '" class="h-9 w-9"</source> </video>'
-            ].join('');
-            document.getElementById(f.name).innerHTML = icon;
-            break;
-        case /pdf/.test(f.type):
-            console.log("PDF type detected");
-            var pdfURL = window.URL.createObjectURL(f);
-            var loc = document.getElementById(f.name);
-            PDFObject.embed(pdfURL, loc);
-            break;
-        default:
-            console.log("default type detected");
-            setIconImage(f.name, f.type, f.name);
-            break;
-    }
-},
-
-checkFilter(mime) {
-    /* No filter XXX */
-    if (filtFiles.type == 'all') {
-        console.log("No file type filters active");
-        return true;
-    }
-    if (mime.match(filtFiles.type) && filtFiles.action == "allow") {
-        return true;
-    }
-    if (mime.match(filtFiles.type) && filtFiles.action == "deny") {
-        return true;
-    }
-    return false;
-},
-
-checkSize(size) {
-    if (size <= (allowedSize * 1024 * 1024)) {
-        return true;
-    }
-    return false;
-},
-
-checkTotalSize() {
-    if (totalsize <= (allowedTotalSize * 1024 * 1024)) {
-        enableUploadButton();
-        return true;
-    }
-    return false;
-},
-
-
-printBannedBanner( id, name, mime, ts, size, msg) {
-            this.errInfos.push({
-                ts:ts,
-                name:name,
-                size:size,
-                mime:mime,
-                id: id,
-                msg:msg
-            });
-},
-
-createBars() {
-    for (var i = 0; i < uploadFileList.length; i++) {
-        var selector = '#a' + i;
-        var bar = new ldBar(selector, {
-            preset: progType.toLowerCase()
-        });
-        bar.set(0);
-        progressBars.push(bar);
-    }
-},
-
-createThumbnails() {
-    for (var i = 0; i < uploadFileList.length; i++) {
-        f = uploadFileList[i];
-        showThumbnail(f, i);
-    }
-},
-
-setupUpload() {
-    var delQ = [];
-    for (var i = 0; i < uploadFileList.length; i++) {
-        let f = uploadFileList[i];
-        let mime = f.type;
-        let name = f.name;
-        let ts = f.lastModifiedDate.toLocaleDateString();
-        totalsize += f.size;
-        let size = humanFileSize(f.size);
-        let id = 'a' + i;
-        if (!checkSize(f.size)) {
-            console.log("Size check:: size is " + f.size);
-            msg = `${name} too big for upload`;
-            console.log(msg);
-            printBannedBanner(errHTML, id, name, mime, ts, size, msg);
-            delQ.push(i);
-            continue;
-        }
-        if (!checkFilter(mime)) {
-            console.log("Hit banned file type:: filter issue");
-            msg = `${name} cannot be uploaded due to policy.`;
-            printBannedBanner(errHTML, id, name, mime, ts, size, msg);
-            delQ.push(i);
-            continue;
-        }
-        if (i == uploadFileList.length - 1) {
-            console.log("Total size check:: total size is " + totalsize);
-            if (!checkTotalSize()) {
-                msg = `Total size exceeds policy, delete some`;
-                disableUploadButton();
-            }
-        }
-        totalfiles += 1;
-    }
-
-    createThumbnails();
-    for (j = 0; j < delQ.length; j++) {
-        var item = delQ[j];
-        delUploadList(item);
-    }
-    createBars();
-    enableUploadButton();
-},
-
-delUploadList(index) {
-    let list = [...uploadFileList];
-    list.splice(index, 1);
-    this.uploadFileList = list;
-},
-delItem(index) {
-    let list = [...this.uploadFileList];
-    list.splice(index, 1);
-    this.uploadFileList = list;
-    this.uploadFileInfos = list;
-},
-
-
-/* XXX delete */
-
-delItem(index) {
-    let list = [...this.uploadFileList];
-    totalsize -= this.upLoadFileList[index].size;
-    list.splice(index, 1);
-    this.uploadFileList = list;
-    this.uploadFileInfos = list;
-    checkTotalSize();
-}
-
-
-    buildThumb(f, type, cb ) {
-        type = type.split('/')[0];
-	console.log(type);
-
-        if (type != "image") {
-            var fileIcon = this.fileTypes[type];
-            if (fileIcon == undefined) {
-                fileIcon = "file.svg";
-            }
-            cb("src/assets/icons/filetypes/" + fileIcon);
-        } else {
-            var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
-                    cb(e.target.result);
-                };
-            })(f);
-            reader.readAsDataURL(f);
-        }
-    },
-
-    createProgressBars() {
-        for (var i = 0; i < this.uploadFileInfos.length; i++) {
-	    let id = "a" + i;
-	    console.log("Creating progress bars...");
-            let bar = new ldBar('#' + id, {
-                preset: this.form.progType.toLowerCase()
-            });
-            this.progressBars.push(bar);
-	}
-   },
-
-    setupUpload() {
-        for (var i = 0; i < this.uploadFileList.length; i++) {
-            let f = this.uploadFileList[i];
-            let ts = f.lastModifiedDate.toLocaleDateString();
-            let fname = f.name;
-            let size = this.humanFileSize(f.size);
-            let mime = f.type;
-            let id = "a" + i;
-	    this.buildThumb(f, mime, (src) => {
-               let imagesrc = src;
-            this.uploadFileInfos.push({
-                ts:ts,
-                name:fname,
-                size:size,
-                mime:mime,
-                id: id,
-                imagesrc:imagesrc
-            });
-
-	    });
-            this.totalsize += f.size;
-            this.totalfiles += 1;
-        }
-        this.disableUpload = false;
- },
-
-}
-};
-
-</script>
 
 <style scoped>
 @import url("https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/progress-up.css");

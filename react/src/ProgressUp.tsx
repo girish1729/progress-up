@@ -5,14 +5,19 @@ import React, {
     useEffect,
     Component
 } from "react";
-import {useDropzone} from 'react-dropzone';
+import {
+    useDropzone
+} from 'react-dropzone';
+import {
+    PDFObject
+} from 'react-pdfobject'
+
 import './assets/style.css';
 import axios from "axios";
 
 import ldBar from './assets/progressBar/loading-bar.js';
 import uploadIcon from './assets/icons/upload/file-submit.svg';
 import progressTypes from './assets/progress-types.png';
-
 import successIcon from './assets/icons/misc/success-icon.svg';
 import trashIcon from './assets/icons/misc/trash-icon.svg';
 import failureIcon from './assets/icons/misc/failure-icon.svg';
@@ -39,21 +44,26 @@ import zip from './assets/icons/filetypes/zip.svg';
 
 function ProgressUp() {
 
-    let [uploadFileInfos, setFileInfos] = useState<[]>([]);
-    let [uploadFileList, setUpload] = useState<FileList>();
-    let [progressBars, setProgress] = useState<[]>([]);
-    let [statsTable, setStats] = useState<[]>([]);
+    let [uploadFileInfos, setFileInfos] = useState < [] > ([]);
+    let [errInfos, setErrInfos] = useState < [] > ([]);
+    let [uploadFileList, setUpload] = useState < FileList > ();
+    let [progressBars, setProgress] = useState < [] > ([]);
+    let [statsTable, setStats] = useState < [] > ([]);
     const [openTab, setOpenTab] = useState(1);
     const [isUploadDisabled, setIsUploadDisabled] = useState(true);
     const [inputs, setInputs] = useState({
-	uploadURL: "",
-	filesName: "",	
-	progType: "",
-	authEnabled: false,
-	authType: "",
-	user: "",
-	pass: ""
-	});
+        uploadURL: "",
+        filesName: "",
+        progType: "",
+        authEnabled: false,
+        authType: "",
+        user: "",
+        pass: ""
+        fileSizeLimit: 10,
+        sizeLimitType: "Single file limit",
+        fileTypeFilter: "All",
+        fileTypeAction: "Allow file type"
+    });
     const [progType, setProgType] = useState("line");
     const [authEnabled, enableAuth] = useState(false);
     const [authType, setAuthType] = useState("Basic");
@@ -61,18 +71,29 @@ function ProgressUp() {
     const [totalfiles, setNumberFiles] = useState(0);
     const [totalsize, setSize] = useState(0);
     let startUploadts = 0;
-    const inputRef:any = useRef();
+    const inputRef: any = useRef();
+
+    var filtFiles = {
+        "type": "all",
+        "action": "allow"
+    };
 
     // From drag and drop
     const onDrop = (files: any) => {
-	console.log("Dnd" + files);
-	setUpload(files);
+        console.log("Dnd" + files);
+        setUpload(files);
         setupUpload(files);
     };
 
-  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
+    const {
+        getRootProps,
+        getInputProps,
+        isDragActive
+    } = useDropzone({
+        onDrop
+    })
 
-    const fileTypes:any = {
+    const fileTypes: any = {
         "video": avi,
         "css": css,
         "csv": csv,
@@ -95,7 +116,7 @@ function ProgressUp() {
     let progress: any = {};
     let showProgress: boolean = true;
 
-    const handleChange = (event:any) => {
+    const handleChange = (event: any) => {
         const name = event.target.name;
         const value = event.target.value;
         setInputs(values => ({
@@ -104,33 +125,33 @@ function ProgressUp() {
         }));
     };
 
- const handleSubmit = (event:any) => {
-    event.preventDefault();
-    console.log(inputs);
-  };
+    const handleSubmit = (event: any) => {
+        event.preventDefault();
+        console.log(inputs);
+    };
 
-   useEffect(() => {
-	console.log("DOM Updated");
-	console.log(uploadFileInfos);
-	createProgressBars();
-        if(inputs.uploadURL == undefined || inputs.filesName == undefined) {
-	    console.log('Disable upload without configuration');
+    useEffect(() => {
+        console.log("DOM Updated");
+        console.log(uploadFileInfos);
+        createProgressBars();
+        if (inputs.uploadURL == undefined || inputs.filesName == undefined) {
+            console.log('Disable upload without configuration');
             setIsUploadDisabled(true);
-	}
-   }, [uploadFileInfos]);
+        }
+    }, [uploadFileInfos]);
 
-   const darkMode = () => {
-	console.log("dark mode change");
-	document.documentElement.classList.toggle('dark');
-  };
+    const darkMode = () => {
+        console.log("dark mode change");
+        document.documentElement.classList.toggle('dark');
+    };
 
     const uploadOneFile = async (file: File, idx: number) => {
         let formData = new FormData();
         formData.append(inputs.filesName, file);
         let fname = file.name;
-	console.log("Uploading to " + inputs.uploadURL);
-	console.log("Uploading file name" + inputs.filesName);
-        await axios.post(inputs.uploadURL, formData, {
+        console.log("Uploading to " + inputs.uploadURL);
+        console.log("Uploading file name" + inputs.filesName);
+       let options = {
             headers: {
                 "Content-Type": "multipart/form-data"
             },
@@ -138,24 +159,39 @@ function ProgressUp() {
                 let perc: number;
                 if (progEvent.total) {
                     perc = (progEvent.loaded / progEvent.total) * 100;
-		    let obj:any = progressBars[idx];
+                    let obj: any = progressBars[idx];
                     obj.set(perc);
-	    bytesSent = humanFileSize(progEvent.progress * size);
-	    Mysize = humanFileSize(file.size);
-	    eta = progEvent.estimated;
-	    rate = (progEvent.rate / 1024 / 1024).toFixed(2);
+                    file.bytesSent = humanFileSize(progEvent.progress * size);
+                    file.Mysize = humanFileSize(file.size);
+                    file.eta = progEvent.estimated;
+                    file.rate = (progEvent.rate / 1024 / 1024).toFixed(2);
 
                     console.log(perc);
                 }
             },
-        }).then(function() {
-	    spitStatistics(idx);
+	};
+
+            if (this.authEnabled) {
+                var username = "user";
+                var password = "password";
+                var basicAuth = "Basic " + btoa(username + ":" + password);
+                options["headers"] = {
+                    "Authorization": +basicAuth
+                };
+            }
+
+        await axios.post(inputs.uploadURL, formData, options).then(function() {
+            spitStatistics(idx);
             console.log("All files uploaded");
-        });
+            }).catch((error) => {
+                alert("Upload failed. Please check endpoint in Setup");
+                alert(error);
+            });
+ 
     };
 
     const uploadAll = () => {
-	startUploadts = Date.now();
+        startUploadts = Date.now();
         if (uploadFileList) {
             for (let i = 0; i < uploadFileList.length; i++) {
                 let file = uploadFileList[i];
@@ -166,15 +202,15 @@ function ProgressUp() {
 
     const fileSelectFinish = (e: any) => {
         let files = e.target.files;
-	console.log(files);
-	setUpload(files);
+        console.log(files);
+        setUpload(files);
         setupUpload(files);
     };
 
 
-    const humanFileSize = (size:number )  => {
+    const humanFileSize = (size: number) => {
         const i: any = Math.floor(Math.log(size) / Math.log(1024));
-	let t2:any = size / Math.pow(1024, i);
+        let t2: any = size / Math.pow(1024, i);
         let t: any = t2.toFixed(2) * 1;
         const ret: string = t + " " + ["B", "kB", "MB", "GB", "TB"][i];
         return (ret);
@@ -189,45 +225,49 @@ function ProgressUp() {
 
             var ts = new Date().toLocaleString();
             var tot = uploadFileList.length;
-            var status = totalfiles == tot ?  true: false;
+            var status = totalfiles == tot ? true : false;
 
-	   var details = totalfiles + '/' + tot 
-		+ " files size " + tsize +
+            var details = totalfiles + '/' + tot +
+                " files size " + tsize +
                 " sent in " + totaltime + " ms";
             setDetails(details);
 
             var id = statsTable.length + 1;
-	    let stat = {
-		id: id,
-		ts: ts,
-		status: status,
-		details: details
-	    };
+            let stat = {
+                id: id,
+                ts: ts,
+                status: status,
+                details: details
+            };
 
-	    let st:any = [...statsTable];
-	    st.push(stat);
-	    setStats(st);
+            let st: any = [...statsTable];
+            st.push(stat);
+            setStats(st);
 
             setIsUploadDisabled(true);
-	    setProgress([]);
+            setProgress([]);
             setSize(0);
             setNumberFiles(0);
         }
     };
 
-   const needsAuth = (event:any) => {
-    enableAuth(event.target.checked);
-};
+    const needsAuth = (event: any) => {
+        enableAuth(event.target.checked);
+    };
     const saveConfig = () => {
-    	       console.log(inputs);
-		console.log(inputs.uploadURL);
-		console.log(inputs.filesName);
-		console.log(progType);
-		console.log(authEnabled);
-		console.log(authType);
-		console.log(inputs.user);
-		console.log(inputs.pass);
-	};
+        console.log(inputs);
+        console.log(inputs.uploadURL);
+        console.log(inputs.filesName);
+        console.log(inputs.progType);
+        if (inputs.authEnabled) {
+            console.log(inputs.authType);
+            console.log(inputs.user, inputs.pass);
+        }
+        console.log(inputs.fileSizeLimit);
+        console.log(inputs.sizeLimitType);
+        console.log(inputs.fileTypeFilter);
+        console.log(inputs.fileTypeAction);
+    };
 
     const testUpload = async () => {
         console.log("Uploading using HTML5 File API...");
@@ -258,19 +298,19 @@ function ProgressUp() {
     };
 
 
-    const setAuth = (event:any) => {
-	let auth = event.target.value;
+    const setAuth = (event: any) => {
+        let auth = event.target.value;
         setAuthType(auth);
         console.log(auth);
     };
 
 
-    const setIndicator = (event:any) => {
+    const setIndicator = (event: any) => {
 
-	let ind = event.target.value;
-	ind = ind.toLowerCase()
+        let ind = event.target.value;
+        ind = ind.toLowerCase()
         setProgType(ind);
-	let extra;
+        let extra;
         console.log(ind);
         switch (ind) {
             case "bubble":
@@ -292,389 +332,361 @@ function ProgressUp() {
 
     const clearAll = () => {
         setDetails("");
-	if(inputRef.current) {
-		inputRef.current.value = "";
-	}
-	setFileInfos([]);
-	setProgress([]);
+        if (inputRef.current) {
+            inputRef.current.value = "";
+        }
+        setFileInfos([]);
+        setErrInfos([]);
+        setProgress([]);
         setIsUploadDisabled(true);
+	setNumberFiles(0);
+	setSize(0);
         console.log("Cleared");
-
     };
 
 
+    const applyFilter = () => {
+        filt = inputs.fileTypeFilter;
+        filtType = inputs.fileTypeAction;
+        console.log(filt, filtType);
+        switch (filt) {
+            case "All":
+                break;
+            case "PDF only":
+                filtFiles = {
+                    "type": "application/pdf",
+                    "action": action
+                };
+                break;
+            case "Image only":
+                filtFiles = {
+                    "type": "image",
+                    "action": action
+                };
+                break;
+            case "Video only":
+                filtFiles = {
+                    "type": "video",
+                    "action": action
+                };
+                break;
+            case "Audio only":
+                filtFiles = {
+                    "type": "audio",
+                    "action": action
+                };
+                break;
+            case "Zip only":
+                filtFiles = {
+                    "type": "application/zip",
+                    "action": action
+                };
+                break;
+            case "Text only":
+                filtFiles = {
+                    "type": "text",
+                    "action": action
+                };
+                break;
+            default:
+                console.log("Filter not understood");
+                break;
+        }
 
- const applyFilter = () => {
-	filt = this.form.fileFilter.value;
-	filtType = this.form.filterAction;
-	if(filtType.checked) {
-		action = "deny";
-	} else {
-		action = "allow";
-	}
-	console.log(filt, action);
-	switch(filt) {
-		case "All":
-			break;
-		case "PDF only":
-			filtFiles = { 
-			"type": "application/pdf",
-			"action": action 
-			};
-			break;
-		case "Image only":
-			filtFiles = {
-			"type": "image",		
-			"action": action
-			};
-			break;
-		case "Video only":
-			filtFiles = {
-			"type": "video",
-			"action": action
-			};
-			break;
-		case "Audio only":
-			filtFiles = {
-			"type": "audio",
-			"action": action
-			};
-			break;
-		case "Zip only":
-			filtFiles = {
-			"type": "application/zip",
-			"action": action
-			};
-			break;
-		case "Text only":
-			filtFiles = {
-			"type": "text",
-			"action": action
-			};
-			break;
-		default:
-			console.log("Filter not understood");
-			break;
-	}
-
-};
-
-const toggleSizeQ = () => {
-    const sizeLabel = "Single file limit";
-    val = this.form.sizeToggle;
-    if(val.checked === true) {
-    	sizeLabel = "Total limit";
-    } else {
-    	sizeLabel = "Single file limit";
-    }
-};
-
-const toggleFilterQ = ()  => {
-    const filterLabel = "Allow file type";
-    val = this.form.filterAction;
-    if(val.checked === true) {
-    	filterLabel = "Deny file type";
-    } else {
-    	filterLabel = "Allow file type";
-    }
-};
-
-
-const wordCount = (val) => {
-    var wom = val.match(/\S+/g);
-    return {
-        chars: val.length,
-        words: wom ? wom.length : 0,
-        lines: val.split(/\r*\n/).length
     };
-};
 
-const showThumbnail = (f, i) => {
-    let id = 'a' + i;
-    switch (true) {
-        case /text/.test(f.type):
-            console.log("Text type detected");
-            var reader = new FileReader();
-            reader.onload = (function(f) {
-                return function(e) {
-                    txt = e.target.result;
-                    wc = this.wordCount(txt);
-                    meta = document.getElementById(`${id}-meta`);
-                    meta.innerHTML = (`
-			Metadata: 
+    const toggleSizeQ = () => {
+        const sizeLabel = "Single file limit";
+        val = inputs.sizeLimitType;
+        if (val.checked === true) {
+            sizeLabel = "Total limit";
+        } else {
+            sizeLabel = "Single file limit";
+        }
+    };
+
+    const toggleFilterQ = () => {
+        const filterLabel = "Allow file type";
+        val = inputs.fileTypeAction;
+        if (val.checked === true) {
+            filterLabel = "Deny file type";
+        } else {
+            filterLabel = "Allow file type";
+        }
+    };
+
+
+    const wordCount = (val) => {
+        var wom = val.match(/\S+/g);
+        return {
+            chars: val.length,
+            words: wom ? wom.length : 0,
+            lines: val.split(/\r*\n/).length
+        };
+    };
+
+
+    const checkFilter = (mime) => {
+        /* No filter XXX */
+        if (filtFiles.type == 'all') {
+            console.log("No file type filters active");
+            return true;
+        }
+        if (mime.match(filtFiles.type) && filtFiles.action == "allow") {
+            return true;
+        }
+        if (mime.match(filtFiles.type) && filtFiles.action == "deny") {
+            return true;
+        }
+        return false;
+    };
+
+    checkSize(size) {
+        if (size <= (inputs.fileSizeLimit * 1024 * 1024)) {
+            return true;
+        }
+        return false;
+    }
+
+    checkTotalSize() {
+        if (inputs.sizeLimitType == "Total limit") {
+            if (totalsize <= (inputs.fileSizeLimit * 1024 * 1024)) {
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+
+    const thumbnail = (f, i) => {
+        switch (this.fileType) {
+
+            case "image":
+                let reader = new FileReader();
+                reader.onload = (function(theFile) {
+                    return function(e) {
+                        if (e.target) {
+
+                            let imagesrc = e.target.result;
+                            return ( <
+                                img width = "125"
+                                height = "125"
+                                src = {
+                                    imagesrc
+                                }
+                                title = {
+                                    name
+                                }
+                                alt = {
+                                    name
+                                }
+                                className = "w-12 h-12" / >
+                            );
+                        }
+                    };
+                })(f);
+                reader.readAsDataURL(f);
+                break;
+
+            case "pdf":
+                var pdfUrl = window.URL.createObjectURL(f);
+                return ( <
+                    PDFObject url = {
+                        pdfUrl
+                    }
+                    />
+                );
+                break;
+
+            case "audio":
+                return (
+                    var audioUrl = window.URL.createObjectURL(f); <
+                    audio controls width = "125"
+                    height = "125" >
+                    <
+                    source src = "{videoUrl}"
+                    title = "{name}"
+                    alt = "{name}"
+                    class = "h-9 w-9" < /source> </audio >
+                );
+                break;
+            case "video":
+                var videoUrl = window.URL.createObjectURL(f);
+                return ( <
+                    video controls width = "125"
+                    height = "125" >
+                    <
+                    source src = "{videoUrl}"
+                    title = "{name}"
+                    alt = "{name}"
+                    class = "h-9 w-9" < /source> </video >
+                );
+                break;
+
+            case "text":
+                reader.onload = (function(f) {
+                    return function(e) {
+                        txt = e.target.result;
+                        wc = this.wordCount(txt);
+                        meta = ` 
    			Chars : ${wc.chars}
    			Words: ${wc.words}
    			Lines: ${wc.lines}
-  			`);
+  			`;
+                        var dataArray = txt.split("\n");
+                        dataArray = dataArray.slice(0, 20);
+                        txt = dataArray.join("\n");
+                        let fileIcon = fileTypes[type];
+                        return ( <
+                            img width = "125"
+                            height = "125"
+                            src = {
+                                fileIcon
+                            }
+                            title = {
+                                txt
+                            }
+                            alt = {
+                                name
+                            }
+                            className = "w-12 h-12" / >
+                        );
+                        setIconImage(f.name, f.type, txt);
 
+                    };
+                })(f);
+                let reader = new FileReader();
 
-                    var dataArray = txt.split("\n");
-                    dataArray = dataArray.slice(0, 20);
-                    txt = dataArray.join("\n");
-                    setIconImage(f.name, f.type, txt);
-                };
-            })(f);
-            reader.readAsText(f);
-            break;
-        case /image/.test(f.type):
-            console.log("Image type detected");
-            var reader = new FileReader();
-            // Closure to capture the file information.  
-            reader.onload = (function(theFile) {
-                return function(e) {
-                    var thumb = [
-                        '<img width="125" height="125" src="',
-                        e.target.result,
-                        '" title="', theFile.name,
-                        '" alt="', theFile.name,
-                        '" class="w-12 h-12" />'
-                    ].join('');
-                    document.getElementById(theFile.name).innerHTML = thumb;
-                };
-            })(f);
-            reader.readAsDataURL(f);
-            break;
-        case /audio/.test(f.type):
-            console.log("Audio type detected");
-            var audioUrl = window.URL.createObjectURL(f);
-
-            var icon = [
-                '<audio controls width="125" height="125"><source src="',
-                audioUrl,
-                '" title="', name,
-                '" alt="', name,
-                '" class="h-9 w-9" </source> </audio>'
-            ].join('');
-            document.getElementById(f.name).innerHTML = icon;
-            break;
-        case /video/.test(f.type):
-            console.log("Video type detected");
-            var videoUrl = window.URL.createObjectURL(f);
-
-            var icon = [
-                '<video controls width="125" height="125"><source src="',
-                videoUrl,
-                '" title="', name,
-                '" alt="', name,
-                '" class="h-9 w-9"</source> </video>'
-            ].join('');
-            document.getElementById(f.name).innerHTML = icon;
-            break;
-        case /pdf/.test(f.type):
-            console.log("PDF type detected");
-            var pdfURL = window.URL.createObjectURL(f);
-            var loc = document.getElementById(f.name);
-            PDFObject.embed(pdfURL, loc);
-            break;
-        default:
-            console.log("default type detected");
-            setIconImage(f.name, f.type, f.name);
-            break;
-    }
-};
-
-
-const checkFilter =(mime) => {
-    /* No filter XXX */
-    if (filtFiles.type == 'all') {
-        console.log("No file type filters active");
-        return true;
-    }
-    if (mime.match(filtFiles.type) && filtFiles.action == "allow") {
-        return true;
-    }
-    if (mime.match(filtFiles.type) && filtFiles.action == "deny") {
-        return true;
-    }
-    return false;
-};
-
-const checkSize = (size) => {
-    if (size <= (allowedSize * 1024 * 1024)) {
-        return true;
-    }
-    return false;
-};
-
-const checkTotalSize =() => {
-    if (totalsize <= (allowedTotalSize * 1024 * 1024)) {
-        enableUploadButton();
-        return true;
-    }
-    return false;
-};
-
-
-const printBannedBanner = ( id, name, mime, ts, size, msg) => {
-            this.errInfos.push({
-                ts:ts,
-                name:name,
-                size:size,
-                mime:mime,
-                id: id,
-                msg:msg
-            });
-};
-
-const createBars = () => {
-    for (var i = 0; i < uploadFileList.length; i++) {
-        var selector = '#a' + i;
-        var bar = new ldBar(selector, {
-            preset: progType.toLowerCase()
-        });
-        bar.set(0);
-        progressBars.push(bar);
-    }
-};
-
-const createThumbnails = () => {
-    for (var i = 0; i < uploadFileList.length; i++) {
-        f = uploadFileList[i];
-        showThumbnail(f, i);
-    }
-};
-
-const setupUpload = () => {
-    var delQ = [];
-    for (var i = 0; i < uploadFileList.length; i++) {
-        let f = uploadFileList[i];
-        let mime = f.type;
-        let name = f.name;
-        let ts = f.lastModifiedDate.toLocaleDateString();
-        totalsize += f.size;
-        let size = humanFileSize(f.size);
-        let id = 'a' + i;
-        if (!checkSize(f.size)) {
-            console.log("Size check:: size is " + f.size);
-            msg = `${name} too big for upload`;
-            console.log(msg);
-            printBannedBanner(errHTML, id, name, mime, ts, size, msg);
-            delQ.push(i);
-            continue;
-        }
-        if (!checkFilter(mime)) {
-            console.log("Hit banned file type:: filter issue");
-            msg = `${name} cannot be uploaded due to policy.`;
-            printBannedBanner(errHTML, id, name, mime, ts, size, msg);
-            delQ.push(i);
-            continue;
-        }
-        if (i == uploadFileList.length - 1) {
-            console.log("Total size check:: total size is " + totalsize);
-            if (!checkTotalSize()) {
-                msg = `Total size exceeds policy, delete some`;
-                disableUploadButton();
-            }
-        }
-        totalfiles += 1;
-    }
-
-    createThumbnails();
-    for (j = 0; j < delQ.length; j++) {
-        var item = delQ[j];
-        delUploadList(item);
-    }
-    createBars();
-    enableUploadButton();
-};
-
-const delUploadList = (index) => {
-    let list = [...uploadFileList];
-    list.splice(index, 1);
-    this.uploadFileList = list;
-};
-
-const delItem = (index) => {
-    let list = [...this.uploadFileList];
-    totalsize -= this.upLoadFileList[index].size;
-    list.splice(index, 1);
-    this.uploadFileList = list;
-    this.uploadFileInfos = list;
-    checkTotalSize();
-};
-
-/* XXX delete */
-
-    const buildThumb = (f: File, type: string, cb: any) => {
-        type = type.split('/')[0];
-
-        if (type != 'image') {
-            let fileIcon = fileTypes[type];
-            if (fileIcon == undefined) {
-                fileIcon = file;
-            }
-            cb(fileIcon);
-        } else {
-            let reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
-		   if(e.target) {
-                    cb(e.target.result); 
-		   }
-                };
-            })(f);
-            reader.readAsDataURL(f);
+                break;
+            default:
+                let fileIcon = fileTypes[type];
+                if (fileIcon == undefined) {
+                    fileIcon = file;
+                }
+                return ( <
+                    img width = "125"
+                    height = "125"
+                    src = {
+                        fileIcon
+                    }
+                    title = {
+                        name
+                    }
+                    alt = {
+                        name
+                    }
+                    className = "w-12 h-12" / >
+                );
         }
     };
 
     const createProgressBars = () => {
-	const allBars:any = [];
-	if(uploadFileList) {
-	for(let j = 0; j < uploadFileList.length;j++) {
-            let id = 'a' + j;
-            let bar = new ldBar('#' + id, {
-                preset: progType
-            });
-            bar.set(0);
-	    allBars.push(bar);
-          }
-	    setProgress(allBars);
-	}
-   };
+        const allBars: any = [];
+        if (uploadFileList) {
+            for (let j = 0; j < uploadFileList.length; j++) {
+                let id = 'a' + j;
+                let bar = new ldBar('#' + id, {
+                    preset: progType
+                });
+                bar.set(0);
+                allBars.push(bar);
+            }
+            setProgress(allBars);
+        }
+    };
 
-    const setupUpload = (files: FileList) => {
-	const allInfos:any = [];
-	for(let i = 0; i < files.length;i++) {
-	    let f = files[i];
-            let ts = f.lastModified.toLocaleString();
-            let name = f.name;
-            let size = humanFileSize(f.size);
+    const createThumbnails = () => {
+        for (var i = 0; i < uploadFileList.length; i++) {
+            f = uploadFileList[i];
+            showThumbnail(f, i);
+        }
+    };
+
+
+    const printBannedBanner = (id, name, mime, ts, size, msg) => {
+        errInfo ={
+            ts: ts,
+            name: name,
+            size: size,
+            mime: mime,
+            id: id,
+            msg: msg
+        };
+ 	setErrInfos(prev => {...prev, errInfo});
+    };
+
+    const setupUpload = () => {
+        var delQ = [];
+        for (var i = 0; i < uploadFileList.length; i++) {
+            let f = uploadFileList[i];
             let mime = f.type;
+            let name = f.name;
+            let ts = f.lastModified.toLocaletring();
+            setSize(prev => prev + f.size);
+            let size = humanFileSize(f.size);
             let id = 'a' + i;
-            buildThumb(f, mime, function(src: string) { 
-		let imagesrc = src; 
-	    let fInfo = {
-                ts:ts,
-                name:name,
-                size:size,
+            if (!checkSize(f.size)) {
+                console.log("Size check:: size is " + f.size);
+                msg = "{name} too big for upload";
+                console.log(msg);
+                printBannedBanner(id, name, mime, ts, size, msg);
+                delQ.push(i);
+                continue;
+            }
+            if (!checkFilter(mime)) {
+                console.log("Hit banned file type:: filter issue");
+                msg = "{name} cannot be uploaded due to policy.";
+                printBannedBanner(id, name, mime, ts, size, msg);
+                delQ.push(i);
+                continue;
+            }
+            if (i == uploadFileList.length - 1) {
+                console.log("Total size check:: total size is " +
+                    totalsize);
+                if (!checkTotalSize()) {
+                    msg = `Total size exceeds policy, delete some`;
+                    setIsUploadDisabled(true);
+                }
+            }
+            let fInfo = {
+                ts: ts,
+                name: name,
+                size: size,
                 mime: mime,
                 id: id,
-                imagesrc:imagesrc
+                meta: '',
+                thumb: '',
+                bytesSent: 0,
+                eta: 0,
+                rate: 0,
             };
-	    allInfos.push(fInfo);
-
-	    if(i == files.length - 1) {
-	    console.log("Setting uploadinfo");
-  	    	setFileInfos(allInfos);
-	     }
-	    });
+            setFileInfos(prev => {
+                ...prev,
+                fInfo
+            });
             setSize(totalsize + f.size);
-	    setNumberFiles(totalfiles + 1);
-	}
+            setNumberFiles(totalfiles + 1);
+        }
+    this.uploadFileList = this.uploadFileList.filter(function(value, index) {
+        return delQ.indexOf(index) == -1;
+    });
+        createBars();
+	thumbnail(f,i);
         setIsUploadDisabled(false);
     };
 
-    const delItem = (index: number) => {
-        let list:any = [...uploadFileInfos];
+    const delItem = (index) => {
+        let list = [...this.uploadFileList];
+        setSize(prev => prev - this.upLoadFileList[index].size);
         list.splice(index, 1);
         setFileInfos(list);
         setUpload(list);
+        checkTotalSize();
     };
 
   return (
-
   <Fragment>
-
 
 <section className="dark:bg-gray-800 dark:text-white">
 
@@ -859,7 +871,7 @@ CORS]" />
 	           Progress indicator type
 	         </label>
 	         <div className="relative">
-	           <select id='progType' onChange={setIndicator} value={inputs.progType || ""} className="block appearance-none w-full bg-gray-200 border
+	           <select name='progType' onChange={setIndicator} value={inputs.progType || ""} className="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	   >
@@ -879,6 +891,78 @@ CORS]" />
 	       </div>
 	      </div>
 	
+
+
+	
+	      <div class="flex flex-wrap -mx-3 mb-6">
+	       <div class="w-full px-3">
+<label class="relative flex justify-between items-center p-2 text-xl"
+for="fileSizeLimit" >
+<span>File Size Limit (MB)</span>
+  <input name="fileSizeLimit" value={inputs.fileSizeLimit || ""}
+onChange={handleChange}
+class='m-6 p-6 form-range'
+type="range"  name="rangeInput" min="10" max="1000"
+step=10 value="0" oninput="sizeLimit.value=rangeInput.value">                      
+<output id="sizeLimit" name="sizeLimit" for="fileSizeLimit">10</output>
+	</div>
+	</div>
+
+	      <div class="flex flex-wrap -mx-3 mb-6">
+	       <div class="w-full px-3">
+
+<label class="relative flex justify-between items-center p-2 text-xl"
+for="sizeToggle" >
+<span>{sizeLabel}</span>
+  <input name="inputs.sizeLimitType" value={inputs.sizeLimitType || ""}
+onChange={toggleSizeQ}
+
+ type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
+bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
+</label>
+	</div>
+	</div>
+
+
+
+	      <div class="flex flex-wrap -mx-3 mb-6">
+	       <div class="w-full px-3">
+	         <label class="block uppercase tracking-wide text-dark-700 text-xs
+	   font-bold mb-2" for="progress-up-indicator">
+	          File type Filters 
+	         </label>
+	         <div class="relative">
+	           <select name="progress-up-filter"
+onChange={handleChange} value={inputs.fileTypeFilter || ""}
+ class="block appearance-none w-full bg-gray-200 border
+	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
+	   focus:outline-none focus:bg-light focus:border-gray-500"
+	   >
+	   			<option default>All</option>
+	   			<option>PDF only</option>
+	   			<option>Image only</option>
+	   			<option>Video only</option>
+	   			<option>Audio only</option>
+	   			<option>Zip only</option>
+	   			<option>Text only</option>
+	           </select>
+	           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-dark-700">
+	             <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+	           </div>
+	         </div>
+	       </div>
+	      </div>
+
+<label class="relative flex justify-between items-center p-2 text-xl"
+for="filterAction" >
+<span>{filterLabel}</span>
+  <input name='inputs.fileTypeAction' onChange={toggleFilterQ}
+checked={inputs.fileTypeAction || false}
+type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
+bg-green-600 rounded-full duration-300 ease-in-out peer-checked:bg-red-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
+</label>
 
 	     <div className="flex flex-wrap -mx-3 mb-6">
 	       <div className="w-full px-3">
@@ -1128,15 +1212,14 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 
 
 <div id="progress-up-progressArea"> 
-
   {uploadFileInfos.length > 0
   ? (
-  uploadFileInfos.map(({name, ts, mime, size,id, imagesrc}) => (
- 
+  uploadFileInfos.map(({name, ts, mime, size,id, imagesrc, bytesSent,
+meta, rate, eta}) => (
 
-<section key={name} className="m-4 p-4 mt-4 mb-4 transition-colors
+  <section key={name} className="m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white mx-auto">
- <div className="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
+    <div className="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
 border-gray-300 text-gray-600 dark:text-white relative">
 
   <div  onClick={() => delItem(id)} title="Delete" className="absolute
@@ -1148,8 +1231,10 @@ cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
       <div className="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div className="h-12 text-sm text-grey-dark flex items-left
 justify-left">
-             <img width="125" height="125" src={imagesrc} title={name} alt={name} className="w-12 h-12" />
-         </div>
+
+      <div>{ thumbnail() }</div>
+
+        </div>
       </div>
 
       <div className="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
@@ -1171,6 +1256,10 @@ dark:text-white">
 dark:text-white">
       	    Size: {size} 
       	    </li>
+       	    <li class="font-light leading-relaxed text-gray-800
+dark:text-white">
+	    Metadata: {meta}
+      	    </li>
       	    <li className="text-xl font-light leading-relaxed text-gray-800
 dark:text-white">
 
@@ -1185,16 +1274,74 @@ dark:text-white">
   </div>
       <div className='ldBar bottom-0 right-0 pb-8' id={id} ></div>
 
-  </div>
-</section>
+    </div>
+  </section>
  ))
 ):<br/> }
+</div>
 
 
+
+<div id="progress-up-errArea"> 
+  {errInfos.length > 0
+  ? (
+  errInfos.map(({name, ts, mime, size,id, imagesrc}) => (
+    <section key={name} class="bg-red-200 m-4 p-4 mt-4 mb-4 transition-colors
+text-light-100 dark:text-white">
+ <div class="bg-red-600 dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
+
+    <div title="Removed from uploads" class="absolute cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
+          <img width="25" height="25"
+src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg" />
+    </div>
+
+    <div class="flex flex-wrap -mx-2 mb-8">
+      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+         <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
+      <div>{ thumbnail() }</div>
+         </div>
+      </div>
+      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+        <div class="h-12  text-grey-dark flex items-left justify-left">
+         <ul>
+      	    <li  class="font-light leading-relaxed text-gray-800
+dark:text-white">
+      	    Name: {name}
+      	    </li>
+      	    <li class=" font-light leading-relaxed text-gray-800
+dark:text-white">
+      	    Date: {ts}
+      	    </li>
+      	    <li class=" font-light leading-relaxed text-gray-800
+dark:text-white">
+      	    Type: {mime}
+      	    </li>
+      	    <li class="font-light leading-relaxed text-gray-800
+dark:text-white">
+      	    Size: {size} 
+      	    </li>
+       	    <li class="font-light leading-relaxed text-gray-800 dark:text-white">
+	    Metadata: {meta}
+      	    </li>
+         </ul>
+        </div>
+       </div>
+
+      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
+         <div class="h-12 text-lg text-grey-dark flex items-left justify-left">
+		{msg}
+         </div>
+      </div>
+
+      </div>
+    </section>
+ ))
+):<br/> }
   </div>
 
 </section>
- </Fragment>
+
+  </Fragment>
   );
 }
 

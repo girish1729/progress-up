@@ -129,8 +129,7 @@ function fileSelectFinish(target) {
 
 function humanFileSize(size) {
     const i = Math.floor(Math.log(size) / Math.log(1024));
-    return (
-        (size / Math.pow(1024, i)).toFixed(2) * 1 +
+    return ( (size / Math.pow(1024, i)).toFixed(2) * 1 +
         " " + ["B", "kB", "MB", "GB", "TB"][i]
     );
 }
@@ -456,18 +455,11 @@ function setupUpload() {
     progressArea.innerHTML = progressHTML.join('');
     errArea.innerHTML = errHTML.join('');
     createThumbnails();
-    for (j = 0; j < delQ.length; j++) {
-        var item = delQ[j];
-        delUploadList(item);
-    }
+    uploadFileList = uploadFileList.filter(function(value, index) {
+        return delQ.indexOf(index) == -1;
+    });
     createBars();
     enableUploadButton();
-}
-
-function delUploadList(index) {
-    let list = [...uploadFileList];
-    list.splice(index, 1);
-    uploadFileList = list;
 }
 
 function delItem(index) {
