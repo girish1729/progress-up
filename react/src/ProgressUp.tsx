@@ -155,16 +155,15 @@ function ProgressUp() {
             headers: {
                 "Content-Type": "multipart/form-data"
             },
-            onUploadProgress: (progEvent) => {
+            onUploadProgress: (progE) => {
                 let perc: number;
-                if (progEvent.total) {
-                    perc = (progEvent.loaded / progEvent.total) * 100;
+                if (progE.total) {
+                    perc = (progE.loaded / progE.total) * 100;
                     let obj: any = progressBars[idx];
                     obj.set(perc);
-                    file.bytesSent = humanFileSize(progEvent.progress * size);
-                    file.Mysize = humanFileSize(file.size);
-                    file.eta = progEvent.estimated;
-                    file.rate = (progEvent.rate / 1024 / 1024).toFixed(2);
+                    file.bytesSent = humanFileSize(progE.progress * size);
+                    file.eta = progE.estimated;
+                    file.rate = (progE.rate / 1024 / 1024).toFixed(2);
 
                     console.log(perc);
                 }
@@ -192,9 +191,9 @@ function ProgressUp() {
 
     const uploadAll = () => {
         startUploadts = Date.now();
-        if (uploadFileList) {
-            for (let i = 0; i < uploadFileList.length; i++) {
-                let file = uploadFileList[i];
+        if (uploadFileInfos) {
+            for (let i = 0; i < uploadFileInfos.length; i++) {
+                let file = uploadFileInfos[i];
                 uploadOneFile(file, i);
             }
         }
@@ -459,7 +458,7 @@ function ProgressUp() {
     }
 
 
-    const thumbnail = (f, i) => {
+    const showThumbnail = (f, i) => {
         switch (this.fileType) {
 
             case "image":
@@ -581,10 +580,11 @@ function ProgressUp() {
         }
     };
 
-    const createProgressBars = () => {
+    const createBars = () => {
         const allBars: any = [];
-        if (uploadFileList) {
-            for (let j = 0; j < uploadFileList.length; j++) {
+        if (uploadFileInfos) {
+            for (let j = 0; j < uploadFileInfos.length; j++) {
+		f = uploadFileInfos[j];
                 let id = 'a' + j;
                 let bar = new ldBar('#' + id, {
                     preset: progType
@@ -596,25 +596,14 @@ function ProgressUp() {
         }
     };
 
-    const createThumbnails = () => {
-        for (var i = 0; i < uploadFileList.length; i++) {
-            f = uploadFileList[i];
-            showThumbnail(f, i);
-        }
-    };
-
-
-    const printBannedBanner = (id, name, mime, ts, size, msg) => {
-        errInfo ={
-            ts: ts,
-            name: name,
-            size: size,
-            mime: mime,
-            id: id,
+    printBannedBanner(file, msg) {
+        errInfos = {
+            file: File,
+            meta: '',
             msg: msg
         };
  	setErrInfos(prev => {...prev, errInfo});
-    };
+    }
 
     const setupUpload = () => {
         var delQ = [];
@@ -623,21 +612,20 @@ function ProgressUp() {
             let mime = f.type;
             let name = f.name;
             let ts = f.lastModified.toLocaletring();
-            setSize(prev => prev + f.size);
             let size = humanFileSize(f.size);
             let id = 'a' + i;
             if (!checkSize(f.size)) {
                 console.log("Size check:: size is " + f.size);
                 msg = "{name} too big for upload";
                 console.log(msg);
-                printBannedBanner(id, name, mime, ts, size, msg);
+            	printBannedBanner(f, msg);
                 delQ.push(i);
                 continue;
             }
             if (!checkFilter(mime)) {
                 console.log("Hit banned file type:: filter issue");
                 msg = "{name} cannot be uploaded due to policy.";
-                printBannedBanner(id, name, mime, ts, size, msg);
+            	printBannedBanner(f, msg);
                 delQ.push(i);
                 continue;
             }
@@ -650,13 +638,9 @@ function ProgressUp() {
                 }
             }
             let fInfo = {
-                ts: ts,
-                name: name,
-                size: size,
-                mime: mime,
+                file: f,
                 id: id,
                 meta: '',
-                thumb: '',
                 bytesSent: 0,
                 eta: 0,
                 rate: 0,
@@ -665,14 +649,13 @@ function ProgressUp() {
                 ...prev,
                 fInfo
             });
-            setSize(totalsize + f.size);
+            setSize(prev => prev + f.size);
             setNumberFiles(totalfiles + 1);
         }
     this.uploadFileList = this.uploadFileList.filter(function(value, index) {
         return delQ.indexOf(index) == -1;
     });
         createBars();
-	thumbnail(f,i);
         setIsUploadDisabled(false);
     };
 
@@ -1214,10 +1197,9 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 <div id="progress-up-progressArea"> 
   {uploadFileInfos.length > 0
   ? (
-  uploadFileInfos.map(({name, ts, mime, size,id, imagesrc, bytesSent,
-meta, rate, eta}) => (
+  uploadFileInfos.map(({file,id, meta, bytesSent, rate, eta}, index) => (
 
-  <section key={name} className="m-4 p-4 mt-4 mb-4 transition-colors
+  <section key={file.name} className="m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white mx-auto">
     <div className="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
 border-gray-300 text-gray-600 dark:text-white relative">
@@ -1232,7 +1214,7 @@ cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
          <div className="h-12 text-sm text-grey-dark flex items-left
 justify-left">
 
-      <div>{ thumbnail() }</div>
+      <div>{ showThumbnail(file, index) }</div>
 
         </div>
       </div>
@@ -1242,19 +1224,19 @@ justify-left">
           <ul>
       	    <li  className="text-xl font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Name: {name}
+      	    Name: {file.name}
       	    </li>
       	    <li className="text-xl font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Date: {ts}
+      	    Date: {file.ts}
       	    </li>
       	    <li className="text-xl font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Type: {mime}
+      	    Type: {file.mime}
       	    </li>
       	    <li className="text-xl font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Size: {size} 
+      	    Size: {file.size} 
       	    </li>
        	    <li class="font-light leading-relaxed text-gray-800
 dark:text-white">
@@ -1263,7 +1245,7 @@ dark:text-white">
       	    <li className="text-xl font-light leading-relaxed text-gray-800
 dark:text-white">
 
-		<span>{bytesSent} of {Mysize} uploaded  {rate} MB/s ETA {eta} s</span>
+		<span>{bytesSent} of {file.size} uploaded  {rate} MB/s ETA {eta} s</span>
       	    </li>
 
 
@@ -1285,8 +1267,8 @@ dark:text-white">
 <div id="progress-up-errArea"> 
   {errInfos.length > 0
   ? (
-  errInfos.map(({name, ts, mime, size,id, imagesrc}) => (
-    <section key={name} class="bg-red-200 m-4 p-4 mt-4 mb-4 transition-colors
+  errInfos.map(({err, meta, msg}, index) => (
+    <section key={err.name} class="bg-red-200 m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white">
  <div class="bg-red-600 dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
 
@@ -1298,7 +1280,7 @@ src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/ic
     <div class="flex flex-wrap -mx-2 mb-8">
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
-      <div>{ thumbnail() }</div>
+      <div>{ showThumbnail(err, index) }</div>
          </div>
       </div>
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
@@ -1306,19 +1288,19 @@ src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/ic
          <ul>
       	    <li  class="font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Name: {name}
+      	    Name: {err.name}
       	    </li>
       	    <li class=" font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Date: {ts}
+      	    Date: {err.ts}
       	    </li>
       	    <li class=" font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Type: {mime}
+      	    Type: {err.mime}
       	    </li>
       	    <li class="font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Size: {size} 
+      	    Size: {err.size} 
       	    </li>
        	    <li class="font-light leading-relaxed text-gray-800 dark:text-white">
 	    Metadata: {meta}

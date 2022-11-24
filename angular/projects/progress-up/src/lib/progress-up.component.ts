@@ -34,10 +34,7 @@ interface statsTableType {
 };
 
 interface fileInfo {
-    ts: string;
-    name: string;
-    size: string;
-    mime: string;
+    file: File,
     id: string;
     meta: string;
     bytesSent: string;
@@ -46,10 +43,7 @@ interface fileInfo {
 };
 
 interface errInfo {
-    ts: string;
-    name: string;
-    size: string;
-    mime: string;
+    file: File,
     meta: string;
     msg: string;
 };
@@ -171,7 +165,6 @@ export class ProgressUpComponent {
                 let perc = parseInt(e.progress * 100);
                 self.progressBars[idx].set(perc);
                 file.bytesSent = self.humanFileSize(e.progress * size);
-                file.Mysize = self.humanFileSize(size);
                 file.eta = e.estimated;
                 file.rate = (e.rate / 1024 / 1024).toFixed(2);
             }
@@ -196,7 +189,7 @@ export class ProgressUpComponent {
 
     uploadAll() {
         this.startUploadts = Date.now();
-        if (this.uploadFileList) {
+        if (this.uploadFileInfos) {
             for (let i = 0; i < this.uploadFileList.length; i++) {
                 let file = this.uploadFileList[i];
                 this.uploadOneFile(file, i);
@@ -462,6 +455,7 @@ export class ProgressUpComponent {
 
     showThumbnail(f, i, cb) {
         let id = 'a' + i;
+	let target = id + '-thumb';
         switch (true) {
             case /text/.test(f.type):
                 console.log("Text type detected");
@@ -477,13 +471,19 @@ export class ProgressUpComponent {
 			`;
                         var dataArray = txt.split("\n");
                         dataArray = dataArray.slice(0, 20);
-                        txt = dataArray.join("\n");
+                        let txt = dataArray.join("\n");
+
                         var fileIcon = this.fileTypeIcons[type];
-                        if (fileIcon == undefined) {
-                            fileIcon = "file.svg";
-                        }
-                        cb("https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" +
-                            fileIcon, txt);
+                        let pic = "src/assets/icons/filetypes/" 
+				+ fileIcon, 
+			f.thumb = [
+                 '<img width="125" height="125" src=',
+		pic,
+		'title="',
+		txt
+		'" alt="', 
+		f.name,
+		'" class="w-12 h-12" />'].join('');
 
                     };
                 })(f);
@@ -496,6 +496,17 @@ export class ProgressUpComponent {
                 reader.onload = (function(theFile) {
                     return function(e) {
                         e.target.result,
+
+			f.thumb = [
+                 '<img width="125" height="125" src=',
+		pic,
+		'title="',
+		txt
+		'" alt="', 
+		f.name,
+		'" class="w-12 h-12" />'].join('');
+                 <img width="125" height="125" src="{{file.imagesrc}}" title="{{file.name}}" alt="{{file.name}}" class="w-12 h-12" />
+			    f.meta = txt;
                     };
                 })(f);
                 reader.readAsDataURL(f);
@@ -503,19 +514,35 @@ export class ProgressUpComponent {
             case /audio/.test(f.type):
                 console.log("Audio type detected");
                 var audioUrl = window.URL.createObjectURL(f);
-
+		f.thumb = [
+		'<audio controls width="125" height="125"> <source src="'
+		audioUrl,
+		'title="',
+		f.name,
+		'" alt="', 
+		f.name,
+		'" class="h-9 w-9"> </source> </audio> />'].join('');
+		f.meta = f.name;
                 break;
             case /video/.test(f.type):
                 console.log("Video type detected");
                 var videoUrl = window.URL.createObjectURL(f);
-
+		f.thumb = [
+		'<video controls width="125" height="125"> <source src="'
+		videoUrl,
+		'title="',
+		f.name,
+		'" alt="', 
+		f.name,
+		'" class="h-9 w-9"> </source> </video> />'].join('');
+		f.meta = f.name;
                 break;
             case /pdf/.test(f.type):
                 console.log("PDF type detected");
                 var pdfURL = window.URL.createObjectURL(f);
                 var id = id + '-pdf';
-                var loc = document.getElementById(id);
-                PDFObject.embed(pdfURL, loc);
+			    f.meta = txt;
+                PDFObject.embed(pdfURL, target);
                 break;
             default:
                 console.log("default type detected");
@@ -523,10 +550,16 @@ export class ProgressUpComponent {
                 if (fileIcon == undefined) {
                     fileIcon = "file.svg";
                 }
-                cb("https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" +
-                    fileIcon, txt);
-
-
+		f.meta = f.name;
+                let pic = "src/assets/icons/filetypes/" + fileIcon; 
+		f.thumb = [
+                 '<img width="125" height="125" src=',
+		pic,
+		'title="',
+		f.name
+		'" alt="', 
+		f.name,
+		'" class="w-12 h-12" />'].join('');
                 break;
         }
     }
@@ -536,7 +569,8 @@ export class ProgressUpComponent {
             return;
         }
         this.progressBars = [];
-        for (var i = 0; i < this.uploadFileList.length; i++) {
+        for (var i = 0; i < this.uploadFileInfos.length; i++) {
+	    let f = this.uploadFileInfos[i];
             let id = 'a' + i;
             let bar = new ldBar('#' + id, {
                 preset: this.form.progType.toLowerCase()
@@ -544,17 +578,15 @@ export class ProgressUpComponent {
             bar.set(0);
             console.log("Creating progress bar::" + id);
             this.progressBars.push(bar);
+	    this.showThumbnail(f,i);
         }
         this.thumbNailsDone = false;
     }
     
-    printBannedBanner(id, name, mime, ts, size, msg) {
+    printBannedBanner(file, msg) {
         this.errInfos.push({
-            ts: ts,
-            name: name,
-            size: size,
-            mime: mime,
-            id: id,
+            file: File,
+            meta: '',
             msg: msg
         });
     }
@@ -573,14 +605,14 @@ export class ProgressUpComponent {
                 console.log("Size check:: size is " + f.size);
                 msg = `${name} too big for upload`;
                 console.log(msg);
-                printBannedBanner(id, name, mime, ts, size, msg);
+                printBannedBanner(f, msg);
                 delQ.push(i);
                 continue;
             }
             if (!checkFilter(mime)) {
                 console.log("Hit banned file type:: filter issue");
                 msg = `${name} cannot be uploaded due to policy.`;
-                printBannedBanner(id, name, mime, ts, size, msg);
+                printBannedBanner(f, msg);
                 delQ.push(i);
                 continue;
             }
@@ -589,23 +621,17 @@ export class ProgressUpComponent {
                 if (!checkTotalSize()) {
                     msg = `Total size exceeds policy, delete some`;
                     this.disableUpload = true;
-                    disableUploadButton();
                 }
             }
             this.uploadFileInfos.push({
-                ts: ts,
-                name: name,
-                size: size,
-                mime: mime,
+                file: f,
                 id: id,
                 meta: '',
-                thumb: '',
                 bytesSent: 0,
                 eta: 0,
                 rate: 0,
             });
             this.totalfiles += 1;
-	    this.showThumbnail(f,i);
         }
 
     this.uploadFileList = this.uploadFileList.filter(function(value, index) {

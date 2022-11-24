@@ -130,10 +130,9 @@ export default {
                     let perc = parseInt(e.progress * 100);
                     console.log(perc + " is the percentage uploaded");
                     self.progressBars[idx].set(perc);
-                    file.bytesSent = this.humanFileSize(event.progress * size);
-                    file.Mysize = this.humanFileSize(file.size);
-                    file.eta = event.estimated;
-                    file.rate = (event.rate / 1024 / 1024).toFixed(2);
+                    file.bytesSent = this.humanFileSize(e.progress * size);
+                    file.eta = e.estimated;
+                    file.rate = (e.rate / 1024 / 1024).toFixed(2);
                 }
             };
 
@@ -157,8 +156,8 @@ export default {
         uploadAll() {
             console.log("Starting upload...");
             this.startUploadts = Date.now();
-            for (let i = 0; i < this.uploadFileList.length; i++) {
-                let f = this.uploadFileList[i];
+            for (let i = 0; i < this.uploadFileInfos.length; i++) {
+                let f = this.uploadFileInfos[i];
                 this.uploadOneFile(f, i);
             }
         },
@@ -388,90 +387,140 @@ export default {
         return false;
     },
 
+    showThumbnail(f, i) {
+        let id = 'a' + i;
+	let target = id + '-thumb';
+        switch (true) {
+            case /text/.test(f.type):
+                console.log("Text type detected");
+                var reader = new FileReader();
+                reader.onload = (function(f) {
+                    return function(e) {
+                        txt = e.target.result;
+                        let wc = this.wordCount(txt);
+                        f.meta = ` 
+   			Chars : ${wc.chars}
+   			Words: ${wc.words}
+   			Lines: ${wc.lines}
+			`;
+                        var dataArray = txt.split("\n");
+                        dataArray = dataArray.slice(0, 20);
+                        let txt = dataArray.join("\n");
 
-        showThumbnail(f, i, cb) {
-            let id = "a" + i;
-            switch (true) {
-                case /text/.test(f.type):
-                    console.log("Text type detected");
-                    var reader = new FileReader();
-                    reader.onload = (function(f) {
-                        return function(e) {
-                            txt = e.target.result;
-                            wc = this.wordCount(txt);
+                        var fileIcon = this.fileTypeIcons[type];
+                        let pic = "src/assets/icons/filetypes/" 
+				+ fileIcon, 
+			f.thumb = [
+                 '<img width="125" height="125" src=',
+		pic,
+		'title="',
+		txt
+		'" alt="', 
+		f.name,
+		'" class="w-12 h-12" />'].join('');
 
-                            var dataArray = txt.split("\n");
-                            dataArray = dataArray.slice(0, 20);
-                            txt = dataArray.join("\n");
+                    };
+                })(f);
+                reader.readAsText(f);
+                break;
+            case /image/.test(f.type):
+                console.log("Image type detected");
+                var reader = new FileReader();
+                // Closure to capture the file information.  
+                reader.onload = (function(theFile) {
+                    return function(e) {
+                        e.target.result,
 
-                            var fileIcon = this.fileTypes[type];
-                            if (fileIcon == undefined) {
-                                fileIcon = "file.svg";
-                            }
-                            cb("src/assets/icons/filetypes/" + fileIcon, txt);
-                        };
-                    })(f);
-                    reader.readAsText(f);
-                    break;
-                case /image/.test(f.type):
-                    console.log("Image type detected");
-                    var reader = new FileReader();
-                    reader.onload = (function(theFile) {
-                        return function(e) {
-                            cb(e.target.result);
-                        };
-                    })(f);
-                    reader.readAsDataURL(f);
-                    break;
-                case /audio/.test(f.type):
-                    console.log("Audio type detected");
-                    var audioUrl = window.URL.createObjectURL(f);
-                    cb(audioUrl);
-                    break;
-                case /video/.test(f.type):
-                    console.log("Video type detected");
-                    var videoUrl = window.URL.createObjectURL(f);
+			f.thumb = [
+                 '<img width="125" height="125" src=',
+		pic,
+		'title="',
+		txt
+		'" alt="', 
+		f.name,
+		'" class="w-12 h-12" />'].join('');
+                 <img width="125" height="125" src="{{file.imagesrc}}" title="{{file.name}}" alt="{{file.name}}" class="w-12 h-12" />
+			    f.meta = txt;
+                    };
+                })(f);
+                reader.readAsDataURL(f);
+                break;
+            case /audio/.test(f.type):
+                console.log("Audio type detected");
+                var audioUrl = window.URL.createObjectURL(f);
+		f.thumb = [
+		'<audio controls width="125" height="125"> <source src="'
+		audioUrl,
+		'title="',
+		f.name,
+		'" alt="', 
+		f.name,
+		'" class="h-9 w-9"> </source> </audio> />'].join('');
+		f.meta = f.name;
+                break;
+            case /video/.test(f.type):
+                console.log("Video type detected");
+                var videoUrl = window.URL.createObjectURL(f);
+		f.thumb = [
+		'<video controls width="125" height="125"> <source src="'
+		videoUrl,
+		'title="',
+		f.name,
+		'" alt="', 
+		f.name,
+		'" class="h-9 w-9"> </source> </video> />'].join('');
+		f.meta = f.name;
+                break;
+            case /pdf/.test(f.type):
+                console.log("PDF type detected");
+                var pdfURL = window.URL.createObjectURL(f);
+                var id = id + '-pdf';
+			    f.meta = txt;
+                PDFObject.embed(pdfURL, target);
+                break;
+            default:
+                console.log("default type detected");
+                var fileIcon = this.fileTypeIcons[type];
+                if (fileIcon == undefined) {
+                    fileIcon = "file.svg";
+                }
+		f.meta = f.name;
+                let pic = "src/assets/icons/filetypes/" + fileIcon; 
+		f.thumb = [
+                 '<img width="125" height="125" src=',
+		pic,
+		'title="',
+		f.name
+		'" alt="', 
+		f.name,
+		'" class="w-12 h-12" />'].join('');
+                break;
+        }
+    },
 
-                    cb(audioUrl);
-                    break;
-                case /pdf/.test(f.type):
-                    console.log("PDF type detected");
-                    var pdfURL = window.URL.createObjectURL(f);
-                    cb(pdfURL);
-                    break;
-                default:
-                    console.log("default type detected");
 
-                    var fileIcon = this.fileTypes[type];
-                    if (fileIcon == undefined) {
-                        fileIcon = "file.svg";
-                    }
-                    cb("src/assets/icons/filetypes/" + fileIcon, f.name);
-                    break;
-            }
-        },
 
         createBars() {
-            for (var i = 0; i < uploadFileList.length; i++) {
+            for (var i = 0; i < uploadFileInfos.length; i++) {
+		f = uploadFileInfos[i];
                 var selector = '#a' + i;
                 var bar = new ldBar(selector, {
                     preset: progType.toLowerCase()
                 });
                 bar.set(0);
                 progressBars.push(bar);
+        	showThumbnail(f, i);
             }
         },
 
-        printBannedBanner(id, name, mime, ts, size, msg) {
-            this.errInfos.push({
-                ts: ts,
-                name: name,
-                size: size,
-                mime: mime,
-                id: id,
-                msg: msg
-            });
-        },
+    printBannedBanner(file, msg) {
+        this.errInfos.push({
+            file: File,
+            meta: '',
+            msg: msg
+        });
+    },
+
 setupUpload() {
     var delQ = [];
     for (var i = 0; i < uploadFileList.length; i++) {
@@ -486,14 +535,14 @@ setupUpload() {
             console.log("Size check:: size is " + f.size);
             msg = `${name} too big for upload`;
             console.log(msg);
-            printBannedBanner(, id, name, mime, ts, size, msg);
+            printBannedBanner(f, msg);
             delQ.push(i);
             continue;
         }
         if (!checkFilter(mime)) {
             console.log("Hit banned file type:: filter issue");
             msg = `${name} cannot be uploaded due to policy.`;
-            printBannedBanner(, id, name, mime, ts, size, msg);
+            printBannedBanner(f, msg);
             delQ.push(i);
             continue;
         }
@@ -506,20 +555,14 @@ setupUpload() {
             }
         }
         totalfiles += 1;
-        let fInfo = {
-            ts: ts,
-            name: name,
-            size: size,
-            mime: mime,
-            id: id,
-            meta: '',
-            thumb: '',
-            bytesSent: 0,
-            eta: 0,
-            rate: 0
-        };
-        this.uploadFileInfos.push(fInfo);
-        showThumbnail(f, i);
+        this.uploadFileInfos.push({
+                file: f,
+                id: id,
+                meta: '',
+                bytesSent: 0,
+                eta: 0,
+                rate: 0,
+        });
     }
     this.uploadFileList = this.uploadFileList.filter(function(value, index) {
         return delQ.indexOf(index) == -1;
@@ -1021,40 +1064,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
           <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
              <div class="h-12 text-sm text-grey-dark flex items-left
     justify-left">
-
-
-<div v-if="type === 'pdf'">
-  
-  <pdf src="./path/to/static/relativity.pdf"></pdf>
-</div>
-<div v-else-if="type === 'image'">
-  
-                 <img width="125" height="125" :src="file.imagesrc"
-:title="file.name" :alt="file.name" class="w-12 h-12" />
-</div>
-<div v-else-if="type === 'video'">
-                <video controls width="125" height="125">
-		<source :src="file.audioUrl" :title="file.name" :alt="file.name" class="h-9 w-9"> 
-		</source> 
-		</video>
-  
-</div>
-<div v-else-if="type === 'audio'">
-                <audio controls width="125" height="125">
-		<source :src="file.audioUrl" :title="file.name" :alt="file.name" class="h-9 w-9"> 
-		</source> 
-		</audio>
-</div>
-<div v-else-if="type === 'text'">
-  
-</div>
-<div v-else>
- 
-</div>
-
-
-
-
+		<div  v-html="file.thumb" id="{{file.id}}" + '-thumb'></div>
              </div>
           </div>
     
@@ -1114,39 +1124,7 @@ dark:text-white">
       <div class="flex flex-wrap -mx-2 mb-8">
         <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
            <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
-
-
-
-<div v-if="type === 'pdf'">
-  
-  <pdf src="./path/to/static/relativity.pdf"></pdf>
-</div>
-<div v-else-if="type === 'image'">
-  
-                 <img width="125" height="125" :src="file.imagesrc"
-:title="file.name" :alt="file.name" class="w-12 h-12" />
-</div>
-<div v-else-if="type === 'video'">
-                <video controls width="125" height="125">
-		<source :src="file.audioUrl" :title="file.name" :alt="file.name" class="h-9 w-9"> 
-		</source> 
-		</video>
-  
-</div>
-<div v-else-if="type === 'audio'">
-                <audio controls width="125" height="125">
-		<source :src="file.audioUrl" :title="file.name" :alt="file.name" class="h-9 w-9"> 
-		</source> 
-		</audio>
-</div>
-<div v-else-if="type === 'text'">
-  
-</div>
-<div v-else>
- 
-</div>
-
-
+		<div  v-html="err.thumb" id="{{err.id}}" + '-thumb'></div>
            </div>
         </div>
         <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
