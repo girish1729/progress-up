@@ -457,7 +457,6 @@ function ProgressUp() {
         return false;
     }
 
-
     const showThumbnail = (f, i) => {
         switch (this.fileType) {
 
@@ -468,18 +467,9 @@ function ProgressUp() {
                         if (e.target) {
 
                             let imagesrc = e.target.result;
-                            return ( <
-                                img width = "125"
-                                height = "125"
-                                src = {
-                                    imagesrc
-                                }
-                                title = {
-                                    name
-                                }
-                                alt = {
-                                    name
-                                }
+                            return ( 
+			<img width = "125" height = "125" src = {imagesrc}
+                         title = {name} alt = {name}
                                 className = "w-12 h-12" / >
                             );
                         }
@@ -490,36 +480,22 @@ function ProgressUp() {
 
             case "pdf":
                 var pdfUrl = window.URL.createObjectURL(f);
-                return ( <
-                    PDFObject url = {
-                        pdfUrl
-                    }
-                    />
-                );
+                return ( <PDFObject url={pdfUrl} />);
                 break;
 
             case "audio":
-                return (
-                    var audioUrl = window.URL.createObjectURL(f); <
-                    audio controls width = "125"
-                    height = "125" >
-                    <
-                    source src = "{videoUrl}"
-                    title = "{name}"
-                    alt = "{name}"
-                    class = "h-9 w-9" < /source> </audio >
+                var audioUrl = window.URL.createObjectURL(f); 
+                return ( <audio controls width = "125" height = "125">
+                    <source src ={audioUrl} 
+                    class = "h-9 w-9" </source> </audio>
                 );
                 break;
             case "video":
                 var videoUrl = window.URL.createObjectURL(f);
-                return ( <
-                    video controls width = "125"
-                    height = "125" >
-                    <
-                    source src = "{videoUrl}"
-                    title = "{name}"
-                    alt = "{name}"
-                    class = "h-9 w-9" < /source> </video >
+                return ( 
+		  <video controls width = "125" height = "125">
+                    <source src ={videoUrl}
+                    class = "h-9 w-9" </source> </video>
                 );
                 break;
 
@@ -537,22 +513,11 @@ function ProgressUp() {
                         dataArray = dataArray.slice(0, 20);
                         txt = dataArray.join("\n");
                         let fileIcon = fileTypes[type];
-                        return ( <
-                            img width = "125"
-                            height = "125"
-                            src = {
-                                fileIcon
-                            }
-                            title = {
-                                txt
-                            }
-                            alt = {
-                                name
-                            }
-                            className = "w-12 h-12" / >
+                        return ( 
+			<img width = "125" height = "125" src = {fileIcon}
+                         title = {txt} alt = {f.name}
+                            className = "w-12 h-12" />
                         );
-                        setIconImage(f.name, f.type, txt);
-
                     };
                 })(f);
                 let reader = new FileReader();
@@ -563,18 +528,9 @@ function ProgressUp() {
                 if (fileIcon == undefined) {
                     fileIcon = file;
                 }
-                return ( <
-                    img width = "125"
-                    height = "125"
-                    src = {
-                        fileIcon
-                    }
-                    title = {
-                        name
-                    }
-                    alt = {
-                        name
-                    }
+                return ( 
+		<img width = "125" height = "125" src = {fileIcon}
+                 title = {f.name} alt = {f.name}
                     className = "w-12 h-12" / >
                 );
         }
