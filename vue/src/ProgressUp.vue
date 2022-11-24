@@ -390,10 +390,11 @@ export default {
         showThumbnail(file, i) {
             let id = 'a' + i;
             let target = id + '-thumb';
+            var reader = new FileReader();
+	    let self = this;
             switch (true) {
                 case /text/.test(file.type):
                     console.log("Text type detected");
-                    var reader = new FileReader();
                     reader.onload = (function(f) {
                         return function(e) {
                             txt = e.target.result;
@@ -407,13 +408,13 @@ export default {
                             dataArray = dataArray.slice(0, 20);
                             let txt = dataArray.join("\n");
 
-                            var fileIcon = this.fileTypeIcons[type];
+                            var fileIcon = self.fileTypeIcons[type];
                             let pic = "src/assets/icons/filetypes/" +
                                 fileIcon;
                                 file.thumb = [
-                                    '<img width="125" height="125" src=',
+                                    '<img width="125" height="125" src="',
                                     pic,
-                                    'title="',
+                                    '" title="',
                                     txt,
 				    '" alt="',
                                     file.name,
@@ -421,20 +422,19 @@ export default {
                                 ].join('');
 
                         };
-                    })(file);
-                    reader.readAsText(file);
+                    })(file.file);
+                    reader.readAsText(file.file);
                     break;
                 case /image/.test(file.type):
                     console.log("Image type detected");
-                    var reader = new FileReader();
                     // Closure to capture the file information.  
                     reader.onload = (function(theFile) {
                         return function(e) {
                             e.target.result,
                              file.thumb = [
-                                    '<img width="125" height="125" src=',
+                                    '<img width="125" height="125" src="',
                                     pic,
-                                    'title="',
+                                    '" title="',
                                     txt,
 				     '" alt="',
                                     file.name,
@@ -442,43 +442,43 @@ export default {
                                 ].join(''); 
                              file.meta = txt;
                         };
-                    })(file);
-                    reader.readAsDataURL(file);
+                    })(file.file);
+                    reader.readAsDataURL(file.file);
                     break;
                 case /audio/.test(file.type):
                     console.log("Audio type detected");
-                    var audioUrl = window.URL.createObjectURL(file);
+                    var audioUrl = window.URL.createObjectURL(file.file);
                     file.thumb = [
-                     '<audio controls width="125" height="125">',
+                     '<audio controls class="h-9 w-9" width="125" height="125">',
 			'<source src="',
                         audioUrl,
-                        'title="',
+                        '" title="',
                         f.name,
                         '" alt="',
                         f.name,
-                        '" class="h-9 w-9"> </source> </audio> />'
+                        '" > </source> </audio> />'
                     ].join('');
                     file.meta = file.name;
                     break;
                 case /video/.test(file.type):
                     console.log("Video type detected");
-                    var videoUrl = window.URL.createObjectURL(file);
+                    var videoUrl = window.URL.createObjectURL(file.file);
                     file.thumb = [
-                        '<video controls width="125" height="125">', 
+                        '<video controls class="h-9 w-9 width="125" height="125">', 
 			'<source src="',
                         videoUrl,
-                        'title="',
+                        '" title="',
                         file.name,
                         '" alt="',
                         file.name,
-                        '" class="h-9 w-9"> </source> </video> />'
+                        '" "> </source> </video> />'
                     ].join('');
                     f.meta = file.name;
                     break;
                 case /pdf/.test(file.type):
                     console.log("PDF type detected");
-                    var pdfURL = window.URL.createObjectURL(file);
-                    f.meta = txt;
+                    var pdfURL = window.URL.createObjectURL(file.file);
+                    file.meta = txt;
                     PDFObject.embed(pdfURL, target);
                     break;
                 default:
@@ -487,12 +487,12 @@ export default {
                     if (fileIcon == undefined) {
                         fileIcon = "file.svg";
                     }
-                    file.meta = file.name;
+                    file.meta = file.file.name;
                     let pic = "src/assets/icons/filetypes/" + fileIcon;
                     file.thumb = [
-                        '<img width="125" height="125" src=',
+                        '<img width="125" height="125" src="',
                         pic,
-                        'title="',
+                        '" title="',
                         file.name,
 			 '" alt="',
                         file.name,
@@ -566,6 +566,7 @@ export default {
                     file: f,
                     id: id,
                     meta: '',
+                    thumb: '',
                     bytesSent: 0,
                     eta: 0,
                     rate: 0,

@@ -169,13 +169,16 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	      <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
 <label class="relative flex justify-between items-center p-2 text-xl"
-for="fileSizeLimit" >
+for="fileSizeLimit">
 <span>File Size Limit (MB)</span>
-  <input  [(ngModel)]='form.fileSizeLimit'
+</label>
+  <input id='fileSizeLimit'  [(ngModel)]='form.fileSizeLimit'
 class='m-6 p-6 form-range'
 type="range"  name="rangeInput" min="10" max="1000"
-step=10 value="0" (change)="sizeLimit.value=rangeInput.value">                      
-<output id="sizeLimit" name="sizeLimit" for="form.fileSizeLimit">10</output>
+step=10 value="0"  />                      
+<output id="sizeLimit" name="sizeLimit" for="form.fileSizeLimit">
+	{{form.fileSizeLimit}}
+</output>
 	</div>
 	</div>
 
@@ -484,7 +487,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
              <div class="h-12 text-sm text-grey-dark flex items-left
     justify-left">
 
-		<div [innerHTML]="info.thumb" id="{{file.id}}-thumb"></div>
+		<div [innerHTML]="info.thumb" id="{{info.id}}-thumb"></div>
              </div>
           </div>
     
@@ -498,11 +501,11 @@ py-4 whitespace-nowrap"> See below for possible options </td>
           	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800
     dark:text-white">
-          	    Date: {{info.file.ts}}
+          	    Date: {{info.ts}}
           	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800
     dark:text-white">
-          	    Type: {{info.file.mime}}
+          	    Type: {{info.file.type}}
           	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800
     dark:text-white">
@@ -521,7 +524,7 @@ dark:text-white">
             </div>
            </div>
       </div>
-          <div  class='ldBar bottom-0 right-0 pb-8' id="{{file.id}}" >
+          <div  class='ldBar bottom-0 right-0 pb-8' id="{{info.id}}" >
 	   </div>
 	   <span *ngIf="lastTime">  {{createBars()}} </span>
       </div>
@@ -543,7 +546,7 @@ src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/ic
     <div class="flex flex-wrap -mx-2 mb-8">
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
-		<div [innerHTML]="err.thumb" id="{{file.id}}-thumb"></div>
+		<div [innerHTML]="err.thumb" id="{{err.id}}-thumb"></div>
          </div>
       </div>
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
@@ -555,11 +558,11 @@ dark:text-white">
       	    </li>
       	    <li class=" font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Date: {{err.file.ts}}
+      	    Date: {{err.ts}}
       	    </li>
       	    <li class=" font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Type: {{err.file.mime}}
+      	    Type: {{err.file.type}}
       	    </li>
       	    <li class="font-light leading-relaxed text-gray-800
 dark:text-white">
@@ -574,14 +577,10 @@ dark:text-white">
         </div>
        </div>
 
-      <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
-         <div class="h-12 text-lg text-grey-dark flex items-left justify-left">
 		{{err.msg}}
-         </div>
 	 
       </div>
-    </div>
-
+     </div>
     </section>
   </div>
 </div>

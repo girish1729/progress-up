@@ -2,7 +2,6 @@ import {
     Component,
     Input,
     Inject,
-    ElementRef,
     ViewEncapsulation
 } from '@angular/core';
 import {
@@ -11,6 +10,7 @@ import {
 import {
     FormsModule
 } from '@angular/forms';
+
 import * as PDFObject from 'pdfobject';
 
 import axios from 'axios';
@@ -34,8 +34,10 @@ interface statsTableType {
 };
 
 interface fileInfo {
-    file: File,
-        id: string;
+    file: File;
+    id: string;
+    ts: string;
+    thumb: string;
     meta: string;
     bytesSent: string;
     rate: string;
@@ -43,8 +45,11 @@ interface fileInfo {
 };
 
 interface errInfo {
-    file: File,
-        meta: string;
+    file: File;
+    id: string;
+    ts: string;
+    thumb: string;
+    meta: string;
     msg: string;
 };
 
@@ -84,7 +89,7 @@ export class ProgressUpComponent {
     };
 
 
-    var filtFiles = {
+    filtFiles = {
         "type": "all",
         "action": "allow"
     };
@@ -97,7 +102,7 @@ export class ProgressUpComponent {
         authType: "Basic",
         user: '',
         pass: '',
-        progType: 'Line'
+        progType: 'Line',
         fileSizeLimit: 10,
         sizeLimitType: "Single file limit",
         fileTypeFilter: "All",
@@ -114,6 +119,8 @@ export class ProgressUpComponent {
     configVals2 = '&#128228; Upload URL ';
     configVals3 = '&#128218; FilesName';
 
+    sizeLabel = "Single file limit";
+    filterLabel = "Allow file type";
     uploadFileList: any = [];
     uploadFileInfos: fileInfo[] = [];
     errInfos: errInfo[] = [];
@@ -141,7 +148,7 @@ export class ProgressUpComponent {
     progress: any = {};
     showProgress: boolean = true;
 
-    constructor(private el: ElementRef, @Inject(DOCUMENT) document: Document) {}
+    constructor(@Inject(DOCUMENT) document: Document) {}
 
     openTab = 1;
     toggleTabs($tabNumber: number) {
@@ -152,37 +159,43 @@ export class ProgressUpComponent {
         document.body.classList.toggle('dark');
     }
 
-    uploadOneFile(file: File, idx: number) {
+    uploadOneFile(file: fileInfo, idx: number) {
         const formData: FormData = new FormData();
-        formData.append(this.form.filesName, file);
+        formData.append(this.form.filesName, file.file);
         console.log("Uploading to " + this.form.uploadURL);
         console.log("Uploading file name" + this.form.filesName);
+	var self = this;
         let options = {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            },
-            onUploadProgress: function(e) {
-                let perc = parseInt(e.progress * 100);
+            onUploadProgress: function(e:any) {
+                let perc = Number(e.progress * 100);
                 self.progressBars[idx].set(perc);
-                file.bytesSent = self.humanFileSize(e.progress * size);
-                file.eta = e.estimated;
-                file.rate = (e.rate / 1024 / 1024).toFixed(2);
-            }
+                file.bytesSent = self.humanFileSize(e.progress *
+file.file.size);
+                file.eta = String(e.estimated);
+		let r:number = Number(e.rate / 1024 / 1024);
+                file.rate = String(r.toFixed(2));
+            },
+	    headers: {
+                'Content-Type': "multipart/form-data",
+		Authorization: ""
+	    } 
         };
         if (this.form.authEnabled) {
             var username = 'user';
             var password = 'password';
             var basicAuth = 'Basic ' + btoa(username + ':' + password);
-            options["headers"] = {
-                'Authorization': +basicAuth
-            };
+            options['headers'] = {
+                'Content-Type': "multipart/form-data",
+		Authorization:  basicAuth
+	    };
         }
 
+
         axios.create(options);
-        await axios.post(this.form.uploadURL, formData, options).then((resp) => {
-            self.spitStatistics(idx)
+        axios.post(this.form.uploadURL, formData, options).then((resp) => {
+            self.spitStatistics(self, idx);
         }).catch((error) => {
-            alert("Upload failed to (" + uploadURL + "). Please check endpoint in Setup");
+            alert("Upload failed to (" + this.form.uploadURL + "). Please check endpoint in Setup");
             alert(error);
         });
     }
@@ -271,7 +284,7 @@ export class ProgressUpComponent {
 
         if (this.form.authEnabled) {
             console.log(this.form.authType);
-            console.log(this.form.user, inputs.pass);
+            console.log(this.form.user, this.form.pass);
         }
         console.log(this.form.fileSizeLimit);
         console.log(this.form.sizeLimitType);
@@ -300,7 +313,7 @@ export class ProgressUpComponent {
             };
         }
 
-        await axios.post(this.uploadURL, testForm, options).then((resp) => {
+        await axios.post(this.form.uploadURL, testForm, options).then((resp) => {
             alert("Test succeeded");
         }).catch((error) => {
             alert("Upload failed. Please check endpoint in Setup");
@@ -343,9 +356,9 @@ export class ProgressUpComponent {
     }
 
     applyFilter() {
-        filt = this.form.fileTypeFilter;
-        filtType = this.form.fileTypeAction;
-        console.log(filt, filtType);
+        let filt = this.form.fileTypeFilter;
+        let action = this.form.fileTypeAction;
+        console.log(filt, action);
         switch (filt) {
             case "All":
                 break;
@@ -393,27 +406,25 @@ export class ProgressUpComponent {
     }
 
     toggleSizeQ() {
-        const sizeLabel = "Single file limit";
-        val = this.form.sizeLimitType;
-        if (val.checked === true) {
-            sizeLabel = "Total limit";
+        let val = this.form.sizeLimitType;
+        if (val) {
+            this.sizeLabel = "Total limit";
         } else {
-            sizeLabel = "Single file limit";
+            this.sizeLabel = "Single file limit";
         }
     }
 
     toggleFilterQ() {
-        const filterLabel = "Allow file type";
-        val = this.form.fileTypeAction;
-        if (val.checked === true) {
-            filterLabel = "Deny file type";
+        let val = this.form.fileTypeAction;
+        if (val) {
+            this.filterLabel = "Deny file type";
         } else {
-            filterLabel = "Allow file type";
+            this.filterLabel = "Allow file type";
         }
     }
 
 
-    wordCount(val) {
+    wordCount(val:string) {
         var wom = val.match(/\S+/g);
         return {
             chars: val.length,
@@ -421,22 +432,22 @@ export class ProgressUpComponent {
             lines: val.split(/\r*\n/).length
         };
     }
-    checkFilter(mime) {
+    checkFilter(mime:string) {
         /* No filter XXX */
-        if (filtFiles.type == 'all') {
+        if (this.filtFiles.type == 'all') {
             console.log("No file type filters active");
             return true;
         }
-        if (mime.match(filtFiles.type) && filtFiles.action == "allow") {
+        if (mime.match(this.filtFiles.type) && this.filtFiles.action == "allow") {
             return true;
         }
-        if (mime.match(filtFiles.type) && filtFiles.action == "deny") {
+        if (mime.match(this.filtFiles.type) && this.filtFiles.action == "deny") {
             return true;
         }
         return false;
     }
 
-    checkSize(size) {
+    checkSize(size:number) {
         if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
             return true;
         }
@@ -444,8 +455,8 @@ export class ProgressUpComponent {
     }
 
     checkTotalSize() {
-        if (this.sizeLimitType == "Total limit") {
-            if (totalsize <= (this.form.fileSizeLimit * 1024 * 1024)) {
+        if (this.form.sizeLimitType == "Total limit") {
+            if (this.totalsize <= (this.form.fileSizeLimit * 1024 * 1024)) {
                 return true;
             }
             return false;
@@ -453,102 +464,105 @@ export class ProgressUpComponent {
         return false;
     }
 
-    showThumbnail(f, i, cb) {
+    showThumbnail(f:fileInfo, i: number) {
         let id = 'a' + i;
         let target = id + '-thumb';
+	let self = this;
+	let type = f.file.type.split('/')[0];
         switch (true) {
-            case /text/.test(f.type):
+            case /text/.test(f.file.type):
                 console.log("Text type detected");
                 var reader = new FileReader();
-                reader.onload = (function(f) {
+                reader.onload = (function(locf) {
                     return function(e) {
-                        txt = e.target.result;
-                        let wc = this.wordCount(txt);
+			let res:any;
+			if(e.target) {
+                        	res = e.target.result;
+			}
+                        let wc = self.wordCount(res);
                         f.meta = ` 
    			Chars : ${wc.chars}
    			Words: ${wc.words}
    			Lines: ${wc.lines}
 			`;
-                        var dataArray = txt.split("\n");
+                        var dataArray = (<string>res).split("\n");
                         dataArray = dataArray.slice(0, 20);
                         let txt = dataArray.join("\n");
 
-                        var fileIcon = this.fileTypeIcons[type];
+                        var fileIcon = self.fileTypeIcons[type];
                         let pic = "src/assets/icons/filetypes/" +
-                            fileIcon,
-                            f.thumb = [
-                                '<img width="125" height="125" src=',
+                            fileIcon;
+                        f.thumb = [
+                                '<img width="125" height="125" src="',
                                 pic,
-                                'title="',
-                                txt '" alt="',
-                                f.name,
+                                '" title="',
+                                txt,
+				 '" alt="',
+                                locf.name,
                                 '" class="w-12 h-12" />'
                             ].join('');
 
                     };
-                })(f);
-                reader.readAsText(f);
+                })(f.file);
+                reader.readAsText(f.file);
                 break;
-            case /image/.test(f.type):
+            case /image/.test(f.file.type):
                 console.log("Image type detected");
                 var reader = new FileReader();
-                // Closure to capture the file information.  
-                reader.onload = (function(theFile) {
+                reader.onload = (function(locf) {
                     return function(e) {
-                        e.target.result,
-
-                            f.thumb = [
-                                '<img width="125" height="125" src=',
+			let pic:any;
+			if(e.target) {
+                        	pic = e.target.result;
+			}
+                        f.thumb = [
+                                '<img width="125" height="125" src="',
                                 pic,
-                                'title="',
-                                txt '" alt="',
-                                f.name,
+                                '" title="',
+                                locf.name,
+				 '" alt="',
+                                locf.name,
                                 '" class="w-12 h-12" />'
-                            ].join(''); <
-                        img width = "125"
-                        height = "125"
-                        src = "{{file.imagesrc}}"
-                        title = "{{file.name}}"
-                        alt = "{{file.name}}"
-                        class = "w-12 h-12" / >
-                            f.meta = txt;
+                            ].join(''); 
+                            f.meta = locf.name;
                     };
-                })(f);
-                reader.readAsDataURL(f);
+                })(f.file);
+                reader.readAsDataURL(f.file);
                 break;
-            case /audio/.test(f.type):
+            case /audio/.test(f.file.type):
                 console.log("Audio type detected");
-                var audioUrl = window.URL.createObjectURL(f);
+                var audioUrl = window.URL.createObjectURL(f.file);
                 f.thumb = [
-                    '<audio controls width="125" height="125"> <source src="'
+                    '<audio controls class="h-9 w-9" width="125" height="125"> ',
+		    '<source src="',
                     audioUrl,
-                    'title="',
-                    f.name,
+                    '" title="',
+                    f.file.name,
                     '" alt="',
-                    f.name,
-                    '" class="h-9 w-9"> </source> </audio> />'
+                    f.file.name,
+                    '" > </source> </audio> />'
                 ].join('');
-                f.meta = f.name;
+                f.meta = f.file.name;
                 break;
-            case /video/.test(f.type):
+            case /video/.test(f.file.type):
                 console.log("Video type detected");
-                var videoUrl = window.URL.createObjectURL(f);
+                var videoUrl = window.URL.createObjectURL(f.file);
                 f.thumb = [
-                    '<video controls width="125" height="125"> <source src="'
+                    '<video controls class="h-9 w-9" width="125" height="125">',
+		    '<source src="',
                     videoUrl,
-                    'title="',
-                    f.name,
+                    '" title="',
+                    f.file.name,
                     '" alt="',
-                    f.name,
-                    '" class="h-9 w-9"> </source> </video> />'
+                    f.file.name,
+                    '" > </source> </video> />'
                 ].join('');
-                f.meta = f.name;
+                f.meta = f.file.name;
                 break;
-            case /pdf/.test(f.type):
+            case /pdf/.test(f.file.type):
                 console.log("PDF type detected");
-                var pdfURL = window.URL.createObjectURL(f);
-                var id = id + '-pdf';
-                f.meta = txt;
+                var pdfURL = window.URL.createObjectURL(f.file);
+                f.meta = f.file.name;
                 PDFObject.embed(pdfURL, target);
                 break;
             default:
@@ -557,14 +571,137 @@ export class ProgressUpComponent {
                 if (fileIcon == undefined) {
                     fileIcon = "file.svg";
                 }
-                f.meta = f.name;
+                f.meta = f.file.name;
                 let pic = "src/assets/icons/filetypes/" + fileIcon;
                 f.thumb = [
                     '<img width="125" height="125" src=',
                     pic,
-                    'title="',
-                    f.name '" alt="',
-                    f.name,
+                    '" title="',
+                    f.file.name,
+		    '" alt="',
+                    f.file.name,
+                    '" class="w-12 h-12" />'
+                ].join('');
+                break;
+        }
+    }
+
+    showErrThumbnail(f:errInfo, i: number) {
+        let id = 'a' + i;
+        let target = id + '-thumb';
+	let self = this;
+	let type = f.file.type.split('/')[0];
+        switch (true) {
+            case /text/.test(f.file.type):
+                console.log("Text type detected");
+                var reader = new FileReader();
+                reader.onload = (function(locf) {
+                    return function(e) {
+			let res:any;
+			if(e.target) {
+                        	res = e.target.result;
+			}
+                        let wc = self.wordCount(res);
+                        f.meta = ` 
+   			Chars : ${wc.chars}
+   			Words: ${wc.words}
+   			Lines: ${wc.lines}
+			`;
+                        var dataArray = (<string>res).split("\n");
+                        dataArray = dataArray.slice(0, 20);
+                        let txt = dataArray.join("\n");
+
+                        var fileIcon = self.fileTypeIcons[type];
+                        let pic = "src/assets/icons/filetypes/" +
+                            fileIcon;
+                        f.thumb = [
+                                '<img width="125" height="125" src="',
+                                pic,
+                                '" title="',
+                                txt,
+				 '" alt="',
+                                locf.name,
+                                '" class="w-12 h-12" />'
+                            ].join('');
+
+                    };
+                })(f.file);
+                reader.readAsText(f.file);
+                break;
+            case /image/.test(f.file.type):
+                console.log("Image type detected");
+                var reader = new FileReader();
+                reader.onload = (function(locf) {
+                    return function(e) {
+			let pic:any;
+			if(e.target) {
+                        	pic = e.target.result;
+			}
+                        f.thumb = [
+                                '<img width="125" height="125" src="',
+                                pic,
+                                '" title="',
+                                locf.name,
+				 '" alt="',
+                                locf.name,
+                                '" class="w-12 h-12" />'
+                            ].join(''); 
+                            f.meta = locf.name;
+                    };
+                })(f.file);
+                reader.readAsDataURL(f.file);
+                break;
+            case /audio/.test(f.file.type):
+                console.log("Audio type detected");
+                var audioUrl = window.URL.createObjectURL(f.file);
+                f.thumb = [
+                    '<audio controls class="h-9 w-9" width="125" height="125"> ',
+		    '<source src="',
+                    audioUrl,
+                    '" title="',
+                    f.file.name,
+                    '" alt="',
+                    f.file.name,
+                    '" > </source> </audio> />'
+                ].join('');
+                f.meta = f.file.name;
+                break;
+            case /video/.test(f.file.type):
+                console.log("Video type detected");
+                var videoUrl = window.URL.createObjectURL(f.file);
+                f.thumb = [
+                    '<video controls class="h-9 w-9" width="125" height="125">',
+		    '<source src="',
+                    videoUrl,
+                    '" title="',
+                    f.file.name,
+                    '" alt="',
+                    f.file.name,
+                    '" > </source> </video> />'
+                ].join('');
+                f.meta = f.file.name;
+                break;
+            case /pdf/.test(f.file.type):
+                console.log("PDF type detected");
+                var pdfURL = window.URL.createObjectURL(f.file);
+                f.meta = f.file.name;
+                PDFObject.embed(pdfURL, target);
+                break;
+            default:
+                console.log("default type detected");
+                var fileIcon = this.fileTypeIcons[type];
+                if (fileIcon == undefined) {
+                    fileIcon = "file.svg";
+                }
+                f.meta = f.file.name;
+                let pic = "src/assets/icons/filetypes/" + fileIcon;
+                f.thumb = [
+                    '<img width="125" height="125" src=',
+                    pic,
+                    '" title="',
+                    f.file.name,
+		    '" alt="',
+                    f.file.name,
                     '" class="w-12 h-12" />'
                 ].join('');
                 break;
@@ -589,74 +726,80 @@ export class ProgressUpComponent {
         }
         for (var i = 0; i < this.errInfos.length; i++) {
             let f = this.errInfos[i];
-            this.showThumbnail(f, i);
+            this.showErrThumbnail(f, i);
         }
         this.thumbNailsDone = false;
     }
 
-    printBannedBanner(file, msg) {
+    printBannedBanner(file:File, id: string, ts:string, msg:string) {
         this.errInfos.push({
-            file: File,
+            file: file,
+            id: id,
             meta: '',
+            thumb: '',
+            ts: ts,
             msg: msg
         });
     }
 
     setupUpload() {
-        var delQ = [];
-        for (var i = 0; i < uploadFileList.length; i++) {
-            let f = uploadFileList[i];
+        var delQ:number[] = [];
+        for (var i = 0; i < this.uploadFileList.length; i++) {
+            let f = this.uploadFileList[i];
             let mime = f.type;
             let name = f.name;
             let ts = f.lastModifiedDate.toLocaleDateString();
-            totalsize += f.size;
-            let size = humanFileSize(f.size);
+            this.totalsize += f.size;
+            let size = this.humanFileSize(f.size);
             let id = 'a' + i;
-            if (!checkSize(f.size)) {
+            if (!this.checkSize(f.size)) {
                 console.log("Size check:: size is " + f.size);
-                msg = `${name} too big for upload`;
+                let msg = `${name} too big for upload`;
                 console.log(msg);
-                printBannedBanner(f, msg);
+                this.printBannedBanner(f, id, ts, msg);
                 delQ.push(i);
                 continue;
             }
-            if (!checkFilter(mime)) {
+            if (!this.checkFilter(mime)) {
                 console.log("Hit banned file type:: filter issue");
-                msg = `${name} cannot be uploaded due to policy.`;
-                printBannedBanner(f, msg);
+                let msg = `${name} cannot be uploaded due to policy.`;
+                this.printBannedBanner(f, id, ts, msg);
                 delQ.push(i);
                 continue;
             }
-            if (i == uploadFileList.length - 1) {
-                console.log("Total size check:: total size is " + totalsize);
-                if (!checkTotalSize()) {
-                    msg = `Total size exceeds policy, delete some`;
+            if (i == this.uploadFileList.length - 1) {
+                console.log("Total size check:: total size is " + this.totalsize);
+                if (!this.checkTotalSize()) {
+                    let msg = `Total size exceeds policy, delete some`;
                     this.disableUpload = true;
                 }
             }
             this.uploadFileInfos.push({
                 file: f,
                 id: id,
+                ts: ts,
                 meta: '',
-                bytesSent: 0,
-                eta: 0,
-                rate: 0,
+                thumb: '',
+                bytesSent: '',
+                eta: '',
+                rate: '',
             });
             this.totalfiles += 1;
         }
-        this.uploadFileList = this.uploadFileList.filter(function(value, index) {
+        this.uploadFileList = this.uploadFileList.filter(function(value:
+any, index:any) {
             return delQ.indexOf(index) == -1;
         });
         this.disableUpload = false;
     }
 
-    delItem(index) {
+    delItem(index:number) {
         let list = [...this.uploadFileList];
-        totalsize -= this.upLoadFileList[index].size;
+        this.totalsize -= this.uploadFileList[index].size;
         list.splice(index, 1);
         this.uploadFileList = list;
         this.uploadFileInfos = list;
-        checkTotalSize();
+        this.checkTotalSize();
     }
 
 
