@@ -14,7 +14,7 @@ export default defineConfig({
       fileName: 'progress-up'
     },
     rollupOptions: {
-      external: ['vue'],
+      external: ['vue', 'vue-pdf'],
       output: {
         globals: {
           vue: 'Vue'

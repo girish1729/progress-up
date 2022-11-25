@@ -19,7 +19,9 @@
     "@angular/platform-browser": "^14.2.0",
     "@angular/platform-browser-dynamic": "^14.2.0",
     "@npmcli/fs": "*",
-    "progress-up": "*",
+    "axios": "^1.2.0",
+    "pdfobject": "^2.2.8",
+    "progress-up": "file:../../angular/dist/progress-up",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

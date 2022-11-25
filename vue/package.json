@@ -25,7 +25,7 @@
     "rollup-plugin-import-css": "^3.1.0",
     "vite-plugin-libcss": "^1.0.5",
     "vue": "^3.2.41",
-    "vue-pdf": "^4.3.0"
+    "pdfobject": "*"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.2.0",

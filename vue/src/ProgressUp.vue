@@ -1,7 +1,8 @@
 <script>
 import axios from "axios";
 import ldBar from "./assets/progressBar/loading-bar.js";
-import pdf from 'vue-pdf'
+import PDFObject from 'pdfobject';
+
 
 export default {
     data() {
