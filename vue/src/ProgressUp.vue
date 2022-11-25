@@ -387,125 +387,132 @@ export default {
             return false;
         },
 
-        showThumbnail(file, i) {
-            let id = 'a' + i;
-            let target = id + '-thumb';
-            var reader = new FileReader();
-	    let self = this;
-            switch (true) {
-                case /text/.test(file.type):
-                    console.log("Text type detected");
-                    reader.onload = (function(f) {
-                        return function(e) {
-                            txt = e.target.result;
-                            let wc = this.wordCount(txt);
-                            file.meta = ` 
+        showThumbnail(f, i ) {
+        let id = 'a' + i;
+        let target = id + '-thumb';
+	let self = this;
+	let type = f.file.type.split('/')[0];
+        switch (true) {
+            case /text/.test(f.file.type):
+                console.log("Text type detected");
+                var reader = new FileReader();
+                reader.onload = (function(locf) {
+                    return function(e) {
+			let res ;
+			if(e.target) {
+                        	res = e.target.result;
+			}
+                        let wc = self.wordCount(res);
+                        f.meta = ` 
    			Chars : ${wc.chars}
    			Words: ${wc.words}
    			Lines: ${wc.lines}
 			`;
-                            var dataArray = txt.split("\n");
-                            dataArray = dataArray.slice(0, 20);
-                            let txt = dataArray.join("\n");
+                        var dataArray = res.split("\n");
+                        dataArray = dataArray.slice(0, 20);
+                        let txt = dataArray.join("\n");
 
-                            var fileIcon = self.fileTypeIcons[type];
-                            let pic = "src/assets/icons/filetypes/" +
-                                fileIcon;
-                                file.thumb = [
-                                    '<img width="125" height="125" src="',
-                                    pic,
-                                    '" title="',
-                                    txt,
-				    '" alt="',
-                                    file.name,
-                                    '" class="w-12 h-12" />'
-                                ].join('');
+                        var fileIcon = self.fileTypeIcons[type];
+                        let pic = "src/assets/icons/filetypes/" +
+                            fileIcon;
+                        f.thumb = [
+                                '<img width="125" height="125" src="',
+                                pic,
+                                '" title="',
+                                txt,
+				 '" alt="',
+                                locf.name,
+                                '" class="w-12 h-12" />'
+                            ].join('');
 
-                        };
-                    })(file.file);
-                    reader.readAsText(file.file);
-                    break;
-                case /image/.test(file.type):
-                    console.log("Image type detected");
-                    // Closure to capture the file information.  
-                    reader.onload = (function(theFile) {
-                        return function(e) {
-                            e.target.result,
-                             file.thumb = [
-                                    '<img width="125" height="125" src="',
-                                    pic,
-                                    '" title="',
-                                    txt,
-				     '" alt="',
-                                    file.name,
-                                    '" class="w-12 h-12" />'
-                                ].join(''); 
-                             file.meta = txt;
-                        };
-                    })(file.file);
-                    reader.readAsDataURL(file.file);
-                    break;
-                case /audio/.test(file.type):
-                    console.log("Audio type detected");
-                    var audioUrl = window.URL.createObjectURL(file.file);
-                    file.thumb = [
-                     '<audio controls class="h-9 w-9" width="125" height="125">',
-			'<source src="',
-                        audioUrl,
-                        '" title="',
-                        f.name,
-                        '" alt="',
-                        f.name,
-                        '" > </source> </audio> />'
-                    ].join('');
-                    file.meta = file.name;
-                    break;
-                case /video/.test(file.type):
-                    console.log("Video type detected");
-                    var videoUrl = window.URL.createObjectURL(file.file);
-                    file.thumb = [
-                        '<video controls class="h-9 w-9 width="125" height="125">', 
-			'<source src="',
-                        videoUrl,
-                        '" title="',
-                        file.name,
-                        '" alt="',
-                        file.name,
-                        '" "> </source> </video> />'
-                    ].join('');
-                    f.meta = file.name;
-                    break;
-                case /pdf/.test(file.type):
-                    console.log("PDF type detected");
-                    var pdfURL = window.URL.createObjectURL(file.file);
-                    file.meta = txt;
-                    PDFObject.embed(pdfURL, target);
-                    break;
-                default:
-                    console.log("default type detected");
-                    var fileIcon = this.fileTypeIcons[type];
-                    if (fileIcon == undefined) {
-                        fileIcon = "file.svg";
-                    }
-                    file.meta = file.file.name;
-                    let pic = "src/assets/icons/filetypes/" + fileIcon;
-                    file.thumb = [
-                        '<img width="125" height="125" src="',
-                        pic,
-                        '" title="',
-                        file.name,
-			 '" alt="',
-                        file.name,
-                        '" class="w-12 h-12" />'
-                    ].join('');
-                    break;
-            }
-        },
+                    };
+                })(f.file);
+                reader.readAsText(f.file);
+                break;
+            case /image/.test(f.file.type):
+                console.log("Image type detected");
+                var reader = new FileReader();
+                reader.onload = (function(locf) {
+                    return function(e) {
+			let pic;
+			if(e.target) {
+                        	pic = e.target.result;
+			}
+                        f.thumb = [
+                                '<img width="125" height="125" src="',
+                                pic,
+                                '" title="',
+                                locf.name,
+				 '" alt="',
+                                locf.name,
+                                '" class="w-12 h-12" />'
+                            ].join(''); 
+                            f.meta = locf.name;
+                    };
+                })(f.file);
+                reader.readAsDataURL(f.file);
+                break;
+            case /audio/.test(f.file.type):
+                console.log("Audio type detected");
+                var audioUrl = window.URL.createObjectURL(f.file);
+                f.thumb = [
+                    '<audio controls class="h-9 w-9" width="125" height="125"> ',
+		    '<source src="',
+                    audioUrl,
+                    '" title="',
+                    f.file.name,
+                    '" alt="',
+                    f.file.name,
+                    '" > </source> </audio> />'
+                ].join('');
+                f.meta = f.file.name;
+                break;
+            case /video/.test(f.file.type):
+                console.log("Video type detected");
+                var videoUrl = window.URL.createObjectURL(f.file);
+                f.thumb = [
+                    '<video controls class="h-9 w-9" width="125" height="125">',
+		    '<source src="',
+                    videoUrl,
+                    '" title="',
+                    f.file.name,
+                    '" alt="',
+                    f.file.name,
+                    '" > </source> </video> />'
+                ].join('');
+                f.meta = f.file.name;
+                break;
+            case /pdf/.test(f.file.type):
+                console.log("PDF type detected");
+                var pdfURL = window.URL.createObjectURL(f.file);
+                f.meta = f.file.name;
+                PDFObject.embed(pdfURL, target);
+                break;
+            default:
+                console.log("default type detected");
+                var fileIcon = this.fileTypeIcons[type];
+                if (fileIcon == undefined) {
+                    fileIcon = "file.svg";
+                }
+                f.meta = f.file.name;
+                let pic = "src/assets/icons/filetypes/" + fileIcon;
+                f.thumb = [
+                    '<img width="125" height="125" src=',
+                    pic,
+                    '" title="',
+                    f.file.name,
+		    '" alt="',
+                    f.file.name,
+                    '" class="w-12 h-12" />'
+                ].join('');
+                break;
+        }
+    },
 
 
         createBars() {
-            for (var i = 0; i < uploadFileInfos.length; i++) {
-                f = uploadFileInfos[i];
+            for (var i = 0; i < this.uploadFileInfos.length; i++) {
+                f = this.uploadFileInfos[i];
                 var selector = '#a' + i;
                 var bar = new ldBar(selector, {
                     preset: progType.toLowerCase()
@@ -514,21 +521,12 @@ export default {
                 progressBars.push(bar);
                 showThumbnail(f, i);
             }
-            for (var i = 0; i < errInfos.length; i++) {
-                f = errInfos[i];
+            for (var i = 0; i < this.errInfos.length; i++) {
+                f = this.errInfos[i];
                 showThumbnail(f, i);
             }
         },
-
-        printBannedBanner(file, msg) {
-            this.errInfos.push({
-                file: File,
-                meta: '',
-                msg: msg
-            });
-        },
-
-        setupUpload() {
+	        setupUpload() {
             var delQ = [];
             for (var i = 0; i < uploadFileList.length; i++) {
                 let f = uploadFileList[i];
@@ -542,14 +540,14 @@ export default {
                     console.log("Size check:: size is " + f.size);
                     msg = `${name} too big for upload`;
                     console.log(msg);
-                    printBannedBanner(f, msg);
+                    this.printBannedBanner(f, id, ts, msg);
                     delQ.push(i);
                     continue;
                 }
                 if (!checkFilter(mime)) {
                     console.log("Hit banned file type:: filter issue");
                     msg = `${name} cannot be uploaded due to policy.`;
-                    printBannedBanner(f, msg);
+                    this.printBannedBanner(f, id, ts, msg);
                     delQ.push(i);
                     continue;
                 }
@@ -585,6 +583,18 @@ export default {
             this.totalsize -= this.upLoadFileList[index].size;
             this.checkTotalSize();
         },
+	printBannedBanner(file, id , ts, msg) {
+        this.errInfos.push({
+            file: file,
+            id: id,
+            meta: '',
+            thumb: '',
+            ts: ts,
+            msg: msg
+        });
+    },
+
+
     }
 };
 </script>
@@ -762,12 +772,13 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	      <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
 <label class="relative flex justify-between items-center p-2 text-xl"
-for="fileSizeLimit" >
+for="fileSizeLimit" />
 <span>File Size Limit (MB)</span>
-  <input v-model="fileSizeLimit" class='m-6 p-6 form-range'
+  <input v-model="form.fileSizeLimit" class='m-6 p-6 form-range'
 type="range"  name="rangeInput" min="10" max="1000"
-step=10 value="0" @change="sizeLimit.value=rangeInput.value">                      
-<output id="sizeLimit" name="sizeLimit" for="fileSizeLimit">10</output>
+step=10 />                      
+<output id="sizeLimit" name="sizeLimit"
+for="fileSizeLimit">{{form.fileSizeLimit}}</output>
 	</div>
 	</div>
 
@@ -777,7 +788,7 @@ step=10 value="0" @change="sizeLimit.value=rangeInput.value">
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="sizeToggle" >
 <span>{{sizeLabel}}</span>
-  <input v-model="sizeToggle" @change="toggleSizeQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <input v-model="form.sizeToggle" @change="toggleSizeQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
 bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
 </label>
@@ -793,7 +804,7 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 	          File type Filters 
 	         </label>
 	         <div class="relative">
-	           <select v-model='progress-up-filter'
+	           <select v-model='form.fileTypeFilter'
  class="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
@@ -816,7 +827,7 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="filterAction" >
 <span>{{filterLabel}}</span>
-  <input v-model="filterAction" @change="toggleFilterQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <input v-model="form.fileTypeAction" @change="toggleFilterQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
 bg-green-600 rounded-full duration-300 ease-in-out peer-checked:bg-red-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
 </label>
@@ -1055,7 +1066,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 
 
 <div id="progress-up-progressArea"> 
-  <div v-for="(file,id) in uploadFileInfos" :key = "id" >
+  <div v-for="(info,id) in uploadFileInfos" :key = "id" >
     <section class="m-4 p-4 mt-4 mb-4 transition-colors
     text-light-100 dark:text-white mx-auto">
      <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
@@ -1070,7 +1081,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
           <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
              <div class="h-12 text-sm text-grey-dark flex items-left
     justify-left">
-		<div  v-html="file.thumb" id="{{file.id}}" + '-thumb'></div>
+		<div  v-html="info.thumb" id="{{info.id}}-thumb"></div>
              </div>
           </div>
     
@@ -1079,35 +1090,36 @@ py-4 whitespace-nowrap"> See below for possible options </td>
               <ul>
           	    <li  class="text-xl font-light leading-relaxed text-gray-800
     dark:text-white">
-          	    Name: {{file.name}}
+          	    Name: {{info.file.name}}
           	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800
     dark:text-white">
-          	    Date: {{file.ts}}
+          	    Date: {{info.ts}}
           	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800
     dark:text-white">
-          	    Type: {{file.mime}}
+          	    Type: {{info.type}}
           	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800
     dark:text-white">
-          	    Size: {{file.size}} 
+          	    Size: {{info.size}} 
           	    </li>
-       	    <li class="font-light leading-relaxed text-gray-800
-dark:text-white">
-		    Metadata: {{file.meta}}
+       	    <li class="font-light leading-relaxed text-gray-800 dark:text-white">
+		    Metadata: {{info.meta}}
+          	    </li>
 
       	    <li class="text-xl font-light leading-relaxed text-gray-800
     dark:text-white">
 
-		<span>{{bytesSent}} of {{Mysize}} uploaded  {{rate}} MB/s ETA ${eta} s</span>
+		<span>{{info.bytesSent}} of {{info.size}} uploaded
+{{info.rate}} MB/s ETA {{infoeta}} s</span>
           	    </li>
      
               </ul>
             </div>
            </div>
       </div>
-          <div class='ldBar bottom-0 right-0 pb-8' :id="file.id" >
+          <div class='ldBar bottom-0 right-0 pb-8' :id="info.id" >
 	  </div>
       </div>
     </section>
@@ -1117,7 +1129,7 @@ dark:text-white">
 
 
   <div id="progress-up-errArea"> 
-    <div v-for="(err,id) in errInfos; last as lastTime;index as id " >
+    <div v-for="(err,id) in errInfos" :key="id" >
       <section class="bg-red-200 m-4 p-4 mt-4 mb-4 transition-colors
   text-light-100 dark:text-white">
    <div class="bg-red-600 dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
@@ -1130,7 +1142,7 @@ dark:text-white">
       <div class="flex flex-wrap -mx-2 mb-8">
         <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
            <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
-		<div  v-html="err.thumb" id="{{err.id}}" + '-thumb'></div>
+		<div  v-html="err.thumb" id="{{err.id}}-thumb"></div>
            </div>
         </div>
         <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
@@ -1138,7 +1150,7 @@ dark:text-white">
            <ul>
         	    <li  class="font-light leading-relaxed text-gray-800
   dark:text-white">
-        	    Name: {{err.name}}
+        	    Name: {{err.file.name}}
         	    </li>
         	    <li class=" font-light leading-relaxed text-gray-800
   dark:text-white">
@@ -1146,11 +1158,11 @@ dark:text-white">
         	    </li>
         	    <li class=" font-light leading-relaxed text-gray-800
   dark:text-white">
-        	    Type: {{err.mime}}
+        	    Type: {{err.file.type}}
         	    </li>
         	    <li class="font-light leading-relaxed text-gray-800
   dark:text-white">
-        	    Size: {{err.size}} 
+        	    Size: {{err.file.size}} 
         	    </li>
         	    <li class="font-light leading-relaxed text-gray-800
   dark:text-white"> Metadata: {{err.meta}}
@@ -1158,15 +1170,11 @@ dark:text-white">
            </ul>
           </div>
          </div>
+         </div>
   
-        <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
-           <div class="h-12 text-lg text-grey-dark flex items-left justify-left">
   		{{err.msg}}
-           </div>
   	 
-        </div>
       </div>
-  
       </section>
     </div>
   </div>

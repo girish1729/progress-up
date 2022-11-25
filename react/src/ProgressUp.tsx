@@ -41,12 +41,35 @@ import txt from './assets/icons/filetypes/txt.svg';
 import wav from './assets/icons/filetypes/wav.svg';
 import word from './assets/icons/filetypes/word.svg';
 import zip from './assets/icons/filetypes/zip.svg';
+  
 
+interface fileInfo {
+    file: File;
+    id: string;
+    ts: string;
+    thumb: string;
+    meta: string;
+    bytesSent: string;
+    rate: string;
+    eta: string;
+};
+
+interface errInfo {
+    file: File;
+    id: string;
+    ts: string;
+    thumb: string;
+    meta: string;
+    msg: string;
+};
+
+
+// Then you need to pass in the type of what you will have in the useState
 function ProgressUp() {
 
-    let [uploadFileInfos, setFileInfos] = useState < [] > ([]);
-    let [errInfos, setErrInfos] = useState < [] > ([]);
-    let [uploadFileList, setUpload] = useState < FileList > ();
+    let [uploadFileInfos, setFileInfos] = useState <Array<fileInfo>> ([]);
+    let [errInfos, setErrInfos] = useState <Array<errInfo>  > ([]);
+    let [uploadFileList, setUpload] = useState <Array<File>> ();
     let [progressBars, setProgress] = useState < [] > ([]);
     let [statsTable, setStats] = useState < [] > ([]);
     const [openTab, setOpenTab] = useState(1);
@@ -82,7 +105,7 @@ function ProgressUp() {
     const onDrop = (files: any) => {
         console.log("Dnd" + files);
         setUpload(files);
-        setupUpload(files);
+        setupUpload();
     };
 
     const {
@@ -115,6 +138,8 @@ function ProgressUp() {
 
     let progress: any = {};
     let showProgress: boolean = true;
+    let sizeLabel:string =  "Single file limit";
+    let filterLabel:string =  "Allow file type";
 
     const handleChange = (event: any) => {
         const name = event.target.name;
@@ -142,10 +167,10 @@ function ProgressUp() {
 
     const darkMode = () => {
         console.log("dark mode change");
-        document.documentElement.classNameList.toggle('dark');
+        document.documentElement.classList.toggle('dark');
     };
 
-    const uploadOneFile = async (file: File, idx: number) => {
+    const uploadOneFile = async (file: any, idx: number) => {
         let formData = new FormData();
         formData.append(inputs.filesName, file);
         let fname = file.name;
@@ -153,15 +178,17 @@ function ProgressUp() {
         console.log("Uploading file name" + inputs.filesName);
        let options = {
             headers: {
-                "Content-Type": "multipart/form-data"
+                "Content-Type": "multipart/form-data",
+		Authorization: ""
             },
-            onUploadProgress: (progE) => {
+            onUploadProgress: (progE:any) => {
                 let perc: number;
                 if (progE.total) {
                     perc = (progE.loaded / progE.total) * 100;
                     let obj: any = progressBars[idx];
                     obj.set(perc);
-                    file.bytesSent = humanFileSize(progE.progress * size);
+                    file.bytesSent = humanFileSize(progE.progress *
+file.file.size);
                     file.eta = progE.estimated;
                     file.rate = (progE.rate / 1024 / 1024).toFixed(2);
 
@@ -175,7 +202,8 @@ function ProgressUp() {
                 var password = "password";
                 var basicAuth = "Basic " + btoa(username + ":" + password);
                 options["headers"] = {
-                    "Authorization": +basicAuth
+                    "Content-Type": "multipart/form-data",
+                    "Authorization": basicAuth
                 };
             }
 
@@ -203,7 +231,7 @@ function ProgressUp() {
         let files = e.target.files;
         console.log(files);
         setUpload(files);
-        setupUpload(files);
+        setupUpload();
     };
 
 
@@ -345,9 +373,9 @@ function ProgressUp() {
 
 
     const applyFilter = () => {
-        filt = inputs.fileTypeFilter;
-        filtType = inputs.fileTypeAction;
-        console.log(filt, filtType);
+        let filt = inputs.fileTypeFilter;
+        let action = inputs.fileTypeAction;
+        console.log(filt, action);
         switch (filt) {
             case "All":
                 break;
@@ -395,9 +423,8 @@ function ProgressUp() {
     };
 
     const toggleSizeQ = () => {
-        let sizeLabel = "Single file limit";
-        val = inputs.sizeLimitType;
-        if (val.checked === true) {
+        let val = inputs.sizeLimitType;
+        if (val) {
             sizeLabel = "Total limit";
         } else {
             sizeLabel = "Single file limit";
@@ -405,9 +432,8 @@ function ProgressUp() {
     };
 
     const toggleFilterQ = () => {
-        let filterLabel = "Allow file type";
-        val = inputs.fileTypeAction;
-        if (val.checked === true) {
+        let val = inputs.fileTypeAction;
+        if (val) {
             filterLabel = "Deny file type";
         } else {
             filterLabel = "Allow file type";
@@ -415,7 +441,7 @@ function ProgressUp() {
     };
 
 
-    const wordCount = (val) => {
+    const wordCount = (val:string) => {
         var wom = val.match(/\S+/g);
         return {
             chars: val.length,
@@ -425,7 +451,7 @@ function ProgressUp() {
     };
 
 
-    const checkFilter = (mime) => {
+    const checkFilter = (mime:string) => {
         /* No filter XXX */
         if (filtFiles.type == 'all') {
             console.log("No file type filters active");
@@ -440,7 +466,7 @@ function ProgressUp() {
         return false;
     };
 
-    const checkSize = (size) => {
+    const checkSize = (size:number) => {
         if (size <= (inputs.fileSizeLimit * 1024 * 1024)) {
             return true;
         }
@@ -457,67 +483,68 @@ function ProgressUp() {
         return false;
     };
 
-    const showThumbnail = (f, i) => {
+    const showThumbnail = (f:any, i:number) => {
         let reader = new FileReader();
-	let fileType = 
-        switch(fileType) {
+	let type = f.file.type.split('/')[0];
+        switch(true) {
 
-            case "image":
+            case /image/.test(f.file.type):
                 reader.onload = (function(theFile) {
                     return function(e) {
                         if (e.target) {
-
-                            let imagesrc = e.target.result;
+                            let imagesrc = String(e.target.result);
+			    if(imagesrc) {
                             return ( 
-			<img width = "125" height = "125" src = {imagesrc}
-                         title = {name} alt = {name}
+			<img width="125" height="125" src={imagesrc}
+                         title={f.name} alt={f.name}
                                 className= "w-12 h-12" / >
                             );
+			   }
                         }
                     };
                 })(f);
                 reader.readAsDataURL(f);
                 break;
 
-            case "pdf":
+            case /pdf/.test(f.file.type):
                 var pdfUrl = window.URL.createObjectURL(f);
                 return ( <PDFObject url={pdfUrl} />);
                 break;
 
-            case "audio":
+            case /audio/.test(f.file.type):
                 var audioUrl = window.URL.createObjectURL(f); 
                 return ( 
-		<audio className = "h-9 w-9" controls width = "125" height = "125">
-                    <source src ={audioUrl} > 
+		<audio className="h-9 w-9" controls >
+                    <source src={audioUrl} > 
 			</source> </audio>
                 );
                 break;
-            case "video":
+            case /video/.test(f.file.type):
                 var videoUrl = window.URL.createObjectURL(f);
                 return ( 
-		  <video controls className = "h-9 w-9" width = "125" height = "125">
-                    <source src ={videoUrl}> </source> </video>
+		  <video controls className="h-9 w-9" >
+                    <source src={videoUrl}> </source> </video>
                 );
                 break;
 
-            case "text":
+            case /text/.test(f.file.type):
                 reader.onload = (function(f) {
                     return function(e) {
-                        res = e.target.result;
-                        wc = wordCount(txt);
-                        meta = ` 
+                        let res = e.target && e.target.result;
+                        let wc = wordCount(String(res));
+                        let meta = ` 
    			Chars : ${wc.chars}
    			Words: ${wc.words}
    			Lines: ${wc.lines}
   			`;
-                        var dataArray = res.split("\n");
-                        dataArray = dataArray.slice(0, 20);
-                        let txt = dataArray.join("\n");
+                        let dataArray:any = res && String(res).split("\n");
+                        dataArray = dataArray && dataArray.slice(0, 20);
+                        let txt = dataArray && dataArray.join("\n");
                         let fileIcon = fileTypes[type];
                         return ( 
-			<img width = "125" height = "125" src = {fileIcon}
-                         title = {txt} alt = {f.name}
-                            className = "w-12 h-12" />
+			<img width="125" height="125" src={fileIcon}
+                         title={txt} alt={f.name}
+                            className="w-12 h-12" />
                         );
                     };
                 })(f);
@@ -551,12 +578,17 @@ function ProgressUp() {
         }
     };
 
-    const printBannedBanner = (file, msg) => {
-        errInfos = {
-            file: File,
+    const printBannedBanner = (file: File, id:string, ts:string,
+msg:string) => {
+        let errInfo = {
+            file: file,
             meta: '',
+            id: id,
+            thumb: '',
+            ts: ts,
             msg: msg
-        };
+     };
+
 	setErrInfos(prev => {
 		const newState = [...prev];
                 newState.push(errInfo);
@@ -565,44 +597,50 @@ function ProgressUp() {
     };
 
     const setupUpload = () => {
-        var delQ = [];
+        var delQ:number[] = [];
+	if(!uploadFileList) {
+		return;
+	}
         for (var i = 0; i < uploadFileList.length; i++) {
-            let f = uploadFileList[i];
+            let f = uploadFileList && uploadFileList[i];
             let mime = f.type;
             let name = f.name;
-            let ts = f.lastModified.toLocaletring();
+            let ts = f.lastModified.toLocaleString();
             let size = humanFileSize(f.size);
             let id = 'a' + i;
             if (!checkSize(f.size)) {
                 console.log("Size check:: size is " + f.size);
-                msg = "{name} too big for upload";
+                let msg = "{name} too big for upload";
                 console.log(msg);
-            	printBannedBanner(f, msg);
+            	printBannedBanner(f, id, ts, msg);
                 delQ.push(i);
                 continue;
             }
             if (!checkFilter(mime)) {
                 console.log("Hit banned file type:: filter issue");
-                msg = "{name} cannot be uploaded due to policy.";
-            	printBannedBanner(f, msg);
+                let msg = "{name} cannot be uploaded due to policy.";
+            	printBannedBanner(f, id, ts, msg);
                 delQ.push(i);
                 continue;
             }
-            if (i == uploadFileList.length - 1) {
+		
+            if (uploadFileList && i == uploadFileList.length - 1) {
                 console.log("Total size check:: total size is " +
                     totalsize);
                 if (!checkTotalSize()) {
-                    msg = `Total size exceeds policy, delete some`;
+                    let msg = `Total size exceeds policy, delete some`;
                     setIsUploadDisabled(true);
                 }
             }
             let fInfo = {
                 file: f,
                 id: id,
+                thumb: '',
                 meta: '',
-                bytesSent: 0,
-                eta: 0,
-                rate: 0,
+                bytesSent: '',
+                eta: '',
+                ts: ts,
+                rate: '',
             };
 	    setFileInfos(prev => {
 		const newState = [...prev];
@@ -612,18 +650,28 @@ function ProgressUp() {
             setSize(prev => prev + f.size);
             setNumberFiles(totalfiles + 1);
         }
-    uploadFileList = uploadFileList.filter(function(value, index) {
+    if(uploadFileList) {
+    uploadFileList = [...uploadFileList].filter(function(value:any,
+index:number) {
         return delQ.indexOf(index) == -1;
     });
+    }
         setIsUploadDisabled(false);
     };
 
-    const delItem = (index) => {
-        let list = [...uploadFileList];
-        setSize(prev => prev - upLoadFileList[index].size);
-        list.splice(index, 1);
-        setFileInfos(list);
+    const delItem = (index:number) => {
+	let s:number;
+	if(uploadFileList) {
+	 s = uploadFileList[index].size;
+        s = totalsize - s;
+       setSize(s );
+	}
+        uploadFileList && uploadFileList.splice(index, 1);
+	let list = uploadFileList as File[];
         setUpload(list);
+
+        uploadFileInfos && uploadFileInfos.splice(index, 1);
+        setFileInfos(uploadFileInfos);
         checkTotalSize();
     };
 
@@ -839,13 +887,14 @@ CORS]" />
 	      <div className="flex flex-wrap -mx-3 mb-6">
 	       <div className="w-full px-3">
 <label className="relative flex justify-between items-center p-2 text-xl"
-for="fileSizeLimit" />
+htmlFor="fileSizeLimit" />
 <span>File Size Limit (MB)</span>
   <input name="fileSizeLimit" value={inputs.fileSizeLimit || ""}
 onChange={handleChange} className="m-6 p-6 form-range" type="range"
-name="rangeInput" min="10" max="1000" step="10" value="0"
-oninput="sizeLimit.value=rangeInput.value" />                      
-<output id="sizeLimit" name="sizeLimit" for="fileSizeLimit">10</output>
+ min="10" max="1000" step="10" 
+ />                      
+<output id="sizeLimit" name="sizeLimit"
+htmlFor="fileSizeLimit">{inputs.fileSizeLimit}</output>
 	</div>
 	</div>
 
@@ -853,7 +902,7 @@ oninput="sizeLimit.value=rangeInput.value" />
 	       <div className="w-full px-3">
 
 <label className="relative flex justify-between items-center p-2 text-xl"
-for="sizeToggle" >
+htmlFor="sizeToggle" >
 <span>{sizeLabel}</span>
   <input name="inputs.sizeLimitType" value={inputs.sizeLimitType || ""}
 onChange={toggleSizeQ}
@@ -870,7 +919,7 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 	      <div className="flex flex-wrap -mx-3 mb-6">
 	       <div className="w-full px-3">
 	         <label className="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" for="progress-up-indicator">
+	   font-bold mb-2" htmlFor="progress-up-indicator">
 	          File type Filters 
 	         </label>
 	         <div className="relative">
@@ -880,7 +929,7 @@ onChange={handleChange} value={inputs.fileTypeFilter || ""}
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	   >
-	   			<option default>All</option>
+	   			<option>All</option>
 	   			<option>PDF only</option>
 	   			<option>Image only</option>
 	   			<option>Video only</option>
@@ -896,10 +945,10 @@ onChange={handleChange} value={inputs.fileTypeFilter || ""}
 	      </div>
 
 <label className="relative flex justify-between items-center p-2 text-xl"
-for="filterAction" >
+htmlFor="filterAction" >
 <span>{filterLabel}</span>
   <input name='inputs.fileTypeAction' onChange={toggleFilterQ}
-checked={inputs.fileTypeAction || false}
+
 type="checkbox" className="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span className="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
 bg-green-600 rounded-full duration-300 ease-in-out peer-checked:bg-red-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
@@ -1155,14 +1204,14 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 <div id="progress-up-progressArea"> 
   {uploadFileInfos.length > 0
   ? (
-  uploadFileInfos.map(({file,id, meta, bytesSent, rate, eta}, index) => (
+  uploadFileInfos.map(({file,id, meta, ts, bytesSent, rate, eta}, index) => (
 
   <section key={file.name} className="m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white mx-auto">
     <div className="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
 border-gray-300 text-gray-600 dark:text-white relative">
 
-  <div  onClick={() => delItem(id)} title="Delete" className="absolute
+  <div  onClick={() => delItem(index)} title="Delete" className="absolute
 cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
 	<img width="25" height="25" src={trashIcon} />
   </div>
@@ -1172,7 +1221,7 @@ cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
          <div className="h-12 text-sm text-grey-dark flex items-left
 justify-left">
 
-      		<div>{ showThumbnail(file, index) }</div>
+      		<div id="{id}-thumb">{ showThumbnail(file, index) }</div>
         </div>
       </div>
 
@@ -1185,11 +1234,11 @@ dark:text-white">
       	    </li>
       	    <li className="text-xl font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Date: {file.ts}
+      	    Date: {ts}
       	    </li>
       	    <li className="text-xl font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Type: {file.mime}
+      	    Type: {file.type}
       	    </li>
       	    <li className="text-xl font-light leading-relaxed text-gray-800
 dark:text-white">
@@ -1219,8 +1268,8 @@ dark:text-white">
 <div id="progress-up-errArea"> 
   {errInfos.length > 0
   ? (
-  errInfos.map(({err, meta, msg}, index) => (
-    <section key={err.name} className="bg-red-200 m-4 p-4 mt-4 mb-4 transition-colors
+  errInfos.map(({file, thumb, ts, meta, msg}, index) => (
+    <section key={file.name} className="bg-red-200 m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white">
  <div className="bg-red-600 dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
 
@@ -1233,7 +1282,7 @@ src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/ic
 
       <div className="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div className="h-12 text-sm text-grey-dark flex items-left justify-left">
-      <div>{ showThumbnail(err, index) }</div>
+      <div id="{id}-thumb" >{ showThumbnail(file, index) }</div>
          </div>
       </div>
 
@@ -1242,19 +1291,19 @@ src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/ic
          <ul>
       	    <li  className="font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Name: {err.name}
+      	    Name: {file.name}
       	    </li>
       	    <li className=" font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Date: {err.ts}
+      	    Date: {ts}
       	    </li>
       	    <li className=" font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Type: {err.mime}
+      	    Type: {file.type}
       	    </li>
       	    <li className="font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Size: {err.size} 
+      	    Size: {file.size} 
       	    </li>
        	    <li className="font-light leading-relaxed text-gray-800 dark:text-white">
 	    Metadata: {meta}
