@@ -32,6 +32,7 @@
     "file-system": "^2.2.2",
     "http-auth": "^4.2.0",
     "http-auth-connect": "^1.0.6",
+    "lit": "^2.4.1",
     "mongodb": "^4.6.0",
     "morgan": "^1.10.0",
     "morgan-body": "^2.6.8",

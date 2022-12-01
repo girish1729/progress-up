@@ -7,7 +7,8 @@
 This is a HTML5 multiple files Upload plugin with progress bar
 indicator.
 
-This uses the HTTP File API protocol to show continuous progress.
+
+This uses the [HTTP File API](https://www.w3.org/TR/FileAPI/) to show continuous progress.
 
 
 >This is the very first attempt to create a clean no frills upload plugin
@@ -259,6 +260,16 @@ If you wish to collaborate or send pull requests
 please get in touch using my Github profile.
 
 If you cannot write code, then buying me a coffee can work as well.
+
+
+## Alternatives
+
+- [Uppy](https://github.com/transloadit/uppy)
+- [DropIt](https://github.com/ThalKod/DropIt)
+- [Resumable.js](https://github.com/23/resumable.js)
+- [Filepond](https://github.com/pqina/filepond)
+- [Krajee bootstrap file input](https://github.com/kartik-v/bootstrap-fileinput)
+- [Dropzone](https://github.com/dropzone/dropzone)
 
 ## Contact
 
