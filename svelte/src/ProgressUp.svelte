@@ -1,5 +1,5 @@
 
-<!--
+<svelte:head>
 <script
 src="https://cdn.jsdelivr.net/npm/tus-js-client@latest/dist/tus.min.js"
 defer></script>
@@ -12,8 +12,8 @@ src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/pr
 defer></script>
 <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"
 defer></script>
+</svelte:head>
 
--->
 
 <script>
 </script>

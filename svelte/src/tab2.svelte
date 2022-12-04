@@ -1,4 +1,106 @@
 
+<script>
+
+    const needsAuth = (event: any) => {
+        enableAuth(event.target.checked);
+    };
+    const saveConfig = () => {
+        console.log(inputs);
+        console.log(inputs.uploadURL);
+        console.log(inputs.filesName);
+        console.log(inputs.progType);
+        if (inputs.authEnabled) {
+            console.log(inputs.authType);
+            console.log(inputs.user, inputs.pass);
+        }
+        console.log(inputs.fileSizeLimit);
+        console.log(inputs.sizeLimitType);
+        console.log(inputs.fileTypeFilter);
+        console.log(inputs.fileTypeAction);
+    };
+
+    const testUpload = async () => {
+        console.log("Uploading using HTML5 File API...");
+        let testForm = new FormData();
+
+        const blob = new Blob(['Test upload DELETE'], {
+            type: 'plain/text'
+        });
+        testForm.append(inputs.filesName, blob, 'progress-up-test.txt');
+        let options = {};
+        if (authEnabled) {
+            var username = 'user';
+            var password = 'password';
+            var basicAuth = 'Basic ' + btoa(username + ':' + password);
+            options = {
+                headers: {
+                    'Authorization': +basicAuth
+                }
+            };
+        }
+
+        await axios.post(inputs.uploadURL, testForm, options).then((resp) => {
+            alert("Test succeeded");
+        }).catch((error) => {
+            alert("Upload failed. Please check endpoint in Setup");
+            alert(error);
+        });
+    };
+
+
+    const setAuth = (event: any) => {
+        let auth = event.target.value;
+        setAuthType(auth);
+        console.log(auth);
+    };
+
+
+    const setIndicator = (event: any) => {
+
+        let ind = event.target.value;
+        ind = ind.toLowerCase()
+        setProgType(ind);
+        let extra;
+        console.log(ind);
+        switch (ind) {
+            case "bubble":
+                extra = 'data-img-size="100,100"';
+                break;
+            case "rainbow":
+                extra = 'data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"';
+                break;
+            default:
+                break;
+        }
+    };
+
+    const testEP = () => {
+        saveConfig();
+        testUpload();
+    };
+
+    const toggleSizeQ = () => {
+        let val = inputs.sizeLimitType;
+        if (val) {
+            sizeLabel = "Total limit";
+        } else {
+            sizeLabel = "Single file limit";
+        }
+    };
+
+    const toggleFilterQ = () => {
+        let val = inputs.fileTypeAction;
+        if (val) {
+            filterLabel = "Deny file type";
+        } else {
+            filterLabel = "Allow file type";
+        }
+    };
+
+
+
+</script>
+
 	<h2>File upload config</h2>
 	   <form class="w-full max-w-lg">
 	     <div class="flex flex-wrap -mx-3 mb-6">

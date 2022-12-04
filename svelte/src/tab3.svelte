@@ -1,3 +1,41 @@
+<script>
+
+    const spitStatistics = (idx: number) => {
+        if (uploadFileList && idx == uploadFileList.length - 1) {
+            let endUploadts = Date.now();
+            let totaltime = endUploadts - startUploadts;
+            let tsize = humanFileSize(totalsize);
+
+            var ts = new Date().toLocaleString();
+            var tot = uploadFileList.length;
+            var status = totalfiles == tot ? true : false;
+
+            var details = totalfiles + '/' + tot +
+                " files size " + tsize +
+                " sent in " + totaltime + " ms";
+            setDetails(details);
+
+            var id = statsTable.length + 1;
+            let stat = {
+                id: id,
+                ts: ts,
+                status: status,
+                details: details
+            };
+
+            let st: any = [...statsTable];
+            st.push(stat);
+            setStats(st);
+
+            setIsUploadDisabled(true);
+            setProgress([]);
+            setSize(0);
+            setNumberFiles(0);
+        }
+    };
+
+</script>
+
       <h2> Statistics </h2>
 	<div class="flex flex-col">
 	  <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
