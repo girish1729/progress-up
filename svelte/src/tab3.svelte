@@ -1,6 +1,8 @@
-<script>
+<script lang='ts'>
 
-    const spitStatistics = (idx: number) => {
+   const statsTable = [];
+
+    const spitStatistics = (idx ) => {
         if (uploadFileList && idx == uploadFileList.length - 1) {
             let endUploadts = Date.now();
             let totaltime = endUploadts - startUploadts;
@@ -23,7 +25,7 @@
                 details: details
             };
 
-            let st: any = [...statsTable];
+            let st = [...statsTable];
             st.push(stat);
             setStats(st);
 
@@ -70,9 +72,11 @@ font-medium text-gray-900">{stat.id}</td>
 	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
 
     {#if stat.status}
-                <img src={successIcon} /> 
+                <img src="assets/icons/misc/success-icon.svg"
+alt="Success icon" /> 
      {:else} 
-                <img src={failureIcon} />
+                <img src="assets/icons/misc/failure-icon.svg"
+alt="Failure icon" />
       {/if}
 	              </td>
 	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">

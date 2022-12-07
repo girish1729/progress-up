@@ -1,7 +1,29 @@
 
-<script>
+<script lang='ts'>
+   let sizeLabel =  "Single file limit";
+    let filterLabel:string =  "Allow file type";
+    let authEnabled:boolean = false;
 
-    const needsAuth = (event: any) => {
+    const inputs  = {
+        uploadURL: "",
+        filesName: "",
+        progType: "",
+        authEnabled: false,
+        authType: "",
+        user: "",
+        pass: "",
+        fileSizeLimit: 10,
+        sizeLimitType: "Single file limit",
+        fileTypeFilter: "All",
+        fileTypeAction: "Allow file type"
+    };
+
+     const handleChange = (event) => {
+        const name = event.target.name;
+        const value = event.target.value;
+    };
+
+    const needsAuth = (event) => {
         enableAuth(event.target.checked);
     };
     const saveConfig = () => {
@@ -48,14 +70,13 @@
     };
 
 
-    const setAuth = (event: any) => {
+    const setAuth = (event ) => {
         let auth = event.target.value;
         setAuthType(auth);
         console.log(auth);
     };
 
-
-    const setIndicator = (event: any) => {
+    const setIndicator = (event ) => {
 
         let ind = event.target.value;
         ind = ind.toLowerCase()
@@ -97,8 +118,6 @@
         }
     };
 
-
-
 </script>
 
 	<h2>File upload config</h2>
@@ -106,7 +125,7 @@
 	     <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
 	         <label class="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" htmlFor="inputs.uploadURL">
+	   font-bold mb-2" for="inputs.uploadURL">
 	          POST endpoint  
 	         </label>
 	         <input name="inputs.uploadURL" value={inputs.uploadURL || ""} 
@@ -121,7 +140,7 @@ CORS]" />
 	   
 	       <div class="w-full md:w-1/2 px-3">
 	         <label class="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" htmlFor="progress-up-filesName">
+	   font-bold mb-2" for="progress-up-filesName">
 	   	Name of files input field
 	         </label>
 	         <input name="inputs.filesName" value={inputs.filesName || ""} onChange={handleChange} id='filesName' class="appearance-none block w-full bg-gray-200
@@ -134,7 +153,7 @@ CORS]" />
 	     <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
 	         <label class="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" htmlFor="progType">
+	   font-bold mb-2" for="progType">
 	           Progress indicator type
 	         </label>
 	         <div class="relative">
@@ -164,14 +183,14 @@ CORS]" />
 	      <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
 <label class="relative flex justify-between items-center p-2 text-xl"
-htmlFor="fileSizeLimit" />
+for="fileSizeLimit" />
 <span>File Size Limit (MB)</span>
   <input name="fileSizeLimit" value={inputs.fileSizeLimit || ""}
 onChange={handleChange} class="m-6 p-6 form-range" type="range"
  min="10" max="1000" step="10" 
  />                      
 <output id="sizeLimit" name="sizeLimit"
-htmlFor="fileSizeLimit">{inputs.fileSizeLimit}</output>
+for="fileSizeLimit">{inputs.fileSizeLimit}</output>
 	</div>
 	</div>
 
@@ -179,7 +198,7 @@ htmlFor="fileSizeLimit">{inputs.fileSizeLimit}</output>
 	       <div class="w-full px-3">
 
 <label class="relative flex justify-between items-center p-2 text-xl"
-htmlFor="sizeToggle" >
+for="sizeToggle" >
 <span>{sizeLabel}</span>
   <input name="inputs.sizeLimitType" value={inputs.sizeLimitType || ""}
 onChange={toggleSizeQ}
@@ -196,7 +215,7 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 	      <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
 	         <label class="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" htmlFor="progress-up-indicator">
+	   font-bold mb-2" for="progress-up-indicator">
 	          File type Filters 
 	         </label>
 	         <div class="relative">
@@ -222,7 +241,7 @@ onChange={handleChange} value={inputs.fileTypeFilter || ""}
 	      </div>
 
 <label class="relative flex justify-between items-center p-2 text-xl"
-htmlFor="filterAction" >
+for="filterAction" >
 <span>{filterLabel}</span>
   <input name='inputs.fileTypeAction' onChange={toggleFilterQ}
 
@@ -248,7 +267,7 @@ checked={inputs.authEnabled || false} class="mr-2 leading-tight" type="checkbox"
 	        <div class="flex flex-wrap -mx-3 mb-6">
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
 	            <label class="block uppercase tracking-wide
-text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
+text-dark-700 text-xs font-bold mb-2" for="authType">
 	              Auth type
 	            </label>
 	            <div class="relative">
@@ -265,7 +284,7 @@ text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	      
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
 	            <label class="block uppercase tracking-wide text-dark-700 text-xs
-	      font-bold mb-2" htmlFor="user">
+	      font-bold mb-2" for="user">
 	             Username  
 	            </label>
 	            <input name='inputs.user' value={inputs.user || ""} onChange={handleChange} class="appearance-none block w-full bg-gray-200
@@ -277,7 +296,7 @@ text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	      
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
 	            <label class="block uppercase tracking-wide text-dark-700 text-xs
-	      font-bold mb-2" htmlFor="progress-up-pass">
+	      font-bold mb-2" for="progress-up-pass">
 	      	Password
 	            </label>
 	            <input name='inputs.pass' value={inputs.pass || ""} onChange={handleChange} class="appearance-none block w-full bg-gray-200

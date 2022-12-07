@@ -1,39 +1,61 @@
-<script>
+<script lang='ts'>
+  let isUploadDisabled = true;
+  let details = '';
+    const inputs  = {
+        uploadURL: "",
+        filesName: "",
+        progType: "",
+        authEnabled: false,
+        authType: "",
+        user: "",
+        pass: "",
+        fileSizeLimit: 10,
+        sizeLimitType: "Single file limit",
+        fileTypeFilter: "All",
+        fileTypeAction: "Allow file type"
+    };
+
+
   let isDragActive = false;
+ function handleDragEnter(e) {
+	isDragActive = true;
+    }
 
-    // From drag and drop
-    const onDrop = (files: any) => {
-        console.log("Dnd" + files);
-        setUpload(files);
-        setupUpload();
-    };
+    function handleDragLeave(e) {
+	isDragActive = false;
+    }
 
-    const {
-        getRootProps,
-        getInputProps,
-        isDragActive
-    } = useDropzone({
-        onDrop
-    })
 
-    const fileTypes: any = {
-        "video": avi,
-        "css": css,
-        "csv": csv,
-        "eps": eps,
-        "excel": excel,
-        "html": html,
-        "movie": mov,
-        "mp3": mp3,
-        "other": other,
-        "pdf": pdf,
-        "ppt": ppt,
-        "rar": rar,
-        "text": txt,
-        "audio": wav,
-        "word": word,
-        "zip": zip
-    };
+    function handleDragDrop(e) {
+        e.preventDefault();
+        dropFiles = e.dataTransfer.files;
+    	uploadFileList = dropFiles;
+    	setupUpload();
+    }
+
+    function handleDragEnd(e) {
+    e.dataTransfer.dropEffect = 'copy';
+    }
+
+var fileTypeIcons = {
+    "video": "avi.svg",
+    "css": "css.svg",
+    "csv": "csv.svg",
+    "eps": "eps.svg",
+    "excel": "excel.svg",
+    "html": "html.svg",
+    "movie": "mov.svg",
+    "mp3": "mp3.svg",
+    "other": "other.svg",
+    "pdf": "pdf.svg",
+    "ppt": "ppt.svg",
+    "rar": "rar.svg",
+    "text": "txt.svg",
+    "audio": "wav.svg",
+    "word": "word.svg",
+    "zip": "zip.svg"
+};
+
 
 
     let progress: any = {};
@@ -41,21 +63,12 @@
     let sizeLabel:string =  "Single file limit";
     let filterLabel:string =  "Allow file type";
 
-    const handleChange = (event: any) => {
-        const name = event.target.name;
-        const value = event.target.value;
-        setInputs(values => ({
-            ...values,
-            [name]: value
-        }));
-    };
-
     const handleSubmit = (event: any) => {
         event.preventDefault();
         console.log(inputs);
     };
 
-    useEffect(() => {
+   function updateTrig() {
         console.log("DOM Updated");
         console.log(uploadFileInfos);
         createBars();
@@ -63,7 +76,7 @@
             console.log('Disable upload without configuration');
             setIsUploadDisabled(true);
         }
-    }, [uploadFileInfos]);
+   }
 
     const darkMode = () => {
         console.log("dark mode change");
@@ -286,120 +299,6 @@ file.file.size);
         }
         return false;
     };
-
-    const showThumbnail = (f:any, i:number) => {
-        let reader = new FileReader();
-	let type = f.file.type.split('/')[0];
-        switch(true) {
-
-            case /image/.test(f.file.type):
-                reader.onload = (function(theFile) {
-                    return function(e) {
-                        if (e.target) {
-                            let imagesrc = String(e.target.result);
-			    if(imagesrc) {
-                            return ( 
-			<img width="125" height="125" src={imagesrc}
-                         title={f.name} alt={f.name}
-                                className= "w-12 h-12" / >
-                            );
-			   }
-                        }
-                    };
-                })(f);
-                reader.readAsDataURL(f);
-                break;
-
-            case /pdf/.test(f.file.type):
-                var pdfUrl = window.URL.createObjectURL(f);
-                return ( <PDFObject url={pdfUrl} />);
-                break;
-
-            case /audio/.test(f.file.type):
-                var audioUrl = window.URL.createObjectURL(f); 
-                return ( 
-		<audio className="h-9 w-9" controls >
-                    <source src={audioUrl} > 
-			</source> </audio>
-                );
-                break;
-            case /video/.test(f.file.type):
-                var videoUrl = window.URL.createObjectURL(f);
-                return ( 
-		  <video controls className="h-9 w-9" >
-                    <source src={videoUrl}> </source> </video>
-                );
-                break;
-
-            case /text/.test(f.file.type):
-                reader.onload = (function(f) {
-                    return function(e) {
-                        let res = e.target && e.target.result;
-                        let wc = wordCount(String(res));
-                        let meta = ` 
-   			Chars : ${wc.chars}
-   			Words: ${wc.words}
-   			Lines: ${wc.lines}
-  			`;
-                        let dataArray:any = res && String(res).split("\n");
-                        dataArray = dataArray && dataArray.slice(0, 20);
-                        let txt = dataArray && dataArray.join("\n");
-                        let fileIcon = fileTypes[type];
-                        return ( 
-			<img width="125" height="125" src={fileIcon}
-                         title={txt} alt={f.name}
-                            className="w-12 h-12" />
-                        );
-                    };
-                })(f);
-
-                break;
-            default:
-                let fileIcon = fileTypes[type];
-                if (fileIcon == undefined) {
-                    fileIcon = file;
-                }
-                return ( 
-		<img width = "125" height = "125" src = {fileIcon}
-                 title = {f.name} alt = {f.name}
-                    className = "w-12 h-12" / >
-                );
-        }
-    };
-
-    const createBars = () => {
-        const allBars: any = [];
-        if (uploadFileInfos) {
-            for (let j = 0; j < uploadFileInfos.length; j++) {
-                let id = 'a' + j;
-                let bar = new ldBar('#' + id, {
-                    preset: progType
-                });
-                bar.set(0);
-                allBars.push(bar);
-            }
-            setProgress(allBars);
-        }
-    };
-
-    const printBannedBanner = (file: File, id:string, ts:string,
-msg:string) => {
-        let errInfo = {
-            file: file,
-            meta: '',
-            id: id,
-            thumb: '',
-            ts: ts,
-            msg: msg
-     };
-
-	setErrInfos(prev => {
-		const newState = [...prev];
-                newState.push(errInfo);
-		return newState;
-        });
-    };
-
     const setupUpload = () => {
         var delQ:number[] = [];
 	if(!uploadFileList) {
@@ -462,23 +361,6 @@ index:number) {
     }
         setIsUploadDisabled(false);
     };
-
-    const delItem = (index:number) => {
-	let s:number;
-	if(uploadFileList) {
-	 s = uploadFileList[index].size;
-        s = totalsize - s;
-       setSize(s );
-	}
-        uploadFileList && uploadFileList.splice(index, 1);
-	let list = uploadFileList as File[];
-        setUpload(list);
-
-        uploadFileInfos && uploadFileInfos.splice(index, 1);
-        setFileInfos(uploadFileInfos);
-        checkTotalSize();
-    };
-
 </script>
 
 	<div id='progress-up-statsArea'>
@@ -486,12 +368,17 @@ index:number) {
 	</div>
 
 	<div  class=" p-4 rounded mx-auto bg-light"> 
-    	  <div class="{isDragActive ? 'bg-blue-400':'bg-light'} text-gold-400 border border-red-800 border-dashed
+    	  <div 
+	on:dragenter={handleDragEnter} 
+	on:dragleave={handleDragLeave}  
+	on:drop={handleDragDrop} 
+	ondragover="return false"
+class="{isDragActive ? 'bg-blue-400':'bg-light'} text-gold-400 border border-red-800 border-dashed
 rounded cursor-pointer" >
 	   <form class='flex p-8  justify-center'>
 		<img class="stroke-white dark:bg-white" width="100" height="100"
-src={uploadIcon} alt="progress-up file submit icon" />
-	       <input  onChange={fileSelectFinish} {...getInputProps()} name="uploadFiles" type="file" multiple hidden />
+src="assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" />
+	       <input  onChange={fileSelectFinish}  name="uploadFiles" type="file" multiple hidden />
 	   </form>
 	   <h2 class="flex justify-center text-dark-500 text-xl font-medium mb-2"> 
 	     Drop files or click to select</h2>
