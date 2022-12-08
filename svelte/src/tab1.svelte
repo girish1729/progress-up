@@ -1,21 +1,8 @@
 <script lang='ts'>
+   import {inputs} from './store.js';
   let isUploadDisabled = true;
   let details = '';
-    const inputs  = {
-        uploadURL: "",
-        filesName: "",
-        progType: "",
-        authEnabled: false,
-        authType: "",
-        user: "",
-        pass: "",
-        fileSizeLimit: 10,
-        sizeLimitType: "Single file limit",
-        fileTypeFilter: "All",
-        fileTypeAction: "Allow file type"
-    };
-
-
+   
   let isDragActive = false;
  function handleDragEnter(e) {
 	isDragActive = true;
@@ -72,7 +59,7 @@ var fileTypeIcons = {
         console.log("DOM Updated");
         console.log(uploadFileInfos);
         createBars();
-        if (inputs.uploadURL == undefined || inputs.filesName == undefined) {
+        if ($inputs.uploadURL == undefined || $inputs.filesName == undefined) {
             console.log('Disable upload without configuration');
             setIsUploadDisabled(true);
         }
@@ -85,10 +72,10 @@ var fileTypeIcons = {
 
     const uploadOneFile = async (file: any, idx: number) => {
         let formData = new FormData();
-        formData.append(inputs.filesName, file);
+        formData.append($inputs.filesName, file);
         let fname = file.name;
-        console.log("Uploading to " + inputs.uploadURL);
-        console.log("Uploading file name" + inputs.filesName);
+        console.log("Uploading to " + $inputs.uploadURL);
+        console.log("Uploading file name" + $inputs.filesName);
        let options = {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -120,7 +107,7 @@ file.file.size);
                 };
             }
 
-        await axios.post(inputs.uploadURL, formData, options).then(function() {
+        await axios.post($inputs.uploadURL, formData, options).then(function() {
             spitStatistics(idx);
             console.log("All files uploaded");
             }).catch((error) => {
@@ -208,8 +195,8 @@ file.file.size);
 
 
     const applyFilter = () => {
-        let filt = inputs.fileTypeFilter;
-        let action = inputs.fileTypeAction;
+        let filt = $inputs.fileTypeFilter;
+        let action = $inputs.fileTypeAction;
         console.log(filt, action);
         switch (filt) {
             case "All":
@@ -284,15 +271,15 @@ file.file.size);
     };
 
     const checkSize = (size:number) => {
-        if (size <= (inputs.fileSizeLimit * 1024 * 1024)) {
+        if (size <= ($inputs.fileSizeLimit * 1024 * 1024)) {
             return true;
         }
         return false;
     };
 
     const checkTotalSize =() => {
-        if (inputs.sizeLimitType == "Total limit") {
-            if (totalsize <= (inputs.fileSizeLimit * 1024 * 1024)) {
+        if ($inputs.sizeLimitType == "Total limit") {
+            if (totalsize <= ($inputs.fileSizeLimit * 1024 * 1024)) {
                 return true;
             }
             return false;
@@ -388,14 +375,14 @@ src="assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" />
 
 	<div id="config">
 
-    {#if inputs.uploadURL || inputs.filesName}
+    {#if $inputs.uploadURL || $inputs.filesName}
 		<h2 class="leading-tight pb-2">
 	&#128202; Progress type <span
-class='text-sm'>{progType}</span>  
+class='text-sm'>{$inputs.progType}</span>  
 			 &#128228; Upload URL <span
-class='text-sm'>{inputs.uploadURL}</span> 
+class='text-sm'>{$inputs.uploadURL}</span> 
 		&#128218; FilesName <span
-class='text-sm'>{inputs.filesName}</span>
+class='text-sm'>{$inputs.filesName}</span>
 		</h2>
    {:else}
 		<h2 class="leading-tight pb-2">

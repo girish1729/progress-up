@@ -1,22 +1,10 @@
 
 <script lang='ts'>
+   import {inputs} from './store.js';
    let sizeLabel =  "Single file limit";
     let filterLabel:string =  "Allow file type";
     let authEnabled:boolean = false;
 
-    const inputs  = {
-        uploadURL: "",
-        filesName: "",
-        progType: "",
-        authEnabled: false,
-        authType: "",
-        user: "",
-        pass: "",
-        fileSizeLimit: 10,
-        sizeLimitType: "Single file limit",
-        fileTypeFilter: "All",
-        fileTypeAction: "Allow file type"
-    };
 
      const handleChange = (event) => {
         const name = event.target.name;
@@ -27,18 +15,18 @@
         enableAuth(event.target.checked);
     };
     const saveConfig = () => {
-        console.log(inputs);
-        console.log(inputs.uploadURL);
-        console.log(inputs.filesName);
-        console.log(inputs.progType);
-        if (inputs.authEnabled) {
-            console.log(inputs.authType);
-            console.log(inputs.user, inputs.pass);
+        console.log($inputs);
+        console.log($inputs.uploadURL);
+        console.log($inputs.filesName);
+        console.log($inputs.progType);
+        if ($inputs.authEnabled) {
+            console.log($inputs.authType);
+            console.log($inputs.user, inputs.pass);
         }
-        console.log(inputs.fileSizeLimit);
-        console.log(inputs.sizeLimitType);
-        console.log(inputs.fileTypeFilter);
-        console.log(inputs.fileTypeAction);
+        console.log($inputs.fileSizeLimit);
+        console.log($inputs.sizeLimitType);
+        console.log($inputs.fileTypeFilter);
+        console.log($inputs.fileTypeAction);
     };
 
     const testUpload = async () => {
@@ -128,7 +116,7 @@
 	   font-bold mb-2" for="inputs.uploadURL">
 	          POST endpoint  
 	         </label>
-	         <input name="inputs.uploadURL" value={inputs.uploadURL || ""} 
+	         <input name="inputs.uploadURL" bind:value={$inputs.uploadURL} 
         onChange={handleChange}
 class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
@@ -143,7 +131,7 @@ CORS]" />
 	   font-bold mb-2" for="progress-up-filesName">
 	   	Name of files input field
 	         </label>
-	         <input name="inputs.filesName" value={inputs.filesName || ""} onChange={handleChange} id='filesName' class="appearance-none block w-full bg-gray-200
+	         <input name="inputs.filesName" bind:value={$inputs.filesName} onChange={handleChange} id='filesName' class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	    type="text" placeholder="Name of files input field" />
@@ -157,7 +145,8 @@ CORS]" />
 	           Progress indicator type
 	         </label>
 	         <div class="relative">
-	           <select name='progType' onChange={setIndicator} value={inputs.progType || ""} class="block appearance-none w-full bg-gray-200 border
+	           <select name='progType' onChange={setIndicator}
+bind:value={$inputs.progType} class="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	   >
@@ -177,20 +166,18 @@ CORS]" />
 	       </div>
 	      </div>
 	
-
-
 	
 	      <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="fileSizeLimit" />
 <span>File Size Limit (MB)</span>
-  <input name="fileSizeLimit" value={inputs.fileSizeLimit || ""}
+  <input name="fileSizeLimit" bind:value={$inputs.fileSizeLimit}
 onChange={handleChange} class="m-6 p-6 form-range" type="range"
  min="10" max="1000" step="10" 
  />                      
 <output id="sizeLimit" name="sizeLimit"
-for="fileSizeLimit">{inputs.fileSizeLimit}</output>
+for="fileSizeLimit">{$inputs.fileSizeLimit}</output>
 	</div>
 	</div>
 
@@ -200,7 +187,7 @@ for="fileSizeLimit">{inputs.fileSizeLimit}</output>
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="sizeToggle" >
 <span>{sizeLabel}</span>
-  <input name="inputs.sizeLimitType" value={inputs.sizeLimitType || ""}
+  <input name="inputs.sizeLimitType" bind:value={$inputs.sizeLimitType}
 onChange={toggleSizeQ}
 
  type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
@@ -220,7 +207,7 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 	         </label>
 	         <div class="relative">
 	           <select name="progress-up-filter"
-onChange={handleChange} value={inputs.fileTypeFilter || ""}
+onChange={handleChange} bind:value={$inputs.fileTypeFilter}
  class="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
@@ -271,7 +258,8 @@ text-dark-700 text-xs font-bold mb-2" for="authType">
 	              Auth type
 	            </label>
 	            <div class="relative">
-	              <select id='authType' onChange={setAuth} value={inputs.authType || ""} class="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
+	              <select id='authType' onChange={setAuth}
+bind:value={$inputs.authType} class="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
 	                <option>HTTP basic auth</option>
 	                <option>HTTP digest auth</option>
 	              </select>
@@ -287,7 +275,7 @@ text-dark-700 text-xs font-bold mb-2" for="authType">
 	      font-bold mb-2" for="user">
 	             Username  
 	            </label>
-	            <input name='inputs.user' value={inputs.user || ""} onChange={handleChange} class="appearance-none block w-full bg-gray-200
+	            <input name='inputs.user' bind:value={$inputs.user} onChange={handleChange} class="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	      focus:outline-none focus:bg-light"  type="text"
 	      placeholder="username" />
@@ -299,7 +287,7 @@ text-dark-700 text-xs font-bold mb-2" for="authType">
 	      font-bold mb-2" for="progress-up-pass">
 	      	Password
 	            </label>
-	            <input name='inputs.pass' value={inputs.pass || ""} onChange={handleChange} class="appearance-none block w-full bg-gray-200
+	            <input name='inputs.pass' bind:value={$inputs.pass} onChange={handleChange} class="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	      focus:outline-none focus:bg-light focus:border-gray-500"
 	       type="password" placeholder="Password" />
@@ -308,13 +296,13 @@ text-dark-700 text-xs font-bold mb-2" for="authType">
  	   </div>
      {/if} 
 	   
-	   <button type="button" onClick={saveConfig} class="inline-block px-6
+	   <button type="button" on:click={saveConfig} class="inline-block px-6
 	py-2.5 bg-red-600 text-dark dark:text-white font-medium text-xs leading-tight uppercase
 	rounded shadow-md hover:bg-red-700 hover:shadow-lg focus:bg-red-700
 	focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-800
 	active:shadow-lg transition duration-150 ease-in-out">Save</button>
 	   
-	   <button type="button" onClick={testEP} class="inline-block
+	   <button type="button" on:click={testEP} class="inline-block
 px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs
 leading-tight uppercase rounded shadow-md hover:bg-blue-500
 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none
