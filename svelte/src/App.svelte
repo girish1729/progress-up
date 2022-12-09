@@ -142,9 +142,8 @@ import Tab4 from './tab4.svelte';
           <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
              <div class="h-12 text-sm text-grey-dark flex items-left
     justify-left">
-
 		<div  id="{info.id}-thumb">
-	 {@html info.thumb}
+	 		{@html info.thumb }
 		</div>
              </div>
           </div>
@@ -166,15 +165,14 @@ import Tab4 from './tab4.svelte';
           	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800
     dark:text-white">
-          	    Size: {info.file.size} 
+          	    Size: {info.size} 
           	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800 dark:text-white">
-       	    <li class="font-light leading-relaxed text-gray-800
-dark:text-white">
+       	    <li class="text-xl font-light leading-relaxed text-gray-800 dark:text-white">
 		    Metadata: {info.meta}
       	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800 dark:text-white">
-		<span>{info.bytesSent} of {info.file.size} uploaded
+		<span>{info.bytesSent} of {info.size} uploaded
 {info.rate} MB/s ETA {info.eta} s</span>
           	    </li>
               </ul>
@@ -203,8 +201,8 @@ src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/ic
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
 		<div  id="{err.id}-thumb">
-	  {@html "err.thumb"}
-	</div>
+	  		{@html err.thumb}
+		</div>
          </div>
       </div>
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">

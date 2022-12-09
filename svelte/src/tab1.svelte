@@ -2,15 +2,17 @@
 	<script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js" ></script>
 	<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" ></script>
 	<script  src="https://cdn.jsdelivr.net/npm/pdfobject@2.2.8/pdfobject.min.js" ></script>
-	<script context="module" src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/progressBar/loading-bar.js" ></script>
 </svelte:head>
 
 <script lang='ts'>
+   import ldBar from 'https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/progressBar/loading-bar.js';
    import {afterUpdate} from 'svelte';
-   import {inputs, totalsize, totalfiles, progressBars, errInfos, uploadFileInfos, uploadFileList } from './store.ts';
+   import {inputs, totalsize, totalfiles, statsTable, progressBars, errInfos, uploadFileInfos, uploadFileList } from './store.ts';
   let isUploadDisabled = true;
   let browseInput;
   let details = '';
+  let startUploadts = 0;
+  let thumbNailsDone = false;
 
     var filtFiles = {
         "type": "all",
@@ -74,12 +76,12 @@ var fileTypeIcons = {
         console.log("DOM Updated");
    })
 
-    const uploadOneFile = async (file: any, idx: number) => {
+    const uploadOneFile = async (info: any, idx: number) => {
         let formData = new FormData();
-        formData.append($inputs.filesName, file);
-        let fname = file.name;
-        console.log("Uploading to " + $inputs.uploadURL);
-        console.log("Uploading file name" + $inputs.filesName);
+        formData.append($inputs.filesName, info.file);
+        let fname = info.file.name;
+        console.log("Uploading to ::" + $inputs.uploadURL);
+        console.log("Uploading file name ::" + $inputs.filesName);
        let options = {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -89,19 +91,17 @@ var fileTypeIcons = {
                 let perc: number;
                 if (progE.total) {
                     perc = (progE.loaded / progE.total) * 100;
-                    let obj: any = $progressBars[idx];
-                    obj.set(perc);
-                    file.bytesSent = humanFileSize(progE.progress *
-file.file.size);
-                    file.eta = progE.estimated;
-                    file.rate = (progE.rate / 1024 / 1024).toFixed(2);
+                    $progressBars[idx].set(perc);
+                    info.bytesSent = humanFileSize(progE.progress * info.file.size);
+                    info.eta = progE.estimated;
+                    info.rate = (progE.rate / 1024 / 1024).toFixed(2);
 
-                    console.log(perc);
+                    console.log(info.bytesSent, info.eta, info.rate, perc);
                 }
             },
 	};
 
-            if (authEnabled) {
+            if ($inputs.authEnabled) {
                 var username = "user";
                 var password = "password";
                 var basicAuth = "Basic " + btoa(username + ":" + password);
@@ -114,6 +114,7 @@ file.file.size);
         await axios.post($inputs.uploadURL, formData, options).then(function() {
             spitStatistics(idx);
             console.log("All files uploaded");
+	    thumbNailsDone = true;
             }).catch((error) => {
                 alert("Upload failed. Please check endpoint in Setup");
                 alert(error);
@@ -123,10 +124,10 @@ file.file.size);
 
     const uploadAll = () => {
         startUploadts = Date.now();
-        if (uploadFileInfos) {
-            for (let i = 0; i < uploadFileInfos.length; i++) {
-                let file = uploadFileInfos[i];
-                uploadOneFile(file, i);
+        if ($uploadFileInfos) {
+            for (let i = 0; i < $uploadFileInfos.length; i++) {
+                let info = $uploadFileInfos[i];
+                uploadOneFile(info, i);
             }
         }
     };
@@ -156,28 +157,24 @@ file.file.size);
 
             var ts = new Date().toLocaleString();
             var tot = $uploadFileList.length;
-            var status = totalfiles == tot ? true : false;
+            var status = $totalfiles == tot ? true : false;
 
-            var details = $totalfiles + '/' + tot +
+            details = $totalfiles + '/' + tot +
                 " files size " + tsize +
                 " sent in " + totaltime + " ms";
 
-            var id = statsTable.length + 1;
+            var id = $statsTable.length + 1;
             let stat = {
                 id: id,
                 ts: ts,
                 status: status,
                 details: details
             };
-
-            let st: any = [...statsTable];
-            st.push(stat);
-            setStats(st);
-
+	    statsTable.set([...$statsTable,stat]);
             isUploadDisabled = true;
-            setProgress([]);
-            setSize(0);
-            setNumberFiles(0);
+            $progressBars = [];
+	    $totalfiles = 0;
+	    $totalsize = 0;
         }
     };
 
@@ -192,6 +189,7 @@ file.file.size);
 	$totalfiles = 0;
 	$totalsize = 0;
         console.log("Cleared");
+	thumbNailsDone = false;
     };
 
  const checkTotalSize =() => {
@@ -299,11 +297,10 @@ msg:string)  => {
         });
     };
 
-const showThumbnail = (f:fileInfo, i: number) => {
+const showThumbnail = (f:fileInfo, i: number, cb) => {
 	console.log("creating thumb for " + f.file.name);
         let id = 'a' + i;
         let target = id + '-thumb';
-	let self = this;
 	let type = f.file.type.split('/')[0];
         switch (true) {
             case /text/.test(f.file.type):
@@ -315,8 +312,8 @@ const showThumbnail = (f:fileInfo, i: number) => {
 			if(e.target) {
                         	res = e.target.result;
 			}
-                        let wc = self.wordCount(res);
-                        f.meta = ` 
+                        let wc = wordCount(res);
+                        $: f.meta = ` 
    			Chars : ${wc.chars}
    			Words: ${wc.words}
    			Lines: ${wc.lines}
@@ -324,9 +321,8 @@ const showThumbnail = (f:fileInfo, i: number) => {
                         var dataArray = (<string>res).split("\n");
                         dataArray = dataArray.slice(0, 20);
                         let txt = dataArray.join("\n");
-
-                        var fileIcon = self.fileTypeIcons[type];
-                        let pic = "src/assets/icons/filetypes/" +
+                        var fileIcon = fileTypeIcons[type];
+                        let pic = "/assets/icons/filetypes/" +
                             fileIcon;
                         f.thumb = [
                                 '<img width="125" height="125" src="',
@@ -337,7 +333,7 @@ const showThumbnail = (f:fileInfo, i: number) => {
                                 locf.name,
                                 '" class="w-12 h-12" />'
                             ].join('');
-
+			cb();
                     };
                 })(f.file);
                 reader.readAsText(f.file);
@@ -361,6 +357,7 @@ const showThumbnail = (f:fileInfo, i: number) => {
                                 '" class="w-12 h-12" />'
                             ].join(''); 
                             f.meta = locf.name;
+			    cb();
                     };
                 })(f.file);
                 reader.readAsDataURL(f.file);
@@ -408,130 +405,8 @@ const showThumbnail = (f:fileInfo, i: number) => {
                     fileIcon = "file.svg";
                 }
                 f.meta = f.file.name;
-                let pic = "src/assets/icons/filetypes/" + fileIcon;
-                f.thumb = [
-                    '<img width="125" height="125" src=',
-                    pic,
-                    '" title="',
-                    f.file.name,
-		    '" alt="',
-                    f.file.name,
-                    '" class="w-12 h-12" />'
-                ].join('');
-                break;
-        }
-    };
-
-    const showErrThumbnail = (f:errInfo, i: number) => {
-        let id = 'a' + i;
-        let target = id + '-thumb';
-	let self = this;
-	let type = f.file.type.split('/')[0];
-        switch (true) {
-            case /text/.test(f.file.type):
-                console.log("Text type detected");
-                var reader = new FileReader();
-                reader.onload = (function(locf) {
-                    return function(e) {
-			let res:any;
-			if(e.target) {
-                        	res = e.target.result;
-			}
-                        let wc = self.wordCount(res);
-                        f.meta = ` 
-   			Chars : ${wc.chars}
-   			Words: ${wc.words}
-   			Lines: ${wc.lines}
-			`;
-                        var dataArray = (<string>res).split("\n");
-                        dataArray = dataArray.slice(0, 20);
-                        let txt = dataArray.join("\n");
-
-                        var fileIcon = self.fileTypeIcons[type];
-                        let pic = "src/assets/icons/filetypes/" +
-                            fileIcon;
-                        f.thumb = [
-                                '<img width="125" height="125" src="',
-                                pic,
-                                '" title="',
-                                txt,
-				 '" alt="',
-                                locf.name,
-                                '" class="w-12 h-12" />'
-                            ].join('');
-
-                    };
-                })(f.file);
-                reader.readAsText(f.file);
-                break;
-            case /image/.test(f.file.type):
-                console.log("Image type detected");
-                var reader = new FileReader();
-                reader.onload = (function(locf) {
-                    return function(e) {
-			let pic:any;
-			if(e.target) {
-                        	pic = e.target.result;
-			}
-                        f.thumb = [
-                                '<img width="125" height="125" src="',
-                                pic,
-                                '" title="',
-                                locf.name,
-				 '" alt="',
-                                locf.name,
-                                '" class="w-12 h-12" />'
-                            ].join(''); 
-                            f.meta = locf.name;
-                    };
-                })(f.file);
-                reader.readAsDataURL(f.file);
-                break;
-            case /audio/.test(f.file.type):
-                console.log("Audio type detected");
-                var audioUrl = window.URL.createObjectURL(f.file);
-                f.thumb = [
-                    '<audio controls class="h-9 w-9" width="125" height="125"> ',
-		    '<source src="',
-                    audioUrl,
-                    '" title="',
-                    f.file.name,
-                    '" alt="',
-                    f.file.name,
-                    '" > </source> </audio> />'
-                ].join('');
-                f.meta = f.file.name;
-                break;
-            case /video/.test(f.file.type):
-                console.log("Video type detected");
-                var videoUrl = window.URL.createObjectURL(f.file);
-                f.thumb = [
-                    '<video controls class="h-9 w-9" width="125" height="125">',
-		    '<source src="',
-                    videoUrl,
-                    '" title="',
-                    f.file.name,
-                    '" alt="',
-                    f.file.name,
-                    '" > </source> </video> />'
-                ].join('');
-                f.meta = f.file.name;
-                break;
-            case /pdf/.test(f.file.type):
-                console.log("PDF type detected");
-                var pdfURL = window.URL.createObjectURL(f.file);
-                f.meta = f.file.name;
-                PDFObject.embed(pdfURL, target);
-                break;
-            default:
-                console.log("default type detected");
-                var fileIcon = fileTypeIcons[type];
-                if (fileIcon == undefined) {
-                    fileIcon = "file.svg";
-                }
-                f.meta = f.file.name;
-                let pic = "src/assets/icons/filetypes/" + fileIcon;
-                f.thumb = [
+                let pic = "/assets/icons/filetypes/" + fileIcon;
+                $: f.thumb = [
                     '<img width="125" height="125" src=',
                     pic,
                     '" title="',
@@ -545,32 +420,36 @@ const showThumbnail = (f:fileInfo, i: number) => {
     };
 
     const createBars = () => {
-	/*
-        if (!thumbNailsDone) {
+	console.log(thumbNailsDone);
+        if (thumbNailsDone) {
 	    console.log("Returning immediately");
             return;
         }
-	*/
-        $progressBars = [];
         for (var i = 0; i < $uploadFileInfos.length; i++) {
             let f = $uploadFileInfos[i];
             let id = 'a' + i;
-	    /*
             let bar = new ldBar('#' + id, {
-                preset: this.form.progType.toLowerCase()
+                preset: $inputs.progType.toLowerCase()
             });
             bar.set(0);
             console.log("Creating progress bar::" + id);
-            $progressBars.push(bar);
-	    */
-            showThumbnail(f, i);
+            progressBars.set([...$progressBars,bar]);
+            showThumbnail(f, i, function() {
+		if(i == $uploadFileInfos.length - 1) {
+        	thumbNailsDone = true;
+		console.log("All thumbnails done");
+		}
+	    });
         }
         for (var i = 0; i < $errInfos.length; i++) {
             let f = $errInfos[i];
-            showErrThumbnail(f, i);
+            showThumbnail(f, i, function() {
+		if(i == $errInfos.length - 1) {
+        	thumbNailsDone = true;
+		console.log("All thumbnails done");
+		}
+	    });
         }
-        //thumbNailsDone = false;
-	console.log("All thumbnails done");
     };
 
     const setupUpload = () => {
@@ -610,8 +489,10 @@ const showThumbnail = (f:fileInfo, i: number) => {
                     isUploadDisabled = true;
                 }
             }
-            let fInfo = {
+            let fInfo; 
+            fInfo = {
                 file: f,
+                size: size,
                 id: id,
                 thumb: '',
                 meta: '',
