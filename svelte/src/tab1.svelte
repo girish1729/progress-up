@@ -1,7 +1,23 @@
+<svelte:head>
+	<script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js" ></script>
+	<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" ></script>
+	<script  src="https://cdn.jsdelivr.net/npm/pdfobject@2.2.8/pdfobject.min.js" ></script>
+	<script context="module" src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/progressBar/loading-bar.js" ></script>
+</svelte:head>
+
 <script lang='ts'>
-   import {inputs} from './store.js';
+   import {afterUpdate} from 'svelte';
+   import {inputs, totalsize, totalfiles, progressBars, errInfos, uploadFileInfos, uploadFileList } from './store.ts';
   let isUploadDisabled = true;
+  let browseInput;
   let details = '';
+
+    var filtFiles = {
+        "type": "all",
+        "action": "allow"
+    };
+
+
    
   let isDragActive = false;
  function handleDragEnter(e) {
@@ -16,7 +32,7 @@
     function handleDragDrop(e) {
         e.preventDefault();
         dropFiles = e.dataTransfer.files;
-    	uploadFileList = dropFiles;
+    	$uploadFileList = dropFiles;
     	setupUpload();
     }
 
@@ -43,8 +59,6 @@ var fileTypeIcons = {
     "zip": "zip.svg"
 };
 
-
-
     let progress: any = {};
     let showProgress: boolean = true;
     let sizeLabel:string =  "Single file limit";
@@ -55,20 +69,10 @@ var fileTypeIcons = {
         console.log(inputs);
     };
 
-   function updateTrig() {
-        console.log("DOM Updated");
-        console.log(uploadFileInfos);
+   afterUpdate(() => {
         createBars();
-        if ($inputs.uploadURL == undefined || $inputs.filesName == undefined) {
-            console.log('Disable upload without configuration');
-            setIsUploadDisabled(true);
-        }
-   }
-
-    const darkMode = () => {
-        console.log("dark mode change");
-        document.documentElement.classList.toggle('dark');
-    };
+        console.log("DOM Updated");
+   })
 
     const uploadOneFile = async (file: any, idx: number) => {
         let formData = new FormData();
@@ -85,7 +89,7 @@ var fileTypeIcons = {
                 let perc: number;
                 if (progE.total) {
                     perc = (progE.loaded / progE.total) * 100;
-                    let obj: any = progressBars[idx];
+                    let obj: any = $progressBars[idx];
                     obj.set(perc);
                     file.bytesSent = humanFileSize(progE.progress *
 file.file.size);
@@ -130,7 +134,7 @@ file.file.size);
     const fileSelectFinish = (e: any) => {
         let files = e.target.files;
         console.log(files);
-        setUpload(files);
+        $uploadFileList = files;
         setupUpload();
     };
 
@@ -145,19 +149,18 @@ file.file.size);
 
 
     const spitStatistics = (idx: number) => {
-        if (uploadFileList && idx == uploadFileList.length - 1) {
+        if ($uploadFileList && idx == $uploadFileList.length - 1) {
             let endUploadts = Date.now();
             let totaltime = endUploadts - startUploadts;
-            let tsize = humanFileSize(totalsize);
+            let tsize = humanFileSize($totalsize);
 
             var ts = new Date().toLocaleString();
-            var tot = uploadFileList.length;
+            var tot = $uploadFileList.length;
             var status = totalfiles == tot ? true : false;
 
-            var details = totalfiles + '/' + tot +
+            var details = $totalfiles + '/' + tot +
                 " files size " + tsize +
                 " sent in " + totaltime + " ms";
-            setDetails(details);
 
             var id = statsTable.length + 1;
             let stat = {
@@ -171,7 +174,7 @@ file.file.size);
             st.push(stat);
             setStats(st);
 
-            setIsUploadDisabled(true);
+            isUploadDisabled = true;
             setProgress([]);
             setSize(0);
             setNumberFiles(0);
@@ -180,19 +183,26 @@ file.file.size);
 
 
     const clearAll = () => {
-        setDetails("");
-        if (inputRef.current) {
-            inputRef.current.value = "";
-        }
-        setFileInfos([]);
-        setErrInfos([]);
-        setProgress([]);
-        setIsUploadDisabled(true);
-	setNumberFiles(0);
-	setSize(0);
+        details = "";
+	$: $uploadFileInfos = [];
+	$uploadFileList = [];
+        $errInfos = [];
+        $progressBars = [];
+        isUploadDisabled = true;
+	$totalfiles = 0;
+	$totalsize = 0;
         console.log("Cleared");
     };
 
+ const checkTotalSize =() => {
+        if ($inputs.sizeLimitType == "Total limit") {
+            if ($totalsize <= ($inputs.fileSizeLimit * 1024 * 1024)) {
+                return true;
+            }
+            return false;
+        }
+        return false;
+    };
 
     const applyFilter = () => {
         let filt = $inputs.fileTypeFilter;
@@ -277,27 +287,305 @@ file.file.size);
         return false;
     };
 
-    const checkTotalSize =() => {
-        if ($inputs.sizeLimitType == "Total limit") {
-            if (totalsize <= ($inputs.fileSizeLimit * 1024 * 1024)) {
-                return true;
-            }
-            return false;
-        }
-        return false;
+    const printBannedBanner = (file:File, id: string, ts:string,
+msg:string)  => {
+        $errInfos.push({
+            file: file,
+            id: id,
+            meta: '',
+            thumb: '',
+            ts: ts,
+            msg: msg
+        });
     };
+
+const showThumbnail = (f:fileInfo, i: number) => {
+	console.log("creating thumb for " + f.file.name);
+        let id = 'a' + i;
+        let target = id + '-thumb';
+	let self = this;
+	let type = f.file.type.split('/')[0];
+        switch (true) {
+            case /text/.test(f.file.type):
+                console.log("Text type detected");
+                var reader = new FileReader();
+                reader.onload = (function(locf) {
+                    return function(e) {
+			let res:any;
+			if(e.target) {
+                        	res = e.target.result;
+			}
+                        let wc = self.wordCount(res);
+                        f.meta = ` 
+   			Chars : ${wc.chars}
+   			Words: ${wc.words}
+   			Lines: ${wc.lines}
+			`;
+                        var dataArray = (<string>res).split("\n");
+                        dataArray = dataArray.slice(0, 20);
+                        let txt = dataArray.join("\n");
+
+                        var fileIcon = self.fileTypeIcons[type];
+                        let pic = "src/assets/icons/filetypes/" +
+                            fileIcon;
+                        f.thumb = [
+                                '<img width="125" height="125" src="',
+                                pic,
+                                '" title="',
+                                txt,
+				 '" alt="',
+                                locf.name,
+                                '" class="w-12 h-12" />'
+                            ].join('');
+
+                    };
+                })(f.file);
+                reader.readAsText(f.file);
+                break;
+            case /image/.test(f.file.type):
+                console.log("Image type detected");
+                var reader = new FileReader();
+                reader.onload = (function(locf) {
+                    return function(e) {
+			let pic:any;
+			if(e.target) {
+                        	pic = e.target.result;
+			}
+                        f.thumb = [
+                                '<img width="125" height="125" src="',
+                                pic,
+                                '" title="',
+                                locf.name,
+				 '" alt="',
+                                locf.name,
+                                '" class="w-12 h-12" />'
+                            ].join(''); 
+                            f.meta = locf.name;
+                    };
+                })(f.file);
+                reader.readAsDataURL(f.file);
+                break;
+            case /audio/.test(f.file.type):
+                console.log("Audio type detected");
+                var audioUrl = window.URL.createObjectURL(f.file);
+                f.thumb = [
+                    '<audio controls class="h-9 w-9" width="125" height="125"> ',
+		    '<source src="',
+                    audioUrl,
+                    '" title="',
+                    f.file.name,
+                    '" alt="',
+                    f.file.name,
+                    '" > </source> </audio> />'
+                ].join('');
+                f.meta = f.file.name;
+                break;
+            case /video/.test(f.file.type):
+                console.log("Video type detected");
+                var videoUrl = window.URL.createObjectURL(f.file);
+                f.thumb = [
+                    '<video controls class="h-9 w-9" width="125" height="125">',
+		    '<source src="',
+                    videoUrl,
+                    '" title="',
+                    f.file.name,
+                    '" alt="',
+                    f.file.name,
+                    '" > </source> </video> />'
+                ].join('');
+                f.meta = f.file.name;
+                break;
+            case /pdf/.test(f.file.type):
+                console.log("PDF type detected");
+                var pdfURL = window.URL.createObjectURL(f.file);
+                f.meta = f.file.name;
+                PDFObject.embed(pdfURL, target);
+                break;
+            default:
+                console.log("default type detected");
+                var fileIcon = fileTypeIcons[type];
+                if (fileIcon == undefined) {
+                    fileIcon = "file.svg";
+                }
+                f.meta = f.file.name;
+                let pic = "src/assets/icons/filetypes/" + fileIcon;
+                f.thumb = [
+                    '<img width="125" height="125" src=',
+                    pic,
+                    '" title="',
+                    f.file.name,
+		    '" alt="',
+                    f.file.name,
+                    '" class="w-12 h-12" />'
+                ].join('');
+                break;
+        }
+    };
+
+    const showErrThumbnail = (f:errInfo, i: number) => {
+        let id = 'a' + i;
+        let target = id + '-thumb';
+	let self = this;
+	let type = f.file.type.split('/')[0];
+        switch (true) {
+            case /text/.test(f.file.type):
+                console.log("Text type detected");
+                var reader = new FileReader();
+                reader.onload = (function(locf) {
+                    return function(e) {
+			let res:any;
+			if(e.target) {
+                        	res = e.target.result;
+			}
+                        let wc = self.wordCount(res);
+                        f.meta = ` 
+   			Chars : ${wc.chars}
+   			Words: ${wc.words}
+   			Lines: ${wc.lines}
+			`;
+                        var dataArray = (<string>res).split("\n");
+                        dataArray = dataArray.slice(0, 20);
+                        let txt = dataArray.join("\n");
+
+                        var fileIcon = self.fileTypeIcons[type];
+                        let pic = "src/assets/icons/filetypes/" +
+                            fileIcon;
+                        f.thumb = [
+                                '<img width="125" height="125" src="',
+                                pic,
+                                '" title="',
+                                txt,
+				 '" alt="',
+                                locf.name,
+                                '" class="w-12 h-12" />'
+                            ].join('');
+
+                    };
+                })(f.file);
+                reader.readAsText(f.file);
+                break;
+            case /image/.test(f.file.type):
+                console.log("Image type detected");
+                var reader = new FileReader();
+                reader.onload = (function(locf) {
+                    return function(e) {
+			let pic:any;
+			if(e.target) {
+                        	pic = e.target.result;
+			}
+                        f.thumb = [
+                                '<img width="125" height="125" src="',
+                                pic,
+                                '" title="',
+                                locf.name,
+				 '" alt="',
+                                locf.name,
+                                '" class="w-12 h-12" />'
+                            ].join(''); 
+                            f.meta = locf.name;
+                    };
+                })(f.file);
+                reader.readAsDataURL(f.file);
+                break;
+            case /audio/.test(f.file.type):
+                console.log("Audio type detected");
+                var audioUrl = window.URL.createObjectURL(f.file);
+                f.thumb = [
+                    '<audio controls class="h-9 w-9" width="125" height="125"> ',
+		    '<source src="',
+                    audioUrl,
+                    '" title="',
+                    f.file.name,
+                    '" alt="',
+                    f.file.name,
+                    '" > </source> </audio> />'
+                ].join('');
+                f.meta = f.file.name;
+                break;
+            case /video/.test(f.file.type):
+                console.log("Video type detected");
+                var videoUrl = window.URL.createObjectURL(f.file);
+                f.thumb = [
+                    '<video controls class="h-9 w-9" width="125" height="125">',
+		    '<source src="',
+                    videoUrl,
+                    '" title="',
+                    f.file.name,
+                    '" alt="',
+                    f.file.name,
+                    '" > </source> </video> />'
+                ].join('');
+                f.meta = f.file.name;
+                break;
+            case /pdf/.test(f.file.type):
+                console.log("PDF type detected");
+                var pdfURL = window.URL.createObjectURL(f.file);
+                f.meta = f.file.name;
+                PDFObject.embed(pdfURL, target);
+                break;
+            default:
+                console.log("default type detected");
+                var fileIcon = fileTypeIcons[type];
+                if (fileIcon == undefined) {
+                    fileIcon = "file.svg";
+                }
+                f.meta = f.file.name;
+                let pic = "src/assets/icons/filetypes/" + fileIcon;
+                f.thumb = [
+                    '<img width="125" height="125" src=',
+                    pic,
+                    '" title="',
+                    f.file.name,
+		    '" alt="',
+                    f.file.name,
+                    '" class="w-12 h-12" />'
+                ].join('');
+                break;
+        }
+    };
+
+    const createBars = () => {
+	/*
+        if (!thumbNailsDone) {
+	    console.log("Returning immediately");
+            return;
+        }
+	*/
+        $progressBars = [];
+        for (var i = 0; i < $uploadFileInfos.length; i++) {
+            let f = $uploadFileInfos[i];
+            let id = 'a' + i;
+	    /*
+            let bar = new ldBar('#' + id, {
+                preset: this.form.progType.toLowerCase()
+            });
+            bar.set(0);
+            console.log("Creating progress bar::" + id);
+            $progressBars.push(bar);
+	    */
+            showThumbnail(f, i);
+        }
+        for (var i = 0; i < $errInfos.length; i++) {
+            let f = $errInfos[i];
+            showErrThumbnail(f, i);
+        }
+        //thumbNailsDone = false;
+	console.log("All thumbnails done");
+    };
+
     const setupUpload = () => {
         var delQ:number[] = [];
-	if(!uploadFileList) {
+	if(!$uploadFileList) {
 		return;
 	}
-        for (var i = 0; i < uploadFileList.length; i++) {
-            let f = uploadFileList && uploadFileList[i];
+        for (var i = 0; i < $uploadFileList.length; i++) {
+            let f = $uploadFileList && $uploadFileList[i];
             let mime = f.type;
             let name = f.name;
-            let ts = f.lastModified.toLocaleString();
+            let ts = f.lastModifiedDate.toLocaleString();
             let size = humanFileSize(f.size);
             let id = 'a' + i;
+            $totalsize  += f.size;
             if (!checkSize(f.size)) {
                 console.log("Size check:: size is " + f.size);
                 let msg = "{name} too big for upload";
@@ -314,12 +602,12 @@ file.file.size);
                 continue;
             }
 		
-            if (uploadFileList && i == uploadFileList.length - 1) {
+            if ($uploadFileList && i == $uploadFileList.length - 1) {
                 console.log("Total size check:: total size is " +
-                    totalsize);
+                    $totalsize);
                 if (!checkTotalSize()) {
                     let msg = `Total size exceeds policy, delete some`;
-                    setIsUploadDisabled(true);
+                    isUploadDisabled = true;
                 }
             }
             let fInfo = {
@@ -327,26 +615,21 @@ file.file.size);
                 id: id,
                 thumb: '',
                 meta: '',
-                bytesSent: '',
-                eta: '',
+                bytesSent: '0 Bytes',
+                eta: '0',
                 ts: ts,
-                rate: '',
+                rate: '0',
             };
-	    setFileInfos(prev => {
-		const newState = [...prev];
-                newState.push(fInfo);
-		return newState;
-            });
-            setSize(prev => prev + f.size);
-            setNumberFiles(totalfiles + 1);
+	    uploadFileInfos.set([...$uploadFileInfos,fInfo]);
+            $totalfiles += 1;
         }
-    if(uploadFileList) {
-    uploadFileList = [...uploadFileList].filter(function(value:any,
+    if($uploadFileList) {
+    $uploadFileList = [...$uploadFileList].filter(function(value:any,
 index:number) {
         return delQ.indexOf(index) == -1;
     });
     }
-        setIsUploadDisabled(false);
+        isUploadDisabled = false;
     };
 </script>
 
@@ -360,12 +643,13 @@ index:number) {
 	on:dragleave={handleDragLeave}  
 	on:drop={handleDragDrop} 
 	ondragover="return false"
+        on:click={() => browseInput.click()}
 class="{isDragActive ? 'bg-blue-400':'bg-light'} text-gold-400 border border-red-800 border-dashed
 rounded cursor-pointer" >
 	   <form class='flex p-8  justify-center'>
 		<img class="stroke-white dark:bg-white" width="100" height="100"
 src="assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" />
-	       <input  onChange={fileSelectFinish}  name="uploadFiles" type="file" multiple hidden />
+	       <input bind:this={browseInput} on:change={fileSelectFinish}  name="uploadFiles" type="file" multiple hidden />
 	   </form>
 	   <h2 class="flex justify-center text-dark-500 text-xl font-medium mb-2"> 
 	     Drop files or click to select</h2>
@@ -392,11 +676,15 @@ class='text-sm'>{$inputs.filesName}</span>
 
 	</div>
 
-	<button disabled={isUploadDisabled} onClick={uploadAll} class={"inline-block px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out " +  (isUploadDisabled ? " opacity-20" : "")}
->Begin Uploading files </button>
+	<button disabled={isUploadDisabled} on:click={uploadAll}
+class="inline-block px-6 py-2.5 bg-blue-400 text-dark dark:text-white
+font-medium text-xs leading-tight uppercase rounded shadow-md
+hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg
+focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg
+transition duration-150 ease-in-out  {isUploadDisabled ? ' opacity-20' : ''}" >Begin Uploading files </button>
 	
 	
-	<button type="button" onClick={clearAll} class="inline-block
+	<button type="button" on:click={clearAll} class="inline-block
 px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
 	 Reset form
 	</button>

@@ -1,6 +1,5 @@
 <script lang='ts'>
-
-   const statsTable = [];
+ import {statsTable} from './store.ts';
 
     const spitStatistics = (idx ) => {
         if (uploadFileList && idx == uploadFileList.length - 1) {
@@ -17,7 +16,7 @@
                 " sent in " + totaltime + " ms";
             setDetails(details);
 
-            var id = statsTable.length + 1;
+            var id = $statsTable.length + 1;
             let stat = {
                 id: id,
                 ts: ts,
@@ -25,7 +24,7 @@
                 details: details
             };
 
-            let st = [...statsTable];
+            let st = [...$statsTable];
             st.push(stat);
             setStats(st);
 
@@ -62,7 +61,7 @@
 	          </thead>
 	          <tbody id="progress-up-statsTable">
 
-   {#each statsTable as stat}
+   {#each $statsTable as stat}
 	            <tr key={stat.id} class="bg-gray-100 border-b">
 	              <td class="px-6 py-4 whitespace-nowrap text-sm
 font-medium text-gray-900">{stat.id}</td>

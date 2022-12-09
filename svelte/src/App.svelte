@@ -1,379 +1,44 @@
-<svelte:head>
-	<script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js" ></script>
-	<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" ></script>
-	<script  src="https://cdn.jsdelivr.net/npm/pdfobject@2.2.8/pdfobject.min.js" ></script>
-</svelte:head>
-<!--
-	<script context="module" src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/progressBar/loading-bar.js" ></script>
--->
 <script lang='ts'>
+   import {openTab, totalsize, totalfiles, inputs, uploadFileList, uploadFileInfos, errInfos, progressBars, } from './store.ts';
+
+
 
 let darkMode = false;
-let openTab = 1;
 
+    let disableUpload = true;
+    let thumbNailsDone = false;
+    let isDragged = false;
+    let details = '';
 
    function toggle() {
         darkMode = !darkMode;
         window.document.body.classList.toggle('dark');
     }
 
-type statsTableType = {
-    id: number;
-    ts: string;
-    status: string;
-    details: string;
-};
-
-type fileInfo = {
-    file: File;
-    id: string;
-    ts: string;
-    thumb: string;
-    meta: string;
-    bytesSent: string;
-    rate: string;
-    eta: string;
-};
-
-type errInfo = {
-    file: File;
-    id: string;
-    ts: string;
-    thumb: string;
-    meta: string;
-    msg: string;
-};
-
-
-    let uploadFileList: any = [];
-    let uploadFileInfos: fileInfo[] = [];
-    let errInfos: errInfo[] = [];
-    let disableUpload = true;
-    let thumbNailsDone = false;
-    let isDragged = false;
-
-    let progressBars: any[] = [];
-    let details = '';
-    let statsTable: statsTableType[] = [];
-
  
-    const delItem = (index:number) => {
-	let s:number;
-	if(uploadFileList) {
-	 s = uploadFileList[index].size;
-        s = totalsize - s;
-       setSize(s );
-	}
-        uploadFileList && uploadFileList.splice(index, 1);
-	let list = uploadFileList as File[];
-        setUpload(list);
+ const checkTotalSize =() => {
+        if ($inputs.sizeLimitType == "Total limit") {
+            if ($totalsize <= ($inputs.fileSizeLimit * 1024 * 1024)) {
+                return true;
+            }
+            return false;
+        }
+        return false;
+    };
 
-        uploadFileInfos && uploadFileInfos.splice(index, 1);
-        setFileInfos(uploadFileInfos);
+       const delItem = (index:number) => {
+	let s:number;
+	s = $uploadFileList[index].size;
+        $totalsize -= s;
+        $uploadFileList.splice(index, 1);
+	let list = $uploadFileList as File[];
+        $uploadFileList = list;
+
+        $uploadFileInfos && $uploadFileInfos.splice(index, 1);
         checkTotalSize();
     };
 
 
-/*
-
-const showThumbnail = (f:fileInfo, i: number) => {
-        let id = 'a' + i;
-        let target = id + '-thumb';
-	let self = this;
-	let type = f.file.type.split('/')[0];
-        switch (true) {
-            case /text/.test(f.file.type):
-                console.log("Text type detected");
-                var reader = new FileReader();
-                reader.onload = (function(locf) {
-                    return function(e) {
-			let res:any;
-			if(e.target) {
-                        	res = e.target.result;
-			}
-                        let wc = self.wordCount(res);
-                        f.meta = ` 
-   			Chars : ${wc.chars}
-   			Words: ${wc.words}
-   			Lines: ${wc.lines}
-			`;
-                        var dataArray = (<string>res).split("\n");
-                        dataArray = dataArray.slice(0, 20);
-                        let txt = dataArray.join("\n");
-
-                        var fileIcon = self.fileTypeIcons[type];
-                        let pic = "src/assets/icons/filetypes/" +
-                            fileIcon;
-                        f.thumb = [
-                                '<img width="125" height="125" src="',
-                                pic,
-                                '" title="',
-                                txt,
-				 '" alt="',
-                                locf.name,
-                                '" class="w-12 h-12" />'
-                            ].join('');
-
-                    };
-                })(f.file);
-                reader.readAsText(f.file);
-                break;
-            case /image/.test(f.file.type):
-                console.log("Image type detected");
-                var reader = new FileReader();
-                reader.onload = (function(locf) {
-                    return function(e) {
-			let pic:any;
-			if(e.target) {
-                        	pic = e.target.result;
-			}
-                        f.thumb = [
-                                '<img width="125" height="125" src="',
-                                pic,
-                                '" title="',
-                                locf.name,
-				 '" alt="',
-                                locf.name,
-                                '" class="w-12 h-12" />'
-                            ].join(''); 
-                            f.meta = locf.name;
-                    };
-                })(f.file);
-                reader.readAsDataURL(f.file);
-                break;
-            case /audio/.test(f.file.type):
-                console.log("Audio type detected");
-                var audioUrl = window.URL.createObjectURL(f.file);
-                f.thumb = [
-                    '<audio controls class="h-9 w-9" width="125" height="125"> ',
-		    '<source src="',
-                    audioUrl,
-                    '" title="',
-                    f.file.name,
-                    '" alt="',
-                    f.file.name,
-                    '" > </source> </audio> />'
-                ].join('');
-                f.meta = f.file.name;
-                break;
-            case /video/.test(f.file.type):
-                console.log("Video type detected");
-                var videoUrl = window.URL.createObjectURL(f.file);
-                f.thumb = [
-                    '<video controls class="h-9 w-9" width="125" height="125">',
-		    '<source src="',
-                    videoUrl,
-                    '" title="',
-                    f.file.name,
-                    '" alt="',
-                    f.file.name,
-                    '" > </source> </video> />'
-                ].join('');
-                f.meta = f.file.name;
-                break;
-            case /pdf/.test(f.file.type):
-                console.log("PDF type detected");
-                var pdfURL = window.URL.createObjectURL(f.file);
-                f.meta = f.file.name;
-                PDFObject.embed(pdfURL, target);
-                break;
-            default:
-                console.log("default type detected");
-                var fileIcon = this.fileTypeIcons[type];
-                if (fileIcon == undefined) {
-                    fileIcon = "file.svg";
-                }
-                f.meta = f.file.name;
-                let pic = "src/assets/icons/filetypes/" + fileIcon;
-                f.thumb = [
-                    '<img width="125" height="125" src=',
-                    pic,
-                    '" title="',
-                    f.file.name,
-		    '" alt="',
-                    f.file.name,
-                    '" class="w-12 h-12" />'
-                ].join('');
-                break;
-        }
-    };
-
-    const showErrThumbnail = (f:errInfo, i: number) => {
-        let id = 'a' + i;
-        let target = id + '-thumb';
-	let self = this;
-	let type = f.file.type.split('/')[0];
-        switch (true) {
-            case /text/.test(f.file.type):
-                console.log("Text type detected");
-                var reader = new FileReader();
-                reader.onload = (function(locf) {
-                    return function(e) {
-			let res:any;
-			if(e.target) {
-                        	res = e.target.result;
-			}
-                        let wc = self.wordCount(res);
-                        f.meta = ` 
-   			Chars : ${wc.chars}
-   			Words: ${wc.words}
-   			Lines: ${wc.lines}
-			`;
-                        var dataArray = (<string>res).split("\n");
-                        dataArray = dataArray.slice(0, 20);
-                        let txt = dataArray.join("\n");
-
-                        var fileIcon = self.fileTypeIcons[type];
-                        let pic = "src/assets/icons/filetypes/" +
-                            fileIcon;
-                        f.thumb = [
-                                '<img width="125" height="125" src="',
-                                pic,
-                                '" title="',
-                                txt,
-				 '" alt="',
-                                locf.name,
-                                '" class="w-12 h-12" />'
-                            ].join('');
-
-                    };
-                })(f.file);
-                reader.readAsText(f.file);
-                break;
-            case /image/.test(f.file.type):
-                console.log("Image type detected");
-                var reader = new FileReader();
-                reader.onload = (function(locf) {
-                    return function(e) {
-			let pic:any;
-			if(e.target) {
-                        	pic = e.target.result;
-			}
-                        f.thumb = [
-                                '<img width="125" height="125" src="',
-                                pic,
-                                '" title="',
-                                locf.name,
-				 '" alt="',
-                                locf.name,
-                                '" class="w-12 h-12" />'
-                            ].join(''); 
-                            f.meta = locf.name;
-                    };
-                })(f.file);
-                reader.readAsDataURL(f.file);
-                break;
-            case /audio/.test(f.file.type):
-                console.log("Audio type detected");
-                var audioUrl = window.URL.createObjectURL(f.file);
-                f.thumb = [
-                    '<audio controls class="h-9 w-9" width="125" height="125"> ',
-		    '<source src="',
-                    audioUrl,
-                    '" title="',
-                    f.file.name,
-                    '" alt="',
-                    f.file.name,
-                    '" > </source> </audio> />'
-                ].join('');
-                f.meta = f.file.name;
-                break;
-            case /video/.test(f.file.type):
-                console.log("Video type detected");
-                var videoUrl = window.URL.createObjectURL(f.file);
-                f.thumb = [
-                    '<video controls class="h-9 w-9" width="125" height="125">',
-		    '<source src="',
-                    videoUrl,
-                    '" title="',
-                    f.file.name,
-                    '" alt="',
-                    f.file.name,
-                    '" > </source> </video> />'
-                ].join('');
-                f.meta = f.file.name;
-                break;
-            case /pdf/.test(f.file.type):
-                console.log("PDF type detected");
-                var pdfURL = window.URL.createObjectURL(f.file);
-                f.meta = f.file.name;
-                PDFObject.embed(pdfURL, target);
-                break;
-            default:
-                console.log("default type detected");
-                var fileIcon = this.fileTypeIcons[type];
-                if (fileIcon == undefined) {
-                    fileIcon = "file.svg";
-                }
-                f.meta = f.file.name;
-                let pic = "src/assets/icons/filetypes/" + fileIcon;
-                f.thumb = [
-                    '<img width="125" height="125" src=',
-                    pic,
-                    '" title="',
-                    f.file.name,
-		    '" alt="',
-                    f.file.name,
-                    '" class="w-12 h-12" />'
-                ].join('');
-                break;
-        }
-    };
-
-    const createBars = () => {
-        if (!this.thumbNailsDone) {
-            return;
-        }
-        this.progressBars = [];
-        for (var i = 0; i < this.uploadFileInfos.length; i++) {
-            let f = this.uploadFileInfos[i];
-            let id = 'a' + i;
-            let bar = new ldBar('#' + id, {
-                preset: this.form.progType.toLowerCase()
-            });
-            bar.set(0);
-            console.log("Creating progress bar::" + id);
-            this.progressBars.push(bar);
-            this.showThumbnail(f, i);
-        }
-        for (var i = 0; i < this.errInfos.length; i++) {
-            let f = this.errInfos[i];
-            this.showErrThumbnail(f, i);
-        }
-        this.thumbNailsDone = false;
-    };
-
-    const printBannedBanner = (file:File, id: string, ts:string,
-msg:string)  => {
-        this.errInfos.push({
-            file: file,
-            id: id,
-            meta: '',
-            thumb: '',
-            ts: ts,
-            msg: msg
-        });
-    };
-
-        const printBannedBanner = (file: File, id:string, ts:string,
-msg:string) => {
-        let errInfo = {
-            file: file,
-            meta: '',
-            id: id,
-            thumb: '',
-            ts: ts,
-            msg: msg
-     };
-
-	setErrInfos(prev => {
-		const newState = [...prev];
-                newState.push(errInfo);
-		return newState;
-        });
-    };
-
-*/
 import Tab1 from './tab1.svelte';
 import Tab2 from './tab2.svelte';
 import Tab3 from './tab3.svelte';
@@ -400,7 +65,7 @@ import Tab4 from './tab4.svelte';
   <ul id="tabs" class="inline-flex pt-2 px-1 w-full border-b">
 
     <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
-              <a on:click={() => openTab = 1} class={ (openTab === 1 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
+              <a on:click={() => $openTab = 1} class={ ($openTab === 1 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
                 data-toggle="tab"
                 href="#link1"
                 role="tablist"
@@ -409,7 +74,7 @@ import Tab4 from './tab4.svelte';
     </li>
 
     <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
-              <a on:click={() => openTab = 2} class={ (openTab === 2 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
+              <a on:click={() => $openTab = 2} class={ ($openTab === 2 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
                 data-toggle="tab"
                 href="#link2"
                 role="tablist"
@@ -418,7 +83,7 @@ import Tab4 from './tab4.svelte';
 
     <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
 
-              <a on:click={() => openTab = 3} class={ (openTab === 3 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
+              <a on:click={() => $openTab = 3} class={ ($openTab === 3 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
                 data-toggle="tab"
                 href="#link3"
                 role="tablist"
@@ -428,7 +93,7 @@ import Tab4 from './tab4.svelte';
 
     <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
 
-              <a on:click={() => openTab = 4} class={ (openTab === 4 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
+              <a on:click={() => $openTab = 4} class={ ($openTab === 4 ?  "bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px" : "px-4 text-dark-800 font-semibold py-2 rounded-t")}
                 data-toggle="tab"
                 href="#link4"
                 role="tablist"
@@ -439,20 +104,20 @@ import Tab4 from './tab4.svelte';
   </ul>
 
 <div id="tab-contents">
- <div class={openTab === 1 ? "block" : "hidden"} id="link1">
+ <div class={$openTab === 1 ? "block" : "hidden"} id="link1">
 		<Tab1></Tab1>
   </div>
 
- <div class={openTab === 2 ? "block" : "hidden"} id="link2">
+ <div class={$openTab === 2 ? "block" : "hidden"} id="link2">
 		<Tab2></Tab2>
   </div>
 
- <div class={openTab === 3 ? "block" : "hidden"} id="link3">
+ <div class={$openTab === 3 ? "block" : "hidden"} id="link3">
 		<Tab3></Tab3>
   </div>
 
 
- <div class={openTab === 4 ? "block" : "hidden"} id="link4">
+ <div class={$openTab === 4 ? "block" : "hidden"} id="link4">
 		<Tab4></Tab4>
   </div>
 
@@ -462,13 +127,13 @@ import Tab4 from './tab4.svelte';
 
 
 <div id="progress-up-progressArea"> 
-  {#each uploadFileInfos as info, id } 
+  {#each $uploadFileInfos as info, id } 
     <section class="m-4 p-4 mt-4 mb-4 transition-colors
     text-light-100 dark:text-white mx-auto">
      <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6
     border-gray-300 text-gray-600 dark:text-white relative">
     
-      <div on:click={delItem(id)} title="Delete" class="absolute
+      <div on:click={() => delItem(id)} title="Delete" class="absolute
     cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
     	<img width="25" height="25" src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/trash-icon.svg" />
       </div>
@@ -479,7 +144,7 @@ import Tab4 from './tab4.svelte';
     justify-left">
 
 		<div  id="{info.id}-thumb">
-	 {@html "info.thumb"}
+	 {@html info.thumb}
 		</div>
              </div>
           </div>
@@ -516,7 +181,7 @@ dark:text-white">
             </div>
            </div>
       </div>
-          <div  class='ldBar bottom-0 right-0 pb-8' id="{info.id}" >
+          <div  class='ldBar bottom-0 right-0 pb-8' id={info.id} >
 	   </div>
       </div>
     </section>
@@ -524,7 +189,7 @@ dark:text-white">
 </div>
 
 <div id="progress-up-errArea"> 
-  {#each  errInfos as err,id } 
+  {#each  $errInfos as err,id } 
     <section class="bg-red-200 m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white">
  <div class="bg-red-600 dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">

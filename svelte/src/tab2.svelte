@@ -1,6 +1,6 @@
 
 <script lang='ts'>
-   import {inputs} from './store.js';
+   import {openTab, inputs} from './store.ts';
    let sizeLabel =  "Single file limit";
     let filterLabel:string =  "Allow file type";
     let authEnabled:boolean = false;
@@ -27,6 +27,7 @@
         console.log($inputs.sizeLimitType);
         console.log($inputs.fileTypeFilter);
         console.log($inputs.fileTypeAction);
+	$openTab = 1;
     };
 
     const testUpload = async () => {
