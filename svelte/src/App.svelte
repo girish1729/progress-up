@@ -232,7 +232,7 @@ dark:text-white">
          </ul>
         </div>
        </div>
-		{err.msg}
+		{@html err.msg}
       </div>
      </div>
     </section>

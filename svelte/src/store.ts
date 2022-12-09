@@ -14,10 +14,6 @@ export const inputs = writable({
         fileTypeAction: "Allow file type"
 });
 
-inputs.subscribe(value => {
-	console.log(value);
-});
-
 type statsTableType = {
     id: number;
     ts: string;
@@ -54,7 +50,3 @@ export const openTab = writable(1);
 export const totalsize = writable(0);
 export const totalfiles = writable(0);
 
-
-uploadFileInfos.subscribe(value => {
-	console.log(value);
-});

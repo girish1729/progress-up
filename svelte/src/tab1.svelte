@@ -73,6 +73,8 @@ var fileTypeIcons = {
 
    afterUpdate(() => {
         createBars();
+	errInfos.set([...$errInfos]);
+	uploadFileInfos.set([...$uploadFileInfos]);
         console.log("DOM Updated");
    })
 
@@ -97,6 +99,7 @@ var fileTypeIcons = {
                     info.rate = (progE.rate / 1024 / 1024).toFixed(2);
 
                     console.log(info.bytesSent, info.eta, info.rate, perc);
+	            uploadFileInfos.set([...$uploadFileInfos]);
                 }
             },
 	};
@@ -178,18 +181,29 @@ var fileTypeIcons = {
         }
     };
 
+   const reloadAll = () => {
+        details = "";
+	$uploadFileInfos = [];
+        $errInfos = [];
+        $progressBars = [];
+        isUploadDisabled = true;
+	$totalfiles = 0;
+	$totalsize = 0;
+	thumbNailsDone = false;
+        console.log("Reload ");
+   };
 
     const clearAll = () => {
         details = "";
-	$: $uploadFileInfos = [];
+	$uploadFileInfos = [];
 	$uploadFileList = [];
         $errInfos = [];
         $progressBars = [];
         isUploadDisabled = true;
 	$totalfiles = 0;
 	$totalsize = 0;
-        console.log("Cleared");
 	thumbNailsDone = false;
+        console.log("Cleared");
     };
 
  const checkTotalSize =() => {
@@ -313,7 +327,7 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
                         	res = e.target.result;
 			}
                         let wc = wordCount(res);
-                        $: f.meta = ` 
+                        f.meta = ` 
    			Chars : ${wc.chars}
    			Words: ${wc.words}
    			Lines: ${wc.lines}
@@ -333,7 +347,7 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
                                 locf.name,
                                 '" class="w-12 h-12" />'
                             ].join('');
-			cb();
+			cb(i);
                     };
                 })(f.file);
                 reader.readAsText(f.file);
@@ -357,7 +371,7 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
                                 '" class="w-12 h-12" />'
                             ].join(''); 
                             f.meta = locf.name;
-			    cb();
+			    cb(i);
                     };
                 })(f.file);
                 reader.readAsDataURL(f.file);
@@ -373,9 +387,10 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
                     f.file.name,
                     '" alt="',
                     f.file.name,
-                    '" > </source> </audio> />'
+                    '" > </source> </audio>'
                 ].join('');
                 f.meta = f.file.name;
+		cb(i);
                 break;
             case /video/.test(f.file.type):
                 console.log("Video type detected");
@@ -388,15 +403,18 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
                     f.file.name,
                     '" alt="',
                     f.file.name,
-                    '" > </source> </video> />'
+                    '" > </source> </video> '
                 ].join('');
                 f.meta = f.file.name;
+		cb(i);
                 break;
             case /pdf/.test(f.file.type):
                 console.log("PDF type detected");
                 var pdfURL = window.URL.createObjectURL(f.file);
                 f.meta = f.file.name;
+		target = document.getElementById(id + '-thumb');
                 PDFObject.embed(pdfURL, target);
+		cb(i);
                 break;
             default:
                 console.log("default type detected");
@@ -406,7 +424,7 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
                 }
                 f.meta = f.file.name;
                 let pic = "/assets/icons/filetypes/" + fileIcon;
-                $: f.thumb = [
+                f.thumb = [
                     '<img width="125" height="125" src=',
                     pic,
                     '" title="',
@@ -415,6 +433,7 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
                     f.file.name,
                     '" class="w-12 h-12" />'
                 ].join('');
+		cb(i);
                 break;
         }
     };
@@ -434,25 +453,28 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
             bar.set(0);
             console.log("Creating progress bar::" + id);
             progressBars.set([...$progressBars,bar]);
-            showThumbnail(f, i, function() {
+            showThumbnail(f, i, function(i) {
 		if(i == $uploadFileInfos.length - 1) {
         	thumbNailsDone = true;
 		console.log("All thumbnails done");
 		}
+	        uploadFileInfos.set([...$uploadFileInfos]);
 	    });
         }
         for (var i = 0; i < $errInfos.length; i++) {
             let f = $errInfos[i];
-            showThumbnail(f, i, function() {
+            showThumbnail(f, i, function(i) {
 		if(i == $errInfos.length - 1) {
         	thumbNailsDone = true;
 		console.log("All thumbnails done");
 		}
+	        errInfos.set([...$errInfos]);
 	    });
         }
     };
 
     const setupUpload = () => {
+	reloadAll();
         var delQ:number[] = [];
 	if(!$uploadFileList) {
 		return;
@@ -467,7 +489,7 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
             $totalsize  += f.size;
             if (!checkSize(f.size)) {
                 console.log("Size check:: size is " + f.size);
-                let msg = "{name} too big for upload";
+                let msg = name + " too big for upload";
                 console.log(msg);
             	printBannedBanner(f, id, ts, msg);
                 delQ.push(i);
@@ -475,7 +497,7 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
             }
             if (!checkFilter(mime)) {
                 console.log("Hit banned file type:: filter issue");
-                let msg = "{name} cannot be uploaded due to policy.";
+                let msg = name + " cannot be uploaded due to policy.";
             	printBannedBanner(f, id, ts, msg);
                 delQ.push(i);
                 continue;
