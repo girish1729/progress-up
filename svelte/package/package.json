@@ -1,0 +1,37 @@
+{
+  "name": "progress-up-svelte",
+  "version": "1.0.1",
+  "devDependencies": {
+    "@sveltejs/adapter-static": "1.0.0-next.49",
+    "@sveltejs/kit": "*",
+    "@sveltejs/package": "1.0.0-next.6",
+    "@typescript-eslint/eslint-plugin": "*",
+    "@typescript-eslint/parser": "*",
+    "eslint": "^8.25.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
+    "prettier-plugin-svelte": "^2.8.0",
+    "svelte": "*",
+    "svelte-check": "*",
+    "svelte-preprocess": "*",
+    "tslib": "^2.4.0",
+    "typescript": "^4.8.4",
+    "vite": "^3.1.8"
+  },
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    "./ProgressUp.svelte": "./ProgressUp.svelte",
+    ".": "./index.js",
+    "./store": "./store.js",
+    "./style.css": "./style.css",
+    "./tab1.svelte": "./tab1.svelte",
+    "./tab2.svelte": "./tab2.svelte",
+    "./tab3.svelte": "./tab3.svelte",
+    "./tab4.svelte": "./tab4.svelte"
+  },
+  "svelte": "./index.js"
+}

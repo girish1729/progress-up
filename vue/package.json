@@ -1,7 +1,7 @@
 {
-  "name": "progress-up",
+  "name": "progress-up-vue",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "style": "./dist/style.css",
   "files": [

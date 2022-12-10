@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	let progressTypes = "./images/progress-types.png";
 </script>
 

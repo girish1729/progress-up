@@ -12,119 +12,13 @@ This uses the [HTTP File API](https://www.w3.org/TR/FileAPI/) to show continuous
 
 
 >This is the very first attempt to create a clean no frills upload plugin
->in 100% Javascript. Now available for Angular, Vue and React.
+>in 100% Typescript. Now available for Angular, Vue, Svelte and React.
 
 [Canonical home page](https://progress-up.live)
 
 ## What is this?
 
 Demos are [here](https://progress-up.live/demo)
-
-## File structure and explanation of project
-
-
-    .
-    |-- angular
-    |   |-- angular.json
-    |   |-- package.json
-    |   |-- projects
-    |   |   `-- progress-up
-    |   |       |-- karma.conf.js
-    |   |       |-- ng-package.json
-    |   |       |-- package.json
-    |   |       |-- README.md
-    |   |       |-- src
-    |   |       |   |-- lib
-    |   |       |   |   |-- progress-up.component.css
-    |   |       |   |   |-- progress-up.component.ts
-    |   |       |   |   |-- progress-up.module.ts
-    |   |       |   |   `-- progress-up.service.ts
-    |   |       |   |-- public-api.ts
-    |   |       |   `-- test.ts
-    |   |       |-- tsconfig.lib.json
-    |   |       |-- tsconfig.lib.prod.json
-    |   |       `-- tsconfig.spec.json
-    |   `-- tsconfig.json
-    |-- backend
-    |   |-- package.json
-    |   |-- public
-    |   |   |-- index.html
-    |   |   `-- js
-    |   |       `-- uploadProgress.js
-    |   |-- server.js
-    |   `-- uploads
-    |       `-- README.md
-    |-- css
-    |   `-- progress-up.css
-    |-- images
-    |   |-- finish-upload.png
-    |   |-- progress-up-html5-upload-capture.gif
-    |   |-- progress-up-logo.svg
-    |   `-- start-upload.png
-    |-- LICENSE
-    |-- react
-    |   |-- index.html
-    |   |-- package.json
-    |   |-- src
-    |   |   |-- main.tsx
-    |   |   `-- ProgressUp.tsx
-    |   |-- tsconfig.json
-    |   |-- tsconfig.node.json
-    |   `-- vite.config.ts
-    |-- README.md
-    |-- stackblitz-demos
-    |   |-- angular
-    |   |   |-- angular.json
-    |   |   |-- package.json
-    |   |   |-- src
-    |   |   |   |-- app
-    |   |   |   |   |-- app.component.html
-    |   |   |   |   |-- app.component.ts
-    |   |   |   |   `-- app.module.ts
-    |   |   |   |-- assets
-    |   |   |   |-- environments
-    |   |   |   |   |-- environment.prod.ts
-    |   |   |   |   `-- environment.ts
-    |   |   |   |-- favicon.ico
-    |   |   |   |-- index.html
-    |   |   |   |-- main.ts
-    |   |   |   |-- polyfills.ts
-    |   |   |   |-- styles.scss
-    |   |   |   `-- test.ts
-    |   |   |-- tsconfig.app.json
-    |   |   |-- tsconfig.json
-    |   |   |-- tsconfig.spec.json
-    |   |   `-- tslint.json
-    |   |-- react
-    |   |   |-- index.html
-    |   |   |-- package.json
-    |   |   |-- src
-    |   |   |   `-- main.tsx
-    |   |   |-- tsconfig.json
-    |   |   |-- tsconfig.node.json
-    |   |   `-- vite.config.ts
-    |   `-- vue
-    |       |-- index.html
-    |       |-- package.json
-    |       |-- README.md
-    |       |-- src
-    |       |   |-- App.vue
-    |       |   `-- main.ts
-    |       |-- tsconfig.json
-    |       |-- tsconfig.node.json
-    |       `-- vite.config.ts
-    `-- vue
-        |-- index.html
-        |-- package.json
-        |-- README.md
-        |-- src
-        |   |-- main.ts
-        |   `-- ProgressUp.vue
-        |-- tsconfig.json
-        |-- tsconfig.node.json
-        `-- vite.config.ts
-    
-    25 directories, 74 files
 
 ## How to build and run as plain js
 
@@ -196,7 +90,8 @@ Still work in progress. Watch out.
 
 - [Developer docs](https://progress-up.live/docs)
 - [Live demo](https://progress-up.live/demo)
-- [Vue.js](https://progress-up.live/vue)
+- [Vue](https://progress-up.live/vue)
+- [Svelte.ts](https://progress-up.live/svelte)
 - [Angular](https://progress-up.live/angular)
 - [React](https://progress-up.live/react)
  
@@ -247,6 +142,7 @@ touch](https://twitter.com/girish1729).
 Plugins for 
 
 - [Vue.js](https://www.vuejs.org) 
+- [Svelte](https://www.svelte.dev) 
 - [Angular 12](https://angular.io) 
 - [React JS](https://reactjs.org) 
 

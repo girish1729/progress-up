@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
-import { ProgressUpModule } from 'progress-up';
+import { ProgressUpModule } from 'progress-up-angular';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
