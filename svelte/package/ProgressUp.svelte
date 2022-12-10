@@ -1,44 +1,32 @@
-<script lang='ts'>
-   import {openTab, totalsize, totalfiles, inputs, uploadFileList, uploadFileInfos, errInfos, progressBars, } from './store.ts';
-
-
-
+<script>import { openTab, totalsize, inputs, uploadFileList, uploadFileInfos, errInfos, } from './store.js';
 let darkMode = false;
-
-    let disableUpload = true;
-    let thumbNailsDone = false;
-    let isDragged = false;
-    let details = '';
-
-   function toggle() {
-        darkMode = !darkMode;
-        window.document.body.classList.toggle('dark');
-    }
-
- 
- const checkTotalSize =() => {
-        if ($inputs.sizeLimitType == "Total limit") {
-            if ($totalsize <= ($inputs.fileSizeLimit * 1024 * 1024)) {
-                return true;
-            }
-            return false;
+let disableUpload = true;
+let thumbNailsDone = false;
+let isDragged = false;
+let details = '';
+function toggle() {
+    darkMode = !darkMode;
+    window.document.body.classList.toggle('dark');
+}
+const checkTotalSize = () => {
+    if ($inputs.sizeLimitType == "Total limit") {
+        if ($totalsize <= ($inputs.fileSizeLimit * 1024 * 1024)) {
+            return true;
         }
         return false;
-    };
-
-       const delItem = (index:number) => {
-	let s:number;
-	s = $uploadFileList[index].size;
-        $totalsize -= s;
-        $uploadFileList.splice(index, 1);
-	let list = $uploadFileList as File[];
-        $uploadFileList = list;
-
-        $uploadFileInfos && $uploadFileInfos.splice(index, 1);
-        checkTotalSize();
-    };
-
-
+    }
+    return false;
+};
+const delItem = (index) => {
+    let s;
+    s = $uploadFileList[index].size;
+    $totalsize -= s;
+    $uploadFileList.splice(index, 1);
+    let list = $uploadFileList;
+    $uploadFileList = list;
+    $uploadFileInfos && $uploadFileInfos.splice(index, 1);
+    checkTotalSize();
+};
 import Tab1 from './tab1.svelte';
 import Tab2 from './tab2.svelte';
 import Tab3 from './tab3.svelte';

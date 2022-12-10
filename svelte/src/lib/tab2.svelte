@@ -1,6 +1,6 @@
 
 <script lang='ts'>
-   import {openTab, inputs} from './store.ts';
+   import {openTab, inputs} from './store.js';
    let sizeLabel =  "Single file limit";
     let filterLabel:string =  "Allow file type";
     let authEnabled:boolean = false;

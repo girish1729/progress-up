@@ -1,112 +1,99 @@
 
-<script lang='ts'>
-   import {openTab, inputs} from './store.ts';
-   let sizeLabel =  "Single file limit";
-    let filterLabel:string =  "Allow file type";
-    let authEnabled:boolean = false;
-
-
-     const handleChange = (event) => {
-        const name = event.target.name;
-        const value = event.target.value;
-    };
-
-    const needsAuth = (event) => {
-        enableAuth(event.target.checked);
-    };
-    const saveConfig = () => {
-        console.log($inputs);
-        console.log($inputs.uploadURL);
-        console.log($inputs.filesName);
-        console.log($inputs.progType);
-        if ($inputs.authEnabled) {
-            console.log($inputs.authType);
-            console.log($inputs.user, inputs.pass);
-        }
-        console.log($inputs.fileSizeLimit);
-        console.log($inputs.sizeLimitType);
-        console.log($inputs.fileTypeFilter);
-        console.log($inputs.fileTypeAction);
-	$openTab = 1;
-    };
-
-    const testUpload = async () => {
-        console.log("Uploading using HTML5 File API...");
-        let testForm = new FormData();
-
-        const blob = new Blob(['Test upload DELETE'], {
-            type: 'plain/text'
-        });
-        testForm.append(inputs.filesName, blob, 'progress-up-test.txt');
-        let options = {};
-        if (authEnabled) {
-            var username = 'user';
-            var password = 'password';
-            var basicAuth = 'Basic ' + btoa(username + ':' + password);
-            options = {
-                headers: {
-                    'Authorization': +basicAuth
-                }
-            };
-        }
-
-        await axios.post(inputs.uploadURL, testForm, options).then((resp) => {
-            alert("Test succeeded");
-        }).catch((error) => {
-            alert("Upload failed. Please check endpoint in Setup");
-            alert(error);
-        });
-    };
-
-
-    const setAuth = (event ) => {
-        let auth = event.target.value;
-        setAuthType(auth);
-        console.log(auth);
-    };
-
-    const setIndicator = (event ) => {
-
-        let ind = event.target.value;
-        ind = ind.toLowerCase()
-        setProgType(ind);
-        let extra;
-        console.log(ind);
-        switch (ind) {
-            case "bubble":
-                extra = 'data-img-size="100,100"';
-                break;
-            case "rainbow":
-                extra = 'data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"';
-                break;
-            default:
-                break;
-        }
-    };
-
-    const testEP = () => {
-        saveConfig();
-        testUpload();
-    };
-
-    const toggleSizeQ = () => {
-        let val = inputs.sizeLimitType;
-        if (val) {
-            sizeLabel = "Total limit";
-        } else {
-            sizeLabel = "Single file limit";
-        }
-    };
-
-    const toggleFilterQ = () => {
-        let val = inputs.fileTypeAction;
-        if (val) {
-            filterLabel = "Deny file type";
-        } else {
-            filterLabel = "Allow file type";
-        }
-    };
-
+<script>import { openTab, inputs } from './store.js';
+let sizeLabel = "Single file limit";
+let filterLabel = "Allow file type";
+let authEnabled = false;
+const handleChange = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+};
+const needsAuth = (event) => {
+    enableAuth(event.target.checked);
+};
+const saveConfig = () => {
+    console.log($inputs);
+    console.log($inputs.uploadURL);
+    console.log($inputs.filesName);
+    console.log($inputs.progType);
+    if ($inputs.authEnabled) {
+        console.log($inputs.authType);
+        console.log($inputs.user, inputs.pass);
+    }
+    console.log($inputs.fileSizeLimit);
+    console.log($inputs.sizeLimitType);
+    console.log($inputs.fileTypeFilter);
+    console.log($inputs.fileTypeAction);
+    $openTab = 1;
+};
+const testUpload = async () => {
+    console.log("Uploading using HTML5 File API...");
+    let testForm = new FormData();
+    const blob = new Blob(['Test upload DELETE'], {
+        type: 'plain/text'
+    });
+    testForm.append(inputs.filesName, blob, 'progress-up-test.txt');
+    let options = {};
+    if (authEnabled) {
+        var username = 'user';
+        var password = 'password';
+        var basicAuth = 'Basic ' + btoa(username + ':' + password);
+        options = {
+            headers: {
+                'Authorization': +basicAuth
+            }
+        };
+    }
+    await axios.post(inputs.uploadURL, testForm, options).then((resp) => {
+        alert("Test succeeded");
+    }).catch((error) => {
+        alert("Upload failed. Please check endpoint in Setup");
+        alert(error);
+    });
+};
+const setAuth = (event) => {
+    let auth = event.target.value;
+    setAuthType(auth);
+    console.log(auth);
+};
+const setIndicator = (event) => {
+    let ind = event.target.value;
+    ind = ind.toLowerCase();
+    setProgType(ind);
+    let extra;
+    console.log(ind);
+    switch (ind) {
+        case "bubble":
+            extra = 'data-img-size="100,100"';
+            break;
+        case "rainbow":
+            extra = 'data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"';
+            break;
+        default:
+            break;
+    }
+};
+const testEP = () => {
+    saveConfig();
+    testUpload();
+};
+const toggleSizeQ = () => {
+    let val = inputs.sizeLimitType;
+    if (val) {
+        sizeLabel = "Total limit";
+    }
+    else {
+        sizeLabel = "Single file limit";
+    }
+};
+const toggleFilterQ = () => {
+    let val = inputs.fileTypeAction;
+    if (val) {
+        filterLabel = "Deny file type";
+    }
+    else {
+        filterLabel = "Allow file type";
+    }
+};
 </script>
 
 	<h2>File upload config</h2>

@@ -1,5 +1,5 @@
 <script lang='ts'>
- import {statsTable} from './store.ts';
+ import {statsTable} from './store.js';
 
     const spitStatistics = (idx ) => {
         if (uploadFileList && idx == uploadFileList.length - 1) {

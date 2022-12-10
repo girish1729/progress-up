@@ -20,14 +20,14 @@
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
 		"baseUrl": ".",
-		"allowJs": true,
-		"checkJs": true,
+		"allowJs": false,
 		"paths": {
+			"$assets": ["static"],
 			"$lib": ["src/lib"],
 			"$lib/*": ["src/lib/*"],
 			"$components": ["src/lib/components"],
 			"$components/*": ["src/lib/components/*"]
 		}
 	},
-	"include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"]
+	"include": ["static/**/*", "src/**/*.d.ts",  "src/**/*.ts", "src/**/*.svelte"]
 }

@@ -1,5 +1,4 @@
-<script lang="ts">
-	let progressTypes = "./images/progress-types.png";
+<script>let progressTypes = "./images/progress-types.png";
 </script>
 
     <div class="flex flex-col">

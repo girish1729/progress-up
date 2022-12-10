@@ -1,17 +1,19 @@
-
-// svelte.config.js
 import adapter from '@sveltejs/adapter-static';
+import preprocess from 'svelte-preprocess';
 
-export default {
-  kit: {
-    adapter: adapter({
-      // default options are shown. On some platforms
-      // these options are set automatically — see below
-      assets: 'assets',
-      fallback: null,
-      precompress: false,
-      strict: true
-    })
-  }
+const config = {
+    preprocess: preprocess(),
+    kit: {
+        adapter: adapter(),
+        prerender: {
+            default: true
+        },
+        files: {
+            assets: 'static',
+            lib: 'src/lib'
+        }
+    }
 };
+
+export default config;
 

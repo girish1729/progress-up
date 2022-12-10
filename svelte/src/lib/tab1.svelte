@@ -7,7 +7,7 @@
 <script lang='ts'>
    import ldBar from 'https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/progressBar/loading-bar.js';
    import {afterUpdate} from 'svelte';
-   import {inputs, totalsize, totalfiles, statsTable, progressBars, errInfos, uploadFileInfos, uploadFileList } from './store.ts';
+   import {inputs, totalsize, totalfiles, statsTable, progressBars, errInfos, uploadFileInfos, uploadFileList } from './store.js';
   let isUploadDisabled = true;
   let browseInput;
   let details = '';
