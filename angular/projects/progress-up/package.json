@@ -1,9 +1,12 @@
 {
-  "name": "progress-up",
-  "version": "0.0.1",
+  "name": "progress-up-angular",
+  "version": "0.0.7",
+  "sideEffects": true,
   "peerDependencies": {
     "@angular/common": "*",
-    "@angular/core": "*"
+    "@angular/core": "*",
+    "axios": "*",
+    "pdfobject": "*"
   },
   "dependencies": {
     "tslib": "*"

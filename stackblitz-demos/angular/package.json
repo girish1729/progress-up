@@ -19,8 +19,6 @@
     "@angular/platform-browser": "^14.2.0",
     "@angular/platform-browser-dynamic": "^14.2.0",
     "@npmcli/fs": "*",
-    "axios": "^1.2.0",
-    "pdfobject": "^2.2.8",
     "progress-up-angular": "*",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
