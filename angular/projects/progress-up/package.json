@@ -4,9 +4,7 @@
   "sideEffects": true,
   "peerDependencies": {
     "@angular/common": "*",
-    "@angular/core": "*",
-    "axios": "*",
-    "pdfobject": "*"
+    "@angular/core": "*"
   },
   "dependencies": {
     "tslib": "*"

@@ -605,7 +605,7 @@ msg:string) => {
             let f = uploadFileList && uploadFileList[i];
             let mime = f.type;
             let name = f.name;
-            let ts = f.lastModified.toLocaleString();
+            let ts = new Date(f.lastModified).toLocaleDateString();
             let size = humanFileSize(f.size);
             let id = 'a' + i;
             if (!checkSize(f.size)) {

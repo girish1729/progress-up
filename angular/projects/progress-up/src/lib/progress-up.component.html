@@ -1,4 +1,4 @@
-<section class="dark:bg-gray-800 dark:text-white">
+<main class="dark:bg-gray-800 dark:text-white">
 
 <div class="flex justify-end items-center space-x-2 mx-auto relative">
   <div class="w-14 h-8">
@@ -174,9 +174,9 @@ for="fileSizeLimit">
 </label>
   <input id='fileSizeLimit'  [(ngModel)]='form.fileSizeLimit'
 class='m-6 p-6 form-range'
-type="range"  name="rangeInput" min="10" max="1000"
+type="range"  class='form-control' name="rangeInput" min="10" max="1000"
 step=10 value="0"  />                      
-<output id="sizeLimit" name="sizeLimit" for="form.fileSizeLimit">
+<output id="sizeLimit" class='form-control' name="sizeLimit" for="form.fileSizeLimit">
 	{{form.fileSizeLimit}}
 </output>
 	</div>
@@ -188,7 +188,8 @@ step=10 value="0"  />
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="sizeToggle" >
 <span >{{sizeLabel}} </span>
-  <input [(ngModel)]='form.sizeLimitType'
+  <input [(ngModel)]='form.sizeLimitType' name='sizeLimitType'
+class='form-control'
 (change)="toggleSizeQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
 bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
@@ -206,7 +207,9 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 	         </label>
 	         <div class="relative">
 	           <select [(ngModel)]='form.fileTypeFilter'
+  name='fileTypeFilter' class='form-control'
  class="block appearance-none w-full bg-gray-200 border
+
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	   >
@@ -229,7 +232,8 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 for="filterAction" >
 <span>{{filterLabel}}</span>
   <input 
-[(ngModel)]='form.fileTypeAction'
+[(ngModel)]='form.fileTypeAction' name='fileTypeAction'
+class='form-control'
 (change)="toggleFilterQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
 bg-green-600 rounded-full duration-300 ease-in-out peer-checked:bg-red-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
@@ -447,7 +451,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 	  </div>
 	</div>
 
-	<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/progress-types.png" alt="Progress-up types" />
+	<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/images/progress-types.png" alt="Progress-up types" />
 
        <ul class='marker:text-green list-outside'>
          <li class='pb-2'> There is also the ability to perform a test Upload to validate the endpoint.  </li>
@@ -469,7 +473,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 <!-- XXX tabs -->
 
 <div id="progress-up-progressArea"> 
-  <div *ngFor="let info of uploadFileInfos; last as lastTime;index as id " 
+  <div *ngFor="let info of uploadFileInfos;last as last;index as id" 
 >
     <section class="m-4 p-4 mt-4 mb-4 transition-colors
     text-light-100 dark:text-white mx-auto">
@@ -509,7 +513,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
           	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800
     dark:text-white">
-          	    Size: {{info.file.size}} 
+          	    Size: {{info.size}} 
           	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800 dark:text-white">
        	    <li class="font-light leading-relaxed text-gray-800
@@ -517,7 +521,7 @@ dark:text-white">
 		    Metadata: {{info.meta}}
       	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800 dark:text-white">
-		<span>{{info.bytesSent}} of {{info.file.size}} uploaded
+		<span>{{info.bytesSent}} of {{info.size}} uploaded
 {{info.rate}} MB/s ETA {{info.eta}} s</span>
           	    </li>
               </ul>
@@ -526,7 +530,7 @@ dark:text-white">
       </div>
           <div  class='ldBar bottom-0 right-0 pb-8' id="{{info.id}}" >
 	   </div>
-	   <span *ngIf="lastTime">  {{createBars()}} </span>
+	   <span *ngIf="last">  {{createBars()}} </span>
       </div>
     </section>
   </div>
@@ -566,7 +570,7 @@ dark:text-white">
       	    </li>
       	    <li class="font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Size: {{err.file.size}} 
+      	    Size: {{err.size}} 
       	    </li>
        	    <li class="font-light leading-relaxed text-gray-800
 dark:text-white">
@@ -576,14 +580,10 @@ dark:text-white">
          </ul>
         </div>
        </div>
-
 		{{err.msg}}
-	 
       </div>
      </div>
     </section>
   </div>
 </div>
-
-
-</section> <!--- XXX same as body -->
+</main> <!--- XXX same as body -->
