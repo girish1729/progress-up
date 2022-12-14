@@ -784,7 +784,7 @@ string, url: string, pic: string, meta: string) {
             }
 	var self = this;
         this.showThumbnail(f, i, function(i:number, title: string, url:
-string, pic: string, meta:string) {
+string, pic: any, meta:string) {
             self.uploadFileInfos.push({
                 file: f,
                 id: id,

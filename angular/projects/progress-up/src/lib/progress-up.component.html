@@ -496,8 +496,8 @@ py-4 whitespace-nowrap"> See below for possible options </td>
     	       	type="application/pdf"></object>
 	         </div>
                  <div *ngSwitchCase="info.file.type.includes('image')">
-                           <img width="125" height="125" src="info.pic" 
-	       	title="txt" alt="info.file.name" class="w-12 h-12" />
+                      <img width="125" height="125" [src]="info.pic" 
+	       	title="info.file.name" alt="info.file.name" class="w-12 h-12" />
 	         </div>
                  <div *ngSwitchCase="info.file.type.includes('video')">
                            <video *ngIf="info.url" controls class="h-9 w-9" width="125" height="125">
@@ -510,12 +510,12 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 	       	alt="info.file.name" >  </audio> 
 	         </div>
                  <div *ngSwitchCase="info.file.type.includes('text')">
-                           <img width="125" height="125" src="info.pic" 
-	       	title="info.title" alt="info.file.name" class="w-12 h-12" />
+                           <img width="125" height="125" [src]="info.pic" 
+	       	[title]="info.title" alt="info.file.name" class="w-12 h-12" />
 	         </div>
                  <div *ngSwitchDefault>
-                           <img width="125" height="125" src="pic" 
-	       	title="txt" alt="info.file.name" class="w-12 h-12" />
+                           <img width="125" height="125" [src]="info.pic" 
+	       	title="info.file.name" alt="info.file.name" class="w-12 h-12" />
 	         </div>
                </div>
 
