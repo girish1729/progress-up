@@ -1,14 +1,12 @@
 import {
-    Component,
     Input,
-    Inject,
     ChangeDetectorRef,
+    ViewChild,
     ViewEncapsulation
 } from '@angular/core';
+import { Component, OnInit, ElementRef,Renderer2,Inject } from '@angular/core';
 import { Pipe, PipeTransform, SecurityContext } from '@angular/core';
-
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-
+import { DomSanitizer, SafeHtml, SafeStyle, SafeScript, SafeUrl, SafeResourceUrl } from '@angular/platform-browser';
 import {catchError} from 'rxjs/operators';
 import {
     DOCUMENT
@@ -40,7 +38,9 @@ interface fileInfo {
     file: File;
     id: string;
     ts: string;
-    thumb: string;
+    title: string;
+    url: string;
+    pic: string;
     meta: string;
     bytesSent: string;
     rate: string;
@@ -52,7 +52,9 @@ interface errInfo {
     file: File;
     id: string;
     ts: string;
-    thumb: string;
+    title: string;
+    url: string;
+    pic: string;
     meta: string;
     msg: string;
     size:string;
@@ -70,6 +72,11 @@ interface errInfo {
 
 export class ProgressUpComponent {
 
+	/*
+ transform(value: string): SafeUrl {
+    return this.sanitize.bypassSecurityTrustUrl(value);
+  }
+	*/
     fileTypeIcons: {
         [key: string]: string
     } = {
@@ -135,7 +142,6 @@ export class ProgressUpComponent {
     details = '';
     statsTable: statsTableType[] = [];
 
-
     totalfiles = 0;
     totalsize = 0;
     totaltime = 0;
@@ -159,9 +165,11 @@ private ref: ChangeDetectorRef,private http:HttpClient, @Inject(DOCUMENT) docume
   ngAfterContentChecked() {
     this.ref.detectChanges();
   }
+
 transform(html: string): SafeHtml {
       return this.sanitizer.bypassSecurityTrustHtml(html);
    }
+
     toggleTabs($tabNumber: number) {
         this.openTab = $tabNumber;
     }
@@ -506,13 +514,17 @@ testForm).subscribe((resp:any) => {
         return false;
     }
 
-    showThumbnail(f:fileInfo, i: number, cb: Function) {
-        let id = 'a' + i;
-        let target = id + '-thumb';
+    showThumbnail(f:File, i: number, cb: Function) {
 	let self = this;
-	let type = f.file.type.split('/')[0];
+	let meta = '';
+	let pic:any = '';
+	let title = '';
+	let url:SafeUrl = '';
+	let turl = '';
+	let ftype = f.type;
+	let fkey = ftype.split('/')[0];
         switch (true) {
-            case /text/.test(f.file.type):
+            case ftype.includes('text'):
                 console.log("Text type detected");
                 var reader = new FileReader();
                 reader.onload = (function(locf) {
@@ -522,7 +534,7 @@ testForm).subscribe((resp:any) => {
                         	res = e.target.result;
 			}
                         let wc = self.wordCount(res);
-                        f.meta = ` 
+                        meta = ` 
    			Chars : ${wc.chars}
    			Words: ${wc.words}
    			Lines: ${wc.lines}
@@ -530,269 +542,85 @@ testForm).subscribe((resp:any) => {
                         var dataArray = (<string>res).split("\n");
                         dataArray = dataArray.slice(0, 20);
                         let txt = dataArray.join("\n");
-
-                        var fileIcon = self.fileTypeIcons[type];
-                        let pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" +
-                            fileIcon;
-                        f.thumb = [
-                                '<img width="125" height="125" src="',
-                                pic,
-                                '" title="',
-                                txt,
-				 '" alt="',
-                                locf.name,
-                                '" class="w-12 h-12" />'
-                            ].join('');
-			cb(i);
-
+                        var fileIcon = self.fileTypeIcons[fkey];
+                        pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" + fileIcon;
+			title = txt;
+			url = '';
+			cb(i, title, url, pic, meta);
                     };
-                })(f.file);
-                reader.readAsText(f.file);
+                })(f);
+                reader.readAsText(f);
                 break;
-            case /image/.test(f.file.type):
+            case ftype.includes('image'):
                 console.log("Image type detected");
                 var reader = new FileReader();
                 reader.onload = (function(locf) {
                     return function(e) {
-			let pic:any;
 			if(e.target) {
                         	pic = e.target.result;
 			}
-                        f.thumb = [
-                                '<img width="125" height="125" src="',
-                                pic,
-                                '" title="',
-                                locf.name,
-				 '" alt="',
-                                locf.name,
-                                '" class="w-12 h-12" />'
-                            ].join(''); 
-                            f.meta = locf.name;
-			    cb(i);
+                        meta = locf.name;
+			title = locf.name;
+			url = '';
+			cb(i, title, url, pic, meta);
                     };
-                })(f.file);
-                reader.readAsDataURL(f.file);
+                })(f);
+                reader.readAsDataURL(f);
                 break;
-            case /audio/.test(f.file.type):
+            case ftype.includes('audio'):
                 console.log("Audio type detected");
-                var audioUrl = window.URL.createObjectURL(f.file);
-                f.thumb = [
-                    '<audio controls class="h-9 w-9" width="125" height="125"> ',
-		    '<source src="',
-                    audioUrl,
-                    '" title="',
-                    f.file.name,
-                    '" alt="',
-                    f.file.name,
-                    '" > </source> </audio> '
-                ].join('');
-                f.meta = f.file.name;
-			cb(i);
+		turl = window.URL.createObjectURL(f);
+                url =
+	this.sanitizer.bypassSecurityTrustUrl(turl) ;
+                meta = f.name;
+		title = f.name;
+		pic = '';
+		cb(i, title, url, pic, meta);
                 break;
-            case /video/.test(f.file.type):
+            case ftype.includes('video'):
                 console.log("Video type detected");
-                var videoUrl = window.URL.createObjectURL(f.file);
-                f.thumb = [
-                    '<video controls class="h-9 w-9" width="125" height="125">',
-		    '<source src="',
-                    videoUrl,
-                    '" title="',
-                    f.file.name,
-                    '" alt="',
-                    f.file.name,
-                    '" > </source> </video> '
-                ].join('');
-                f.meta = f.file.name;
-			cb(i);
+                meta = f.name;
+		turl = window.URL.createObjectURL(f);
+                url = 
+	this.sanitizer.bypassSecurityTrustUrl(turl) ;
+                meta = f.name;
+		title = f.name;
+		pic = '';
+		cb(i, title, url, pic, meta);
                 break;
-            case /pdf/.test(f.file.type):
+            case ftype.includes('pdf'):
                 console.log("PDF type detected");
-                var pdfURL = window.URL.createObjectURL(f.file);
-		let b:any = this.sanitizer.bypassSecurityTrustResourceUrl(pdfURL);
- 		pdfURL = b;
-		f.thumb = [ 
-		'<object [attr.data]="
-		pdfURL,
-    		' width="125px" height="125px" ',
-    		'type="application/pdf"></object>'].join('');
-		let b2:any = this.sanitizer.bypassSecurityTrustHTML(f.thumb);
-		f.thumb = b2;
-                f.meta = f.file.name;
-		cb(i);
+                turl = window.URL.createObjectURL(f);
+		let b:any = 
+		   this.sanitizer.bypassSecurityTrustResourceUrl(turl);
+ 		url = b;
+                meta = f.name;
+		title = f.name;
+		pic = '';
+		cb(i, title, url, pic, meta);
                 break;
             default:
                 console.log("default type detected");
-                var fileIcon = this.fileTypeIcons[type];
+                var fileIcon = this.fileTypeIcons[fkey];
                 if (fileIcon == undefined) {
                     fileIcon = "file.svg";
                 }
-                f.meta = f.file.name;
-                let pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" + fileIcon;
-                f.thumb = [
-                    '<img width="125" height="125" src=',
-                    pic,
-                    '" title="',
-                    f.file.name,
-		    '" alt="',
-                    f.file.name,
-                    '" class="w-12 h-12" />'
-                ].join('');
-			cb(i);
+                pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" + fileIcon;
+                meta = f.name;
+		title = f.name;
+		cb(i, title, url, pic, meta);
                 break;
         }
     }
 
-    showErrThumbnail(f:errInfo, i: number, cb: Function) {
-        let id = 'a' + i;
-        let target = id + '-thumb';
-	let self = this;
-	let type = f.file.type.split('/')[0];
-        switch (true) {
-            case /text/.test(f.file.type):
-                console.log("Text type detected");
-                var reader = new FileReader();
-                reader.onload = (function(locf) {
-                    return function(e) {
-			let res:any;
-			if(e.target) {
-                        	res = e.target.result;
-			}
-                        let wc = self.wordCount(res);
-                        f.meta = ` 
-   			Chars : ${wc.chars}
-   			Words: ${wc.words}
-   			Lines: ${wc.lines}
-			`;
-                        var dataArray = (<string>res).split("\n");
-                        dataArray = dataArray.slice(0, 20);
-                        let txt = dataArray.join("\n");
-
-                        var fileIcon = self.fileTypeIcons[type];
-                        let pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" +
-                            fileIcon;
-                        f.thumb = [
-                                '<img width="125" height="125" src="',
-                                pic,
-                                '" title="',
-                                txt,
-				 '" alt="',
-                                locf.name,
-                                '" class="w-12 h-12" />'
-                            ].join('');
-			cb(i);
-
-                    };
-                })(f.file);
-                reader.readAsText(f.file);
-                break;
-            case /image/.test(f.file.type):
-                console.log("Image type detected");
-                var reader = new FileReader();
-                reader.onload = (function(locf) {
-                    return function(e) {
-			let pic:any;
-			if(e.target) {
-                        	pic = e.target.result;
-			}
-                        f.thumb = [
-                                '<img width="125" height="125" src="',
-                                pic,
-                                '" title="',
-                                locf.name,
-				 '" alt="',
-                                locf.name,
-                                '" class="w-12 h-12" />'
-                            ].join(''); 
-                            f.meta = locf.name;
-			cb(i);
-                    };
-                })(f.file);
-                reader.readAsDataURL(f.file);
-                break;
-            case /audio/.test(f.file.type):
-                console.log("Audio type detected");
-                var audioUrl = window.URL.createObjectURL(f.file);
-                f.thumb = [
-                    '<audio controls class="h-9 w-9" width="125" height="125"> ',
-		    '<source src="',
-                    audioUrl,
-                    '" title="',
-                    f.file.name,
-                    '" alt="',
-                    f.file.name,
-                    '" > </source> </audio> '
-                ].join('');
-                f.meta = f.file.name;
-			cb(i);
-                break;
-            case /video/.test(f.file.type):
-                console.log("Video type detected");
-                var videoUrl = window.URL.createObjectURL(f.file);
-                f.thumb = [
-                    '<video controls class="h-9 w-9" width="125" height="125">',
-		    '<source src="',
-                    videoUrl,
-                    '" title="',
-                    f.file.name,
-                    '" alt="',
-                    f.file.name,
-                    '" > </source> </video> '
-                ].join('');
-                f.meta = f.file.name;
-			cb(i);
-                break;
-
-            case /pdf/.test(f.file.type):
-                console.log("PDF type detected");
-                var reader = new FileReader();
-                reader.onload = (function(locf) {
-                    return function(e) {
-			if(e.target) {
-                    var pdfURL = new Uint8Array(e.target.result as ArrayBuffer);
-                f.thumb = [
-                    '<pdf-viewer class="h-9 w-9" style="width:125;height:125;"',
-		    '[src]="',
-                    pdfURL,
-                    '" > </pdf-viewer>'
-                ].join('');
-                f.meta = f.file.name;
-		cb(i);
-                };
-		}
-                })(f.file);
-                reader.readAsArrayBuffer(f.file);
-                break;
-            default:
-                console.log("default type detected");
-                var fileIcon = this.fileTypeIcons[type];
-                if (fileIcon == undefined) {
-                    fileIcon = "file.svg";
-                }
-                f.meta = f.file.name;
-                let pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" + fileIcon;
-                f.thumb = [
-                    '<img width="125" height="125" src=',
-                    pic,
-                    '" title="',
-                    f.file.name,
-		    '" alt="',
-                    f.file.name,
-                    '" class="w-12 h-12" />'
-                ].join('');
-			cb(i);
-                break;
-        }
-    }
 
     createBars() {
         if (this.thumbNailsDone) {
 	   console.log("createBars():: returning immediately");
             return;
         }
-	let self = this;
         this.progressBars = [];
         for (var i = 0; i < this.uploadFileInfos.length; i++) {
-            let f = this.uploadFileInfos[i];
             let id = 'a' + i;
             let bar = new ldBar('#' + id, {
                 preset: this.form.progType.toLowerCase()
@@ -800,32 +628,126 @@ testForm).subscribe((resp:any) => {
             bar.set(0);
             console.log("Creating progress bar::" + id);
             this.progressBars.push(bar);
-            this.showThumbnail(f, i, function(i:number) {
-		if(i == self.uploadFileInfos.length - 1) { 
-			self.thumbNailsDone = true;
-		}
-	    });
         }
-        for (var i = 0; i < this.errInfos.length; i++) {
-            let f = this.errInfos[i];
-            this.showErrThumbnail(f, i, function(i:number) {
-		if(i == self.errInfos.length - 1) { 
-			self.thumbNailsDone = true;
-		}
-	    });
+	this.thumbNailsDone = true;
+   }
+
+    showErrThumbnail(f:File, cb: Function) {
+	let self = this;
+	let meta = '';
+	let pic:any = '';
+	let title = '';
+	let url:SafeUrl = '';
+	let turl = '';
+	let ftype = f.type;
+	let fkey = ftype.split('/')[0];
+        switch (true) {
+            case ftype.includes('text'):
+                console.log("Text type detected");
+                var reader = new FileReader();
+                reader.onload = (function(locf) {
+                    return function(e) {
+			let res:any;
+			if(e.target) {
+                        	res = e.target.result;
+			}
+                        let wc = self.wordCount(res);
+                        meta = ` 
+   			Chars : ${wc.chars}
+   			Words: ${wc.words}
+   			Lines: ${wc.lines}
+			`;
+                        var dataArray = (<string>res).split("\n");
+                        dataArray = dataArray.slice(0, 20);
+                        let txt = dataArray.join("\n");
+                        var fileIcon = self.fileTypeIcons[fkey];
+                        pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" + fileIcon;
+			title = txt;
+			url = '';
+			cb(title, url, pic, meta);
+                    };
+                })(f);
+                reader.readAsText(f);
+                break;
+            case ftype.includes('image'):
+                console.log("Image type detected");
+                var reader = new FileReader();
+                reader.onload = (function(locf) {
+                    return function(e) {
+			if(e.target) {
+                        	pic = e.target.result;
+			}
+                        meta = locf.name;
+			title = locf.name;
+			url = '';
+			cb(title, url, pic, meta);
+                    };
+                })(f);
+                reader.readAsDataURL(f);
+                break;
+            case ftype.includes('audio'):
+                console.log("Audio type detected");
+		turl = window.URL.createObjectURL(f);
+                url =
+	this.sanitizer.bypassSecurityTrustUrl(turl) ;
+                meta = f.name;
+		title = f.name;
+		pic = '';
+		cb(title, url, pic, meta);
+                break;
+            case ftype.includes('video'):
+                console.log("Video type detected");
+                meta = f.name;
+		turl = window.URL.createObjectURL(f);
+                url = 
+	this.sanitizer.bypassSecurityTrustUrl(turl) ;
+                meta = f.name;
+		title = f.name;
+		pic = '';
+		cb(title, url, pic, meta);
+                break;
+            case ftype.includes('pdf'):
+                console.log("PDF type detected");
+                turl = window.URL.createObjectURL(f);
+		let b:any = 
+		   this.sanitizer.bypassSecurityTrustResourceUrl(turl);
+ 		url = b;
+                meta = f.name;
+		title = f.name;
+		pic = '';
+		cb(title, url, pic, meta);
+                break;
+            default:
+                console.log("default type detected");
+                var fileIcon = this.fileTypeIcons[fkey];
+                if (fileIcon == undefined) {
+                    fileIcon = "file.svg";
+                }
+                pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" + fileIcon;
+                meta = f.name;
+		title = f.name;
+		cb(title, url, pic, meta);
+                break;
         }
     }
 
+
     printBannedBanner(file:File, size: string, id: string, ts:string, msg:string) {
-        this.errInfos.push({
+	var self = this;
+            this.showErrThumbnail(file, function(title:
+string, url: string, pic: string, meta: string) {
+        self.errInfos.push({
             file: file,
             id: id,
             size: size,
-            meta: '',
-            thumb: '',
+            meta: meta,
+    	    title: title,
+    	    url: url,
+    	    pic: pic,
             ts: ts,
             msg: msg
         });
+	    });
     }
 
     setupUpload() {
@@ -860,17 +782,23 @@ testForm).subscribe((resp:any) => {
                     this.disableUpload = true;
                 }
             }
-            this.uploadFileInfos.push({
+	var self = this;
+        this.showThumbnail(f, i, function(i:number, title: string, url:
+string, pic: string, meta:string) {
+            self.uploadFileInfos.push({
                 file: f,
                 id: id,
                 ts: ts,
+    		title: title,
+    		url: url,
+    		pic: pic,
 		size: size,
-                meta: '',
-                thumb: '',
+                meta: meta,
                 bytesSent: '0 Bytes',
                 eta: '',
                 rate: '',
             });
+	    });
             this.totalfiles += 1;
         }
         this.uploadFileList = Array.from(this.uploadFileList).filter(function(value:
@@ -890,6 +818,4 @@ any, index:any) {
         this.uploadFileInfos = list2;
         this.checkTotalSize();
     }
-
-
 }
