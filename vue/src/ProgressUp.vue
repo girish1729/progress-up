@@ -1,4 +1,5 @@
-<script>
+
+<script lang="ts">
 import axios from "axios";
 import ldBar from "./assets/progressBar/loading-bar.js";
 import PDFObject from 'pdfobject';
@@ -10,6 +11,8 @@ export default {
             openTab: 1,
             dragging: false,
             authEnabled: false,
+            filterLabel : "Allow file type",
+            sizeLabel : "Single file limit",
             filtFiles : {
                 "type": "all",
                 "action": "allow"
@@ -27,24 +30,24 @@ export default {
                 fileTypeAction: "Allow file type"
             },
 
-            fileTypes: {
-                "video": "avi.svg",
-                "css": "css.svg",
-                "csv": "csv.svg",
-                "eps": "eps.svg",
-                "excel": "excel.svg",
-                "html": "html.svg",
-                "movie": "mov.svg",
-                "mp3": "mp3.svg",
-                "other": "other.svg",
-                "pdf": "pdf.svg",
-                "ppt": "ppt.svg",
-                "rar": "rar.svg",
-                "text": "txt.svg",
-                "audio": "wav.svg",
-                "word": "word.svg",
-                "zip": "zip.svg"
-            },
+    fileTypes:  {
+        "video": 'avi.svg',
+        "css": 'css.svg',
+        "csv": 'csv.svg',
+        "eps": 'eps.svg',
+        "excel": 'excel.svg',
+        "html": 'html.svg',
+        "movie": 'mov.svg',
+        "mp3": 'mp3.svg',
+        "other": 'other.svg',
+        "pdf": 'pdf.svg',
+        "ppt": 'ppt.svg',
+        "rar": 'rar.svg',
+        "text": 'txt.svg',
+        "audio": 'wav.svg',
+        "word": 'word.svg',
+        "zip": 'zip.svg'
+    },
             uploadFileInfos: [],
             uploadFileList: [],
             errInfos: [],
@@ -92,9 +95,7 @@ export default {
 
                 var ts = new Date().toLocaleString();
                 var tot = self.uploadFileList.length;
-                var status = self.totalfiles == tot ?
-                    "<img src='src/assets/icons/misc/success-icon.svg' >" :
-                    "<img src='src/assets/icons/misc/failure-icon.svg' >";
+                var status = self.totalfiles == tot ?  "<img src=\"./assets/icons/misc/success-icon.svg\" >" : "<img src=\"./assets/icons/misc/failure-icon.svg\" >";
                 self.details = `${self.totalfiles}/${tot} files of size ${this.totalsize} sent in ${self.totaltime} ms`;
                 var id = self.statsTable.length + 1;
 
@@ -172,7 +173,7 @@ export default {
 
             if (this.form.authEnabled) {
                 console.log(this.form.authType);
-                console.log(this.form.user, inputs.pass);
+                console.log(this.form.user, this.form.pass);
             }
             console.log(this.form.fileSizeLimit);
             console.log(this.form.sizeLimitType);
@@ -286,37 +287,37 @@ export default {
                 case "All":
                     break;
                 case "PDF only":
-                    filtFiles = {
+                    this.filtFiles = {
                         "type": "application/pdf",
                         "action": action
                     };
                     break;
                 case "Image only":
-                    filtFiles = {
+                    this.filtFiles = {
                         "type": "image",
                         "action": action
                     };
                     break;
                 case "Video only":
-                    filtFiles = {
+                    this.filtFiles = {
                         "type": "video",
                         "action": action
                     };
                     break;
                 case "Audio only":
-                    filtFiles = {
+                    this.filtFiles = {
                         "type": "audio",
                         "action": action
                     };
                     break;
                 case "Zip only":
-                    filtFiles = {
+                    this.filtFiles = {
                         "type": "application/zip",
                         "action": action
                     };
                     break;
                 case "Text only":
-                    filtFiles = {
+                    this.filtFiles = {
                         "type": "text",
                         "action": action
                     };
@@ -328,7 +329,6 @@ export default {
         },
 
         toggleSizeQ() {
-            var sizeLabel = "Single file limit";
             val = this.form.sizeLimitType;
             if (val.checked === true) {
                 sizeLabel = "Total limit";
@@ -338,7 +338,6 @@ export default {
         },
 
         toggleFilterQ() {
-            var filterLabel = "Allow file type";
             val = this.form.fileTypeAction;
             if (val.checked === true) {
                 filterLabel = "Deny file type";
@@ -358,14 +357,14 @@ export default {
 
         checkFilter(mime) {
             /* No filter XXX */
-            if (filtFiles.type == 'all') {
+            if (this.filtFiles.type == 'all') {
                 console.log("No file type filters active");
                 return true;
             }
-            if (mime.match(filtFiles.type) && filtFiles.action == "allow") {
+            if (mime.match(this.filtFiles.type) && this.filtFiles.action == "allow") {
                 return true;
             }
-            if (mime.match(filtFiles.type) && filtFiles.action == "deny") {
+            if (mime.match(this.filtFiles.type) && this.filtFiles.action == "deny") {
                 return true;
             }
             return false;
@@ -387,10 +386,9 @@ export default {
             }
             return false;
         },
-
         showThumbnail(f, i ) {
         let id = 'a' + i;
-        let target = id + '-thumb';
+        let target = '#' + id + '-thumb';
 	let self = this;
 	let type = f.file.type.split('/')[0];
         switch (true) {
@@ -413,12 +411,10 @@ export default {
                         dataArray = dataArray.slice(0, 20);
                         let txt = dataArray.join("\n");
 
-                        var fileIcon = self.fileTypeIcons[type];
-                        let pic = "src/assets/icons/filetypes/" +
-                            fileIcon;
+             var fileIcon = 'https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/' + self.fileTypes[type];
                         f.thumb = [
                                 '<img width="125" height="125" src="',
-                                pic,
+                                fileIcon,
                                 '" title="',
                                 txt,
 				 '" alt="',
@@ -496,7 +492,7 @@ export default {
                     fileIcon = "file.svg";
                 }
                 f.meta = f.file.name;
-                let pic = "src/assets/icons/filetypes/" + fileIcon;
+                let pic = "/filetypes/" + fileIcon;
                 f.thumb = [
                     '<img width="125" height="125" src=',
                     pic,
@@ -509,69 +505,69 @@ export default {
                 break;
         }
     },
-
-
         createBars() {
             for (var i = 0; i < this.uploadFileInfos.length; i++) {
-                f = this.uploadFileInfos[i];
+                let f = this.uploadFileInfos[i];
                 var selector = '#a' + i;
                 var bar = new ldBar(selector, {
-                    preset: progType.toLowerCase()
+                    preset: this.form.progType.toLowerCase()
                 });
                 bar.set(0);
-                progressBars.push(bar);
-                showThumbnail(f, i);
+                this.progressBars.push(bar);
+                this.showThumbnail(f, i);
             }
             for (var i = 0; i < this.errInfos.length; i++) {
-                f = this.errInfos[i];
-                showThumbnail(f, i);
+                let f = this.errInfos[i];
+                this.showThumbnail(f, i);
             }
         },
 	        setupUpload() {
             var delQ = [];
-            for (var i = 0; i < uploadFileList.length; i++) {
-                let f = uploadFileList[i];
+            for (var i = 0; i < this.uploadFileList.length; i++) {
+                let f = this.uploadFileList[i];
                 let mime = f.type;
                 let name = f.name;
                 let ts = f.lastModifiedDate.toLocaleDateString();
-                totalsize += f.size;
-                let size = humanFileSize(f.size);
+                this.totalsize += f.size;
+                let size = this.humanFileSize(f.size);
                 let id = 'a' + i;
-                if (!checkSize(f.size)) {
+                if (!this.checkSize(f.size)) {
                     console.log("Size check:: size is " + f.size);
-                    msg = `${name} too big for upload`;
+                    let msg = `${name} too big for upload`;
                     console.log(msg);
                     this.printBannedBanner(f, id, ts, msg);
                     delQ.push(i);
                     continue;
                 }
-                if (!checkFilter(mime)) {
+                if (!this.checkFilter(mime)) {
                     console.log("Hit banned file type:: filter issue");
-                    msg = `${name} cannot be uploaded due to policy.`;
+                    let msg = `${name} cannot be uploaded due to policy.`;
                     this.printBannedBanner(f, id, ts, msg);
                     delQ.push(i);
                     continue;
                 }
-                if (i == uploadFileList.length - 1) {
+                if (i == this.uploadFileList.length - 1) {
                     console.log("Total size check:: total size is " +
-                        totalsize);
-                    if (!checkTotalSize()) {
-                        msg = `Total size exceeds policy, delete some`;
+                        this.totalsize);
+                    if (!this.checkTotalSize()) {
+                        let msg = `Total size exceeds policy, delete some`;
                         this.disableUpload = true;
                     }
                 }
-                totalfiles += 1;
+                this.totalfiles += 1;
                 this.uploadFileInfos.push({
                     file: f,
                     id: id,
                     meta: '',
+                    size: size,
+                    ts: ts,
                     thumb: '',
                     bytesSent: 0,
                     eta: 0,
                     rate: 0,
                 });
             }
-            this.uploadFileList = this.uploadFileList.filter(function(value, index) {
+            this.uploadFileList = Array.from(this.uploadFileList).filter(function(value, index) {
                 return delQ.indexOf(index) == -1;
             });
             this.disableUpload = false;
@@ -669,8 +665,8 @@ Help</a>
 @dragenter="onDragEnter" @dragleave="onDragLeave"
 @dragover.prevent @drop.stop.prevent @drop="onDrop" @dragover="dragover" class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
 	   <form class='flex p-8 justify-center'>
-		<img class="stroke-white dark:bg-white" width="100" height="100"
-src="./assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" />
+		<img class="stroke-white dark:bg-white" width="100" height="100" src="./assets/icons/upload/file-submit.svg"
+ alt="progress-up file submit icon" />
 	       <input ref="fileInput" @change="fileSelectFinish" name="uploadFiles" type="file" multiple hidden>
 	   </form>
 	   <h2 class="flex justify-center text-dark-500 text-xl font-medium mb-2"> 
@@ -1082,7 +1078,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
           <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
              <div class="h-12 text-sm text-grey-dark flex items-left
     justify-left">
-		<div  v-html="info.thumb" id="{{info.id}}-thumb"></div>
+		<div  v-html="info.thumb" :id="info.id + '-thumb'"></div>
              </div>
           </div>
     
@@ -1099,7 +1095,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
           	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800
     dark:text-white">
-          	    Type: {{info.type}}
+          	    Type: {{info.file.type}}
           	    </li>
           	    <li class="text-xl font-light leading-relaxed text-gray-800
     dark:text-white">
@@ -1113,7 +1109,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
     dark:text-white">
 
 		<span>{{info.bytesSent}} of {{info.size}} uploaded
-{{info.rate}} MB/s ETA {{infoeta}} s</span>
+{{info.rate}} MB/s ETA {{info.eta}} s</span>
           	    </li>
      
               </ul>
@@ -1137,7 +1133,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
   
       <div title="Removed from uploads" class="absolute cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
             <img width="25" height="25"
-  src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg" />
+  :src="failureIcon" />
       </div>
   
       <div class="flex flex-wrap -mx-2 mb-8">

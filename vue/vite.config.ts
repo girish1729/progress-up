@@ -5,7 +5,7 @@ import libCss from 'vite-plugin-libcss';
 import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
- assetsInclude: ["./assets/**"],
+ assetsInclude: ["./assets/**/*"],
  build: {
     cssCodesplit: true,
     lib: {

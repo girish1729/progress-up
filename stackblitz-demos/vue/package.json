@@ -8,9 +8,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "progress-up-vue": "*",
-    "vue": "^3.2.41",
-    "pdfobject": "*"
+    "pdfobject": "*",
+    "progress-up-vue": "file:../../vue",
+    "vue": "^3.2.41"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.2.0",
