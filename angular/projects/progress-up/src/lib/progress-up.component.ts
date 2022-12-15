@@ -106,8 +106,8 @@ export class ProgressUpComponent {
     /* XXX these are backend variables */
     ///uploadURL = 'https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34';
     form = {
-        uploadURL: 'https://localhost:2324/uploadmultiple',
-        filesName: "uploadFiles",
+        uploadURL: '',
+        filesName: "",
         authEnabled: false,
         authType: "Basic",
         user: '',

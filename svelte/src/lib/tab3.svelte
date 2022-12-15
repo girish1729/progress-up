@@ -71,10 +71,10 @@ font-medium text-gray-900">{stat.id}</td>
 	              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
 
     {#if stat.status}
-                <img src="assets/icons/misc/success-icon.svg"
+                <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/success-icon.svg"
 alt="Success icon" /> 
      {:else} 
-                <img src="assets/icons/misc/failure-icon.svg"
+                <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg"
 alt="Failure icon" />
       {/if}
 	              </td>

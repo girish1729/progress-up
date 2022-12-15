@@ -1,8 +1,8 @@
 import { writable } from 'svelte/store';
 
 export const inputs = writable({
-        uploadURL: "https://localhost:2324/uploadmultiple",
-        filesName: "uploadFiles",
+        uploadURL: "",
+        filesName: "",
         progType: "Line",
         authEnabled: false,
         authType: "",

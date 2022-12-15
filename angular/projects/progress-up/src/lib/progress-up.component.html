@@ -578,31 +578,31 @@ src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/ic
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
 	       <div [ngSwitch] = "true">
-                 <div *ngSwitchCase="info.file.type.includes('pdf')">
-	       	<object [attr.data]="info.url" width="125px" height="125px"
+                 <div *ngSwitchCase="err.file.type.includes('pdf')">
+	       	<object [attr.data]="err.url" width="125px" height="125px"
     	       	type="application/pdf"></object>
 	         </div>
-                 <div *ngSwitchCase="info.file.type.includes('image')">
-                      <img width="125" height="125" [src]="info.pic" 
-	       	title="info.file.name" alt="info.file.name" class="w-12 h-12" />
+                 <div *ngSwitchCase="err.file.type.includes('image')">
+                      <img width="125" height="125" [src]="err.pic" 
+	       	title="err.file.name" alt="err.file.name" class="w-12 h-12" />
 	         </div>
-                 <div *ngSwitchCase="info.file.type.includes('video')">
-                           <video *ngIf="info.url" controls class="h-9 w-9" width="125" height="125">
-	       	   <source [src]="info.url" title="info.file.name" 
-	       	alt="info.file.name" >  </video> 
+                 <div *ngSwitchCase="err.file.type.includes('video')">
+                           <video *ngIf="err.url" controls class="h-9 w-9" width="125" height="125">
+	       	   <source [src]="err.url" title="err.file.name" 
+	       	alt="err.file.name" >  </video> 
 	         </div>
-                 <div *ngSwitchCase="info.file.type.includes('audio')">
-                           <audio *ngIf="info.url" controls class="h-9 w-9" width="125" height="125"> 
-	       	   <source [src]="info.url" title="info.file.name" 
-	       	alt="info.file.name" >  </audio> 
+                 <div *ngSwitchCase="err.file.type.includes('audio')">
+                           <audio *ngIf="err.url" controls class="h-9 w-9" width="125" height="125"> 
+	       	   <source [src]="err.url" title="err.file.name" 
+	       	alt="err.file.name" >  </audio> 
 	         </div>
-                 <div *ngSwitchCase="info.file.type.includes('text')">
-                           <img width="125" height="125" [src]="info.pic" 
-	       	[title]="info.title" alt="info.file.name" class="w-12 h-12" />
+                 <div *ngSwitchCase="err.file.type.includes('text')">
+                           <img width="125" height="125" [src]="err.pic" 
+	       	[title]="err.title" alt="err.file.name" class="w-12 h-12" />
 	         </div>
                  <div *ngSwitchDefault>
-                           <img width="125" height="125" [src]="info.pic" 
-	       	title="info.file.name" alt="info.file.name" class="w-12 h-12" />
+                           <img width="125" height="125" [src]="err.pic" 
+	       	title="err.file.name" alt="err.file.name" class="w-12 h-12" />
 	         </div>
                </div>
          </div>

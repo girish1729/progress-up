@@ -1,5 +1,5 @@
 <script lang="ts">
-	let progressTypes = "./images/progress-types.png";
+	let progressTypes = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/images/progress-types.png";
 </script>
 
     <div class="flex flex-col">

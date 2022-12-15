@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "progress-up-react": "file:../../react",
+    "progress-up-react": "0.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

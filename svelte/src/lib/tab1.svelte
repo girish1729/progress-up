@@ -336,7 +336,7 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
                         dataArray = dataArray.slice(0, 20);
                         let txt = dataArray.join("\n");
                         var fileIcon = fileTypeIcons[type];
-                        let pic = "/assets/icons/filetypes/" +
+                        let pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" +
                             fileIcon;
                         f.thumb = [
                                 '<img width="125" height="125" src="',
@@ -423,7 +423,7 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
                     fileIcon = "file.svg";
                 }
                 f.meta = f.file.name;
-                let pic = "/assets/icons/filetypes/" + fileIcon;
+                let pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" + fileIcon;
                 f.thumb = [
                     '<img width="125" height="125" src=',
                     pic,
@@ -551,7 +551,7 @@ class="{isDragActive ? 'bg-blue-400':'bg-light'} text-gold-400 border border-red
 rounded cursor-pointer" >
 	   <form class='flex p-8  justify-center'>
 		<img class="stroke-white dark:bg-white" width="100" height="100"
-src="assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" />
+src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/upload/file-submit.svg" alt="progress-up file submit icon" />
 	       <input bind:this={browseInput} on:change={fileSelectFinish}  name="uploadFiles" type="file" multiple hidden />
 	   </form>
 	   <h2 class="flex justify-center text-dark-500 text-xl font-medium mb-2"> 

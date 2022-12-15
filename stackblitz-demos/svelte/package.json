@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "progress-up-svelte": "0.0.3"
+    "progress-up-svelte": "0.0.13"
   },
   "scripts": {
     "dev": "vite",
