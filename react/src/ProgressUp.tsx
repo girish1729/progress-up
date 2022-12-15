@@ -48,6 +48,8 @@ interface fileInfo {
     id: string;
     ts: string;
     thumb: string;
+    size:string;
+    src:any;
     meta: string;
     bytesSent: string;
     rate: string;
@@ -103,8 +105,9 @@ function ProgressUp() {
 
     // From drag and drop
     const onDrop = (files: any) => {
-        console.log("Dnd" + files);
         setUpload(files);
+        console.log(files);
+	uploadFileList = files;
         setupUpload();
     };
 
@@ -440,13 +443,13 @@ file.file.size);
         }
     };
 
-
-    const wordCount = (val:string) => {
-        var wom = val.match(/\S+/g);
+   const wordCount = (inp:any) => {
+	const str = String(inp);
+        var wom = str.match(/\S+/g);
         return {
-            chars: val.length,
+            chars: str.length,
             words: wom ? wom.length : 0,
-            lines: val.split(/\r*\n/).length
+            lines: str.split(/\r*\n/).length
         };
     };
 
@@ -485,76 +488,86 @@ file.file.size);
 
     const showThumbnail = (f:any, i:number) => {
         let reader = new FileReader();
-	let type = f.file.type.split('/')[0];
+	let type = f.type.split('/')[0];
         switch(true) {
-
-            case /image/.test(f.file.type):
-                reader.onload = (function(theFile) {
-                    return function(e) {
-                        if (e.target) {
-                            let imagesrc = String(e.target.result);
-			    if(imagesrc) {
-                            return ( 
-			<img width="125" height="125" src={imagesrc}
-                         title={f.name} alt={f.name}
-                                className= "w-12 h-12" / >
-                            );
-			   }
-                        }
-                    };
-                })(f);
+            case /image/.test(f.type):
+		console.log("Image detected");
+                reader.onload = function(e) {
+                	let src = e.target && e.target.result;
+			uploadFileInfos[i].src = src;
+        		setFileInfos(uploadFileInfos);
+                };
                 reader.readAsDataURL(f);
+		uploadFileInfos[i].meta = "image";
+                return ( 
+		 <img width="125" height="125" src={uploadFileInfos[i].src}
+                title={f.name} alt={f.name}
+                className= "w-12 h-12" / >
+                );
                 break;
-
-            case /pdf/.test(f.file.type):
+            case /pdf/.test(f.type):
+		console.log("PDF detected");
                 var pdfUrl = window.URL.createObjectURL(f);
+		uploadFileInfos[i].meta = "PDF";
                 return ( <PDFObject url={pdfUrl} />);
                 break;
 
-            case /audio/.test(f.file.type):
+            case /audio/.test(f.type):
+		console.log("Audio detected");
                 var audioUrl = window.URL.createObjectURL(f); 
                 return ( 
 		<audio className="h-9 w-9" controls >
                     <source src={audioUrl} > 
 			</source> </audio>
                 );
+		uploadFileInfos[i].meta = "Audio file";
                 break;
-            case /video/.test(f.file.type):
+            case /video/.test(f.type):
+		console.log("Video detected");
                 var videoUrl = window.URL.createObjectURL(f);
                 return ( 
 		  <video controls className="h-9 w-9" >
                     <source src={videoUrl}> </source> </video>
                 );
+		uploadFileInfos[i].meta = "Video file";
                 break;
 
-            case /text/.test(f.file.type):
-                reader.onload = (function(f) {
-                    return function(e) {
+            case /text/.test(f.type):
+		console.log("Text detected");
+                reader.onload = function(e) {
                         let res = e.target && e.target.result;
-                        let wc = wordCount(String(res));
-                        let meta = ` 
+			if(res) {
+                        let wc = wordCount(res);
+                        uploadFileInfos[i].meta = ` 
    			Chars : ${wc.chars}
    			Words: ${wc.words}
    			Lines: ${wc.lines}
   			`;
                         let dataArray:any = res && String(res).split("\n");
                         dataArray = dataArray && dataArray.slice(0, 20);
-                        let txt = dataArray && dataArray.join("\n");
-                        let fileIcon = fileTypes[type];
-                        return ( 
-			<img width="125" height="125" src={fileIcon}
-                         title={txt} alt={f.name}
-                            className="w-12 h-12" />
-                        );
-                    };
-                })(f);
-
+			if(dataArray) {
+                        	f.txt = dataArray.join("\n") as string;
+			}
+			}
+                        let src = fileTypes[type];
+			uploadFileInfos[i].src = src;
+        		setFileInfos(uploadFileInfos);
+                };
+                reader.readAsText(f);
+      		return ( 
+		 <img width="125" height="125" src={uploadFileInfos[i].src}
+                title={f.txt} alt={f.name}
+                className= "w-12 h-12" / >
+                );
+           
                 break;
             default:
+		console.log("Default [no detection]");
                 let fileIcon = fileTypes[type];
                 if (fileIcon == undefined) {
                     fileIcon = file;
                 }
+		uploadFileInfos[i].meta = "Unknown file type";
                 return ( 
 		<img width = "125" height = "125" src = {fileIcon}
                  title = {f.name} alt = {f.name}
@@ -569,7 +582,7 @@ file.file.size);
             for (let j = 0; j < uploadFileInfos.length; j++) {
                 let id = 'a' + j;
                 let bar = new ldBar('#' + id, {
-                    preset: progType
+                    preset: inputs.progType.toLowerCase()
                 });
                 bar.set(0);
                 allBars.push(bar);
@@ -585,6 +598,7 @@ msg:string) => {
             meta: '',
             id: id,
             thumb: '',
+            txt: '',
             ts: ts,
             msg: msg
      };
@@ -597,14 +611,18 @@ msg:string) => {
     };
 
     const setupUpload = () => {
-        var delQ:number[] = [];
+	clearAll();
+	console.log("SetupUpload():...");
+
 	if(!uploadFileList) {
 		return;
 	}
+        var delQ:number[] = [];
         for (var i = 0; i < uploadFileList.length; i++) {
             let f = uploadFileList && uploadFileList[i];
             let mime = f.type;
             let name = f.name;
+	    console.log("Checking " + name);
             let ts = new Date(f.lastModified).toLocaleDateString();
             let size = humanFileSize(f.size);
             let id = 'a' + i;
@@ -636,6 +654,9 @@ msg:string) => {
                 file: f,
                 id: id,
                 thumb: '',
+		size: size,
+		src: '',
+                txt: '',
                 meta: '',
                 bytesSent: '',
                 eta: '',
@@ -657,6 +678,7 @@ index:number) {
     });
     }
         setIsUploadDisabled(false);
+	console.log("SetupUpload():... done");
     };
 
     const delItem = (index:number) => {
@@ -794,7 +816,7 @@ src={uploadIcon} alt="progress-up file submit icon" />
     {inputs.uploadURL || inputs.filesName ? (
 		<h2 className="leading-tight pb-2">
 	&#128202; Progress type <span
-className='text-sm'>{progType}</span>  
+className='text-sm'>{inputs.progType}</span>  
 			 &#128228; Upload URL <span
 className='text-sm'>{inputs.uploadURL}</span> 
 		&#128218; FilesName <span
@@ -1204,7 +1226,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 <div id="progress-up-progressArea"> 
   {uploadFileInfos.length > 0
   ? (
-  uploadFileInfos.map(({file,id, meta, ts, bytesSent, rate, eta}, index) => (
+  uploadFileInfos.map(({file, id, size, meta, ts, bytesSent, rate, eta}, index) => (
 
   <section key={file.name} className="m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white mx-auto">
@@ -1220,7 +1242,6 @@ cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
       <div className="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div className="h-12 text-sm text-grey-dark flex items-left
 justify-left">
-
       		<div id="{id}-thumb">{ showThumbnail(file, index) }</div>
         </div>
       </div>
@@ -1242,7 +1263,7 @@ dark:text-white">
       	    </li>
       	    <li className="text-xl font-light leading-relaxed text-gray-800
 dark:text-white">
-      	    Size: {file.size} 
+      	    Size: {size} 
       	    </li>
        	    <li className="font-light leading-relaxed text-gray-800
 dark:text-white">
@@ -1250,13 +1271,12 @@ dark:text-white">
       	    </li>
       	    <li className="text-xl font-light leading-relaxed text-gray-800
 dark:text-white">
-		<span>{bytesSent} of {file.size} uploaded  {rate} MB/s ETA {eta} s</span>
+		<span>{bytesSent} of {size} uploaded  {rate} MB/s ETA {eta} s</span>
       	    </li>
           </ul>
         </div>
        </div>
   </div>
-
       <div className='ldBar bottom-0 right-0 pb-8' id={id} ></div>
 
     </div>
@@ -1268,7 +1288,7 @@ dark:text-white">
 <div id="progress-up-errArea"> 
   {errInfos.length > 0
   ? (
-  errInfos.map(({file, thumb, ts, meta, msg}, index) => (
+  errInfos.map(({file, thumb, ts,  meta, msg}, index) => (
     <section key={file.name} className="bg-red-200 m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white">
  <div className="bg-red-600 dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
