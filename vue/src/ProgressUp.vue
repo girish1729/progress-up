@@ -1,15 +1,18 @@
-
 <script lang="ts">
 import axios from "axios";
 import ldBar from "./assets/progressBar/loading-bar.js";
 import PDFObject from 'pdfobject';
 
-
 export default {
     data() {
         return {
             openTab: 1,
+	    errAlert: false,
+	    thumbNailsDone: false,
             dragging: false,
+	    totalsize: 0,
+	    totalfiles: 0,
+	    totaltime: 0,
             authEnabled: false,
             filterLabel : "Allow file type",
             sizeLabel : "Single file limit",
@@ -23,7 +26,7 @@ export default {
                 authType: '',
                 user: '',
                 pass: '',
-                progType: 'Line',
+                progType: 'Rainbow',
                 fileSizeLimit: 10,
                 sizeLimitType: "Single file limit",
                 fileTypeFilter: "All",
@@ -61,14 +64,17 @@ export default {
     updated() {
         this.$nextTick(() => {
             this.createBars();
-            if (this.form.uploadURL == undefined || this.form.filesName == undefined) {
+            if (this.form.uploadURL == '' || this.form.filesName == '') {
                 this.disableUpload = true;
-            }
+            } else {
+		if(this.uploadFileList.length > 0) {
+                	this.disableUpload = false;
+		}
+	    }
         });
     },
 
     methods: {
-
         dragover(e) {
             e.preventDefault();
         },
@@ -79,9 +85,9 @@ export default {
         onDragLeave() {
             this.dragging = false;
         },
-        onDrop(evt, list) {
+        onDrop(evt) {
+            this.dragging = false;
             const files = evt.dataTransfer.files;
-            this.clearAll();
             console.log(files);
             this.uploadFileList = files;
             this.setupUpload();
@@ -90,12 +96,12 @@ export default {
         spitStatistics(self, idx) {
             if (idx == self.uploadFileList.length - 1) {
                 let endUploadts = Date.now();
-                self.totaltime = `${endUploadts - this.startUploadts}`;
-                self.totalsize = this.humanFileSize(this.totalsize);
+                self.totaltime = `${endUploadts - self.startUploadts}`;
+                self.totalsize = self.humanFileSize(self.totalsize);
 
                 var ts = new Date().toLocaleString();
                 var tot = self.uploadFileList.length;
-                var status = self.totalfiles == tot ?  "<img src=\"./assets/icons/misc/success-icon.svg\" >" : "<img src=\"./assets/icons/misc/failure-icon.svg\" >";
+                var status = self.totalfiles == tot ?  "<img src=\"https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/success-icon.svg\" >" : "<img src=\"https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg\" >";
                 self.details = `${self.totalfiles}/${tot} files of size ${this.totalsize} sent in ${self.totaltime} ms`;
                 var id = self.statsTable.length + 1;
 
@@ -118,7 +124,7 @@ export default {
 
         uploadOneFile(file, idx) {
             let uplFormData = new FormData();
-            uplFormData.append(this.form.filesName, file);
+            uplFormData.append(this.form.filesName, file.file);
             console.log(uplFormData);
             console.log("Uploading to " + this.form.uploadURL);
             console.log("Uploading file name" + this.form.filesName);
@@ -132,7 +138,8 @@ export default {
                     let perc = parseInt(e.progress * 100);
                     console.log(perc + " is the percentage uploaded");
                     self.progressBars[idx].set(perc);
-                    file.bytesSent = this.humanFileSize(e.progress * size);
+                    file.bytesSent = self.humanFileSize(e.progress *
+file.file.size);
                     file.eta = e.estimated;
                     file.rate = (e.rate / 1024 / 1024).toFixed(2);
                 }
@@ -150,13 +157,17 @@ export default {
             axios.post(this.form.uploadURL, uplFormData, options).then((resp) => {
                 this.spitStatistics(self, idx);
             }).catch((error) => {
+		if(!this.errAlert) {
                 alert("Upload failed. Please check endpoint in Setup");
                 alert(error);
+		this.errAlert = true;
+		}
             });
         },
 
         uploadAll() {
             console.log("Starting upload...");
+	    this.errAlert = false;
             this.startUploadts = Date.now();
             for (let i = 0; i < this.uploadFileInfos.length; i++) {
                 let f = this.uploadFileInfos[i];
@@ -164,9 +175,7 @@ export default {
             }
         },
         saveConfig(e) {
-
             e.preventDefault();
-
             console.log(this.form.uploadURL);
             console.log(this.form.filesName);
             console.log(this.form.progType);
@@ -216,44 +225,32 @@ export default {
             this.saveConfig(e);
             this.testUpload();
         },
-
-        setIndicator() {
-            var progType = this.form.progType;
-            console.log(progType);
-            switch (progType) {
-                case "Bubble":
-                    var extra = "data-img-size=\"100,100\"";
-                    break;
-                case "Rainbow":
-                    var extra = "data-stroke=\"data:ldbar/res,gradient(0,1,#f99,#ff9)\"";
-                    break;
-                default:
-                    break;
-            }
-        },
         clearAll() {
             this.details = "";
-            this.uploadFileList = [];
             this.uploadFileInfos = [];
+            this.uploadFiles = [];
             this.errInfos = [];
             this.progressBars = [];
             this.totalfiles = 0;
             this.totalsize = 0;
             this.totaltime = 0;
-
             this.disableUpload = true;
+	    this.thumbNailsDone = false;
             console.log("Cleared");
 
         },
         openFileBrowser() {
-            this.$refs.fileInput.click();
+ let fileUpload = document.getElementById('fileInput')
+  if (fileUpload != null) {
+    fileUpload.click()
+  }
         },
         uploadFile(file, onUploadProgress) {
             let formData = new FormData();
 
             formData.append(filesName, file);
 
-            return axios.post(uploadURL, formData, {
+            return axios.post(this.form.uploadURL, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 },
@@ -263,7 +260,6 @@ export default {
 
         fileSelectFinish(evt) {
             let selectedFiles = evt.target.files;
-            this.clearAll();
             this.uploadFileList = selectedFiles;
             this.setupUpload();
         },
@@ -329,20 +325,20 @@ export default {
         },
 
         toggleSizeQ() {
-            val = this.form.sizeLimitType;
+            let val = this.form.sizeLimitType;
             if (val.checked === true) {
-                sizeLabel = "Total limit";
+                this.sizeLabel = "Total limit";
             } else {
-                sizeLabel = "Single file limit";
+                this.sizeLabel = "Single file limit";
             }
         },
 
         toggleFilterQ() {
-            val = this.form.fileTypeAction;
+            let val = this.form.fileTypeAction;
             if (val.checked === true) {
-                filterLabel = "Deny file type";
+                this.filterLabel = "Deny file type";
             } else {
-                filterLabel = "Allow file type";
+                this.filterLabel = "Allow file type";
             }
         },
 
@@ -506,6 +502,11 @@ export default {
         }
     },
         createBars() {
+	    if(this.thumbNailsDone) {
+			console.log("CreateBars():: Returning now");
+		return;
+	    }
+	    if(this.uploadFileInfos.length > 0) {
             for (var i = 0; i < this.uploadFileInfos.length; i++) {
                 let f = this.uploadFileInfos[i];
                 var selector = '#a' + i;
@@ -516,6 +517,8 @@ export default {
                 this.progressBars.push(bar);
                 this.showThumbnail(f, i);
             }
+	    this.thumbNailsDone = true;
+	    }
             for (var i = 0; i < this.errInfos.length; i++) {
                 let f = this.errInfos[i];
                 this.showThumbnail(f, i);
@@ -523,6 +526,7 @@ export default {
         },
 	        setupUpload() {
             var delQ = [];
+		console.log(this.uploadFileList);
             for (var i = 0; i < this.uploadFileList.length; i++) {
                 let f = this.uploadFileList[i];
                 let mime = f.type;
@@ -562,11 +566,12 @@ export default {
                     size: size,
                     ts: ts,
                     thumb: '',
-                    bytesSent: 0,
-                    eta: 0,
-                    rate: 0,
+                    bytesSent: ' ',
+                    eta: ' ',
+                    rate: ' ',
                 });
             }
+	    console.log(this.uploadFileInfos);
             this.uploadFileList = Array.from(this.uploadFileList).filter(function(value, index) {
                 return delQ.indexOf(index) == -1;
             });
@@ -580,17 +585,17 @@ export default {
             this.totalsize -= this.upLoadFileList[index].size;
             this.checkTotalSize();
         },
-	printBannedBanner(file, id , ts, msg) {
+	printBannedBanner(file, id , size, ts, msg) {
         this.errInfos.push({
             file: file,
             id: id,
             meta: '',
+            size: size,
             thumb: '',
             ts: ts,
             msg: msg
         });
     },
-
 
     }
 };
@@ -653,21 +658,19 @@ Help</a>
 <div id="tab-contents">
 
  <div :class="{'hidden': openTab !== 1, 'block': openTab === 1}">
-<!-- XXX drag drop -->
-
 	<div id='progress-up-statsArea'>
 		<h2 className="text-5xl leading-tight border-b">{{details}} </h2>
 	</div>
 
 
-	<div id='progress-up-form' class="bg-light p-4 rounded mx-auto">
+	<div class="bg-light p-4 rounded mx-auto">
     	  <div @click="openFileBrowser" :class="{'bg-blue-400': dragging, 'bg-white': !dragging}"
 @dragenter="onDragEnter" @dragleave="onDragLeave"
 @dragover.prevent @drop.stop.prevent @drop="onDrop" @dragover="dragover" class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
 	   <form class='flex p-8 justify-center'>
 		<img class="stroke-white dark:bg-white" width="100" height="100" src="./assets/icons/upload/file-submit.svg"
  alt="progress-up file submit icon" />
-	       <input ref="fileInput" @change="fileSelectFinish" name="uploadFiles" type="file" multiple hidden>
+	       <input id="fileInput" @change="fileSelectFinish" name="uploadFiles" type="file" multiple hidden>
 	   </form>
 	   <h2 class="flex justify-center text-dark-500 text-xl font-medium mb-2"> 
 	     Drop files or click to select</h2>
@@ -693,16 +696,16 @@ className='text-sm'>{{form.filesName}}</span>
 
 	<button id="upButton" @click="uploadAll" class="inline-block
 px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs
-leading-tight uppercase rounded shadow-md hover:bg-blue-500
+leading-tight rounded shadow-md hover:bg-blue-500
 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none
 focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150
 ease-in-out" :class="(disableUpload ?  'opacity-20':'')"
->Begin Uploading files
+:disabled="disableUpload">Begin Uploading 
 	</button>
 	
 	<button type="button" @click="clearAll" class="inline-block
-px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
-	 Reset form
+px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
+	 Reset Form
 	</button>
  	
 
@@ -715,22 +718,22 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	   <form class="w-full max-w-lg">
 	     <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-	         <label class="block uppercase tracking-wide text-dark-700 text-xs
+	         <label class="block tracking-wide text-dark-700 text-xs
 	   font-bold mb-2" for="grid-post-endpoint">
-	          POST endpoint  
+	          POST endpoint 
 	         </label>
-	         <input type="text" v-model="form.uploadURL" class="appearance-none block w-full bg-gray-200
+	         <input type="text" name="uploadURL" v-model="form.uploadURL" class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	   focus:outline-none focus:bg-light" placeholder="URL to post [cross origin or absolute URL needs CORS]">
 	         <p class="text-red-500 text-xs italic">Please fill out this field.</p>
 	       </div>
 	   
 	       <div class="w-full md:w-1/2 px-3">
-	         <label class="block uppercase tracking-wide text-dark-700 text-xs
+	         <label class="block tracking-wide text-dark-700 text-xs
 	   font-bold mb-2" for="progress-up-filesName">
 	   	Name of files input field
 	         </label>
-	         <input v-model="form.filesName" class="appearance-none block w-full bg-gray-200
+	         <input v-model="form.filesName" name="filesName" class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	    type="text" placeholder="Name of files input field">
@@ -739,20 +742,20 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	   
 	     <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
-	         <label class="block uppercase tracking-wide text-dark-700 text-xs
+	         <label class="block tracking-wide text-dark-700 text-xs
 	   font-bold mb-2" for="progress-up-indicator">
 	           Progress indicator type
 	         </label>
 	         <div class="relative">
-	           <select v-model='form.progType' @change="setIndicator()" class="block appearance-none w-full bg-gray-200 border
+	           <select name="progType" v-model='form.progType' class="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	   >
-	   			<option default>Line</option>
+	   			<option>Line</option>
 	   			<option>Fan</option>
 	   			<option>Bubble</option>
 	   			<option>Energy</option>
-	   			<option>Rainbow</option>
+	   			<option default>Rainbow</option>
 	   			<option>Stripe</option>
 	   			<option>Text</option>
 	   			<option>Circle</option>
@@ -764,18 +767,15 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	       </div>
 	      </div>
 	
-
-	
 	      <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="fileSizeLimit" />
 <span>File Size Limit (MB)</span>
-  <input v-model="form.fileSizeLimit" class='m-6 p-6 form-range'
-type="range"  name="rangeInput" min="10" max="1000"
+  <input v-model="form.fileSizeLimit" name="fileSizeLimit" class='m-6 p-6 form-range'
+type="range"  min="10" max="1000"
 step=10 />                      
-<output id="sizeLimit" name="sizeLimit"
-for="fileSizeLimit">{{form.fileSizeLimit}}</output>
+<output for="fileSizeLimit">{{form.fileSizeLimit}}</output>
 	</div>
 	</div>
 
@@ -785,7 +785,7 @@ for="fileSizeLimit">{{form.fileSizeLimit}}</output>
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="sizeToggle" >
 <span>{{sizeLabel}}</span>
-  <input v-model="form.sizeToggle" @change="toggleSizeQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <input v-model="form.sizeToggle" name="sizeToggle" @change="toggleSizeQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
 bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
 </label>
@@ -796,12 +796,12 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 
 	      <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
-	         <label class="block uppercase tracking-wide text-dark-700 text-xs
+	         <label class="block tracking-wide text-dark-700 text-xs
 	   font-bold mb-2" for="progress-up-indicator">
 	          File type Filters 
 	         </label>
 	         <div class="relative">
-	           <select v-model='form.fileTypeFilter'
+	           <select name="fileTypeFilter" v-model='form.fileTypeFilter'
  class="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
@@ -824,7 +824,7 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="filterAction" >
 <span>{{filterLabel}}</span>
-  <input v-model="form.fileTypeAction" @change="toggleFilterQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <input v-model="form.fileTypeAction" name="fileTypeAction" @change="toggleFilterQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
 bg-green-600 rounded-full duration-300 ease-in-out peer-checked:bg-red-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
 </label>
@@ -843,7 +843,7 @@ bg-green-600 rounded-full duration-300 ease-in-out peer-checked:bg-red-600 after
              <div :class="(authEnabled ?'block':'hidden')" id='progress-up-authsection'>
 	        <div class="flex flex-wrap -mx-3 mb-6">
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-	            <label class="block uppercase tracking-wide text-dark-700 text-xs font-bold mb-2" >
+	            <label class="block tracking-wide text-dark-700 text-xs font-bold mb-2" >
 	              Auth type
 	            </label>
 	            <div class="relative">
@@ -861,7 +861,7 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 	          </div>
 	      
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-	            <label class="block uppercase tracking-wide text-dark-700 text-xs
+	            <label class="block tracking-wide text-dark-700 text-xs
 	      font-bold mb-2">
 	             Username  
 	            </label>
@@ -873,7 +873,7 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
 	          </div>
 	      
 	          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-	            <label class="block uppercase tracking-wide text-dark-700 text-xs
+	            <label class="block tracking-wide text-dark-700 text-xs
 	      font-bold mb-2">
 	      	Password
 	            </label>
@@ -886,13 +886,13 @@ py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:bor
  	   </div>
 	   
 	   <button @click="saveConfig" class="inline-block px-6
-	py-2.5 bg-red-600 text-dark dark:text-white font-medium text-xs leading-tight uppercase
+	py-2.5 bg-red-600 text-dark dark:text-white font-medium text-xs leading-tight 
 	rounded shadow-md hover:bg-red-700 hover:shadow-lg focus:bg-red-700
 	focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-800
 	active:shadow-lg transition duration-150 ease-in-out">Save</button>
 	   
 	   <button  @click="testEP" class="inline-block
-px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out">
+px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight rounded shadow-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out">
 	    Test file upload
 	   </button>
 	   </form>
@@ -1061,9 +1061,8 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 </div>
 <!-- XXX tabs -->
 
-
 <div id="progress-up-progressArea"> 
-  <div v-for="(info,id) in uploadFileInfos" :key = "id" >
+  <div v-for="(info,id) in uploadFileInfos" :key="id" >
     <section class="m-4 p-4 mt-4 mb-4 transition-colors
     text-light-100 dark:text-white mx-auto">
      <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-6

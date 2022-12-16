@@ -60,6 +60,8 @@ interface errInfo {
     file: File;
     id: string;
     ts: string;
+    size:string;
+    src:any;
     thumb: string;
     meta: string;
     msg: string;
@@ -79,7 +81,7 @@ function ProgressUp() {
     const [inputs, setInputs] = useState({
         uploadURL: "",
         filesName: "",
-        progType: "",
+        progType: "Fan",
         authEnabled: false,
         authType: "",
         user: "",
@@ -89,13 +91,16 @@ function ProgressUp() {
         fileTypeFilter: "All",
         fileTypeAction: "Allow file type"
     });
-    const [progType, setProgType] = useState("line");
     const [authEnabled, enableAuth] = useState(false);
     const [authType, setAuthType] = useState("Basic");
     const [details, setDetails] = useState('');
     const [totalfiles, setNumberFiles] = useState(0);
     const [totalsize, setSize] = useState(0);
+    const [sizeLabel, setSLabel] =  useState("Single file limit");
+    const [filterLabel, setFLabel] =  useState("Allow file type");
+
     let startUploadts = 0;
+    let errAlert = false;
     const inputRef: any = useRef();
 
     var filtFiles = {
@@ -141,16 +146,16 @@ function ProgressUp() {
 
     let progress: any = {};
     let showProgress: boolean = true;
-    let sizeLabel:string =  "Single file limit";
-    let filterLabel:string =  "Allow file type";
 
     const handleChange = (event: any) => {
         const name = event.target.name;
         const value = event.target.value;
+	console.log(name,value);
         setInputs(values => ({
             ...values,
             [name]: value
         }));
+	return(value);
     };
 
     const handleSubmit = (event: any) => {
@@ -162,7 +167,7 @@ function ProgressUp() {
         console.log("DOM Updated");
         console.log(uploadFileInfos);
         createBars();
-        if (inputs.uploadURL == undefined || inputs.filesName == undefined) {
+        if (inputs.uploadURL == '' || inputs.filesName == '') {
             console.log('Disable upload without configuration');
             setIsUploadDisabled(true);
         }
@@ -175,7 +180,7 @@ function ProgressUp() {
 
     const uploadOneFile = async (file: any, idx: number) => {
         let formData = new FormData();
-        formData.append(inputs.filesName, file);
+        formData.append(inputs.filesName, file.file);
         let fname = file.name;
         console.log("Uploading to " + inputs.uploadURL);
         console.log("Uploading file name" + inputs.filesName);
@@ -214,14 +219,18 @@ file.file.size);
             spitStatistics(idx);
             console.log("All files uploaded");
             }).catch((error) => {
+		if(!errAlert) {
                 alert("Upload failed. Please check endpoint in Setup");
                 alert(error);
+		errAlert =true;
+		}
             });
  
     };
 
     const uploadAll = () => {
         startUploadts = Date.now();
+	errAlert = false;
         if (uploadFileInfos) {
             for (let i = 0; i < uploadFileInfos.length; i++) {
                 let file = uploadFileInfos[i];
@@ -334,26 +343,6 @@ file.file.size);
         console.log(auth);
     };
 
-
-    const setIndicator = (event: any) => {
-
-        let ind = event.target.value;
-        ind = ind.toLowerCase()
-        setProgType(ind);
-        let extra;
-        console.log(ind);
-        switch (ind) {
-            case "bubble":
-                extra = 'data-img-size="100,100"';
-                break;
-            case "rainbow":
-                extra = 'data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"';
-                break;
-            default:
-                break;
-        }
-    };
-
     const testEP = () => {
         saveConfig();
         testUpload();
@@ -428,18 +417,18 @@ file.file.size);
     const toggleSizeQ = () => {
         let val = inputs.sizeLimitType;
         if (val) {
-            sizeLabel = "Total limit";
+            setSLabel("Total limit");
         } else {
-            sizeLabel = "Single file limit";
+            setSLabel("Single file limit");
         }
     };
 
     const toggleFilterQ = () => {
         let val = inputs.fileTypeAction;
         if (val) {
-            filterLabel = "Deny file type";
+            setFLabel("Deny file type");
         } else {
-            filterLabel = "Allow file type";
+            setFLabel("Allow file type");
         }
     };
 
@@ -575,6 +564,95 @@ file.file.size);
                 );
         }
     };
+    const showErrThumbnail = (f:any, i:number) => {
+        let reader = new FileReader();
+	let type = f.type.split('/')[0];
+        switch(true) {
+            case /image/.test(f.type):
+		console.log("Image detected");
+                reader.onload = function(e) {
+                	let src = e.target && e.target.result;
+			errInfos[i].src = src;
+        		setErrInfos(errInfos);
+                };
+                reader.readAsDataURL(f);
+		errInfos[i].meta = "image";
+                return ( 
+		 <img width="125" height="125" src={errInfos[i].src}
+                title={f.name} alt={f.name}
+                className= "w-12 h-12" / >
+                );
+                break;
+            case /pdf/.test(f.type):
+		console.log("PDF detected");
+                var pdfUrl = window.URL.createObjectURL(f);
+		errInfos[i].meta = "PDF";
+                return ( <PDFObject url={pdfUrl} />);
+                break;
+
+            case /audio/.test(f.type):
+		console.log("Audio detected");
+                var audioUrl = window.URL.createObjectURL(f); 
+                return ( 
+		<audio className="h-9 w-9" controls >
+                    <source src={audioUrl} > 
+			</source> </audio>
+                );
+		errInfos[i].meta = "Audio file";
+                break;
+            case /video/.test(f.type):
+		console.log("Video detected");
+                var videoUrl = window.URL.createObjectURL(f);
+                return ( 
+		  <video controls className="h-9 w-9" >
+                    <source src={videoUrl}> </source> </video>
+                );
+		errInfos[i].meta = "Video file";
+                break;
+
+            case /text/.test(f.type):
+		console.log("Text detected");
+                reader.onload = function(e) {
+                        let res = e.target && e.target.result;
+			if(res) {
+                        let wc = wordCount(res);
+                        errInfos[i].meta = ` 
+   			Chars : ${wc.chars}
+   			Words: ${wc.words}
+   			Lines: ${wc.lines}
+  			`;
+                        let dataArray:any = res && String(res).split("\n");
+                        dataArray = dataArray && dataArray.slice(0, 20);
+			if(dataArray) {
+                        	f.txt = dataArray.join("\n") as string;
+			}
+			}
+                        let src = fileTypes[type];
+			errInfos[i].src = src;
+        		setErrInfos(errInfos);
+                };
+                reader.readAsText(f);
+      		return ( 
+		 <img width="125" height="125" src={errInfos[i].src}
+                title={f.txt} alt={f.name}
+                className= "w-12 h-12" / >
+                );
+           
+                break;
+            default:
+		console.log("Default [no detection]");
+                let fileIcon = fileTypes[type];
+                if (fileIcon == undefined) {
+                    fileIcon = file;
+                }
+		errInfos[i].meta = "Unknown file type";
+                return ( 
+		<img width = "125" height = "125" src = {fileIcon}
+                 title = {f.name} alt = {f.name}
+                    className = "w-12 h-12" / >
+                );
+        }
+    };
 
     const createBars = () => {
         const allBars: any = [];
@@ -591,11 +669,13 @@ file.file.size);
         }
     };
 
-    const printBannedBanner = (file: File, id:string, ts:string,
+    const printBannedBanner = (file: File, id:string, size: string, ts:string,
 msg:string) => {
         let errInfo = {
             file: file,
             meta: '',
+	    size: size,
+	    src: '',
             id: id,
             thumb: '',
             txt: '',
@@ -630,14 +710,14 @@ msg:string) => {
                 console.log("Size check:: size is " + f.size);
                 let msg = "{name} too big for upload";
                 console.log(msg);
-            	printBannedBanner(f, id, ts, msg);
+            	printBannedBanner(f, id, size, ts, msg);
                 delQ.push(i);
                 continue;
             }
             if (!checkFilter(mime)) {
                 console.log("Hit banned file type:: filter issue");
                 let msg = "{name} cannot be uploaded due to policy.";
-            	printBannedBanner(f, id, ts, msg);
+            	printBannedBanner(f, id, size, ts, msg);
                 delQ.push(i);
                 continue;
             }
@@ -830,12 +910,12 @@ className='text-sm'>{inputs.filesName}</span>
 
 	</div>
 
-	<button disabled={isUploadDisabled} onClick={uploadAll} className={"inline-block px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out " +  (isUploadDisabled ? " opacity-20" : "")}
+	<button disabled={isUploadDisabled} onClick={uploadAll} className={"inline-block px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight rounded shadow-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out " +  (isUploadDisabled ? " opacity-20" : "")}
 >Begin Uploading files </button>
 	
 	
 	<button type="button" onClick={clearAll} className="inline-block
-px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
+px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
 	 Reset form
 	</button>
  	
@@ -850,11 +930,11 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	   <form className="w-full max-w-lg">
 	     <div className="flex flex-wrap -mx-3 mb-6">
 	       <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-	         <label className="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" htmlFor="inputs.uploadURL">
+	         <label className="block tracking-wide text-dark-700 text-xs
+	   font-bold mb-2" htmlFor="uploadURL">
 	          POST endpoint  
 	         </label>
-	         <input name="inputs.uploadURL" value={inputs.uploadURL || ""} 
+	         <input name="uploadURL" defaultValue={inputs.uploadURL} 
         onChange={handleChange}
 className="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
@@ -865,11 +945,11 @@ CORS]" />
 	       </div>
 	   
 	       <div className="w-full md:w-1/2 px-3">
-	         <label className="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" htmlFor="progress-up-filesName">
+	         <label className="block tracking-wide text-dark-700 text-xs
+	   font-bold mb-2" htmlFor="filesName">
 	   	Name of files input field
 	         </label>
-	         <input name="inputs.filesName" value={inputs.filesName || ""} onChange={handleChange} id='filesName' className="appearance-none block w-full bg-gray-200
+	         <input name="filesName" defaultValue={inputs.filesName} onChange={handleChange} id='filesName' className="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	    type="text" placeholder="Name of files input field" />
@@ -878,16 +958,16 @@ CORS]" />
 	   
 	     <div className="flex flex-wrap -mx-3 mb-6">
 	       <div className="w-full px-3">
-	         <label className="block uppercase tracking-wide text-dark-700 text-xs
+	         <label className="block tracking-wide text-dark-700 text-xs
 	   font-bold mb-2" htmlFor="progType">
 	           Progress indicator type
 	         </label>
 	         <div className="relative">
-	           <select name='progType' onChange={setIndicator} value={inputs.progType || ""} className="block appearance-none w-full bg-gray-200 border
+	           <select name="progType" onChange={handleChange}
+defaultValue={inputs.progType} className="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	   >
-	   			<option>Line</option>
 	   			<option>Fan</option>
 	   			<option>Bubble</option>
 	   			<option>Energy</option>
@@ -895,6 +975,7 @@ CORS]" />
 	   			<option>Stripe</option>
 	   			<option>Text</option>
 	   			<option>Circle</option>
+	   			<option>Line</option>
 	           </select>
 	           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-dark-700">
 	             <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
@@ -926,7 +1007,7 @@ htmlFor="fileSizeLimit">{inputs.fileSizeLimit}</output>
 <label className="relative flex justify-between items-center p-2 text-xl"
 htmlFor="sizeToggle" >
 <span>{sizeLabel}</span>
-  <input name="inputs.sizeLimitType" value={inputs.sizeLimitType || ""}
+  <input name="sizeLimitType" value={inputs.sizeLimitType || ""}
 onChange={toggleSizeQ}
 
  type="checkbox" className="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
@@ -935,18 +1016,15 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 </label>
 	</div>
 	</div>
-
-
-
 	      <div className="flex flex-wrap -mx-3 mb-6">
 	       <div className="w-full px-3">
-	         <label className="block uppercase tracking-wide text-dark-700 text-xs
-	   font-bold mb-2" htmlFor="progress-up-indicator">
+	         <label className="block tracking-wide text-dark-700 text-xs
+	   font-bold mb-2" htmlFor="fileTypeFilter">
 	          File type Filters 
 	         </label>
 	         <div className="relative">
-	           <select name="progress-up-filter"
-onChange={handleChange} value={inputs.fileTypeFilter || ""}
+	           <select name="fileTypeFilter"
+onChange={handleChange} defaultValue={inputs.fileTypeFilter}
  className="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
@@ -969,7 +1047,7 @@ onChange={handleChange} value={inputs.fileTypeFilter || ""}
 <label className="relative flex justify-between items-center p-2 text-xl"
 htmlFor="filterAction" >
 <span>{filterLabel}</span>
-  <input name='inputs.fileTypeAction' onChange={toggleFilterQ}
+  <input name='fileTypeAction' onChange={toggleFilterQ}
 
 type="checkbox" className="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span className="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
@@ -982,7 +1060,7 @@ bg-green-600 rounded-full duration-300 ease-in-out peer-checked:bg-red-600 after
 	         <span className="text-sm">
 	           HTTP Auth required?
 	         </span>
-	         <input name='inputs.authEnabled' onChange={needsAuth}
+	         <input name='authEnabled' onChange={needsAuth}
 checked={inputs.authEnabled || false} className="mr-2 leading-tight" type="checkbox" />
 	       </label>
 	      </div>
@@ -992,12 +1070,12 @@ checked={inputs.authEnabled || false} className="mr-2 leading-tight" type="check
              <div id='progress-up-authsection' >
 	        <div className="flex flex-wrap -mx-3 mb-6">
 	          <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-	            <label className="block uppercase tracking-wide
+	            <label className="block tracking-wide
 text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	              Auth type
 	            </label>
 	            <div className="relative">
-	              <select id='authType' onChange={setAuth} value={inputs.authType || ""} className="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
+	              <select name='authType' onChange={setAuth} value={inputs.authType || ""} className="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
 	                <option>HTTP basic auth</option>
 	                <option>HTTP digest auth</option>
 	              </select>
@@ -1009,11 +1087,11 @@ text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	          </div>
 	      
 	          <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-	            <label className="block uppercase tracking-wide text-dark-700 text-xs
+	            <label className="block tracking-wide text-dark-700 text-xs
 	      font-bold mb-2" htmlFor="user">
 	             Username  
 	            </label>
-	            <input name='inputs.user' value={inputs.user || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
+	            <input name='user' value={inputs.user || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	      focus:outline-none focus:bg-light"  type="text"
 	      placeholder="username" />
@@ -1021,11 +1099,11 @@ text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	          </div>
 	      
 	          <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-	            <label className="block uppercase tracking-wide text-dark-700 text-xs
-	      font-bold mb-2" htmlFor="progress-up-pass">
+	            <label className="block tracking-wide text-dark-700 text-xs
+	      font-bold mb-2" htmlFor="pass">
 	      	Password
 	            </label>
-	            <input name='inputs.pass' value={inputs.pass || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
+	            <input name='pass' value={inputs.pass || ""} onChange={handleChange} className="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	      focus:outline-none focus:bg-light focus:border-gray-500"
 	       type="password" placeholder="Password" />
@@ -1033,16 +1111,15 @@ text-dark-700 text-xs font-bold mb-2" htmlFor="authType">
 	         </div>
  	   </div>
       }
-	   
 	   <button type="button" onClick={saveConfig} className="inline-block px-6
-	py-2.5 bg-red-600 text-dark dark:text-white font-medium text-xs leading-tight uppercase
+	py-2.5 bg-red-600 text-dark dark:text-white font-medium text-xs leading-tight 
 	rounded shadow-md hover:bg-red-700 hover:shadow-lg focus:bg-red-700
 	focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-800
 	active:shadow-lg transition duration-150 ease-in-out">Save</button>
 	   
 	   <button type="button" onClick={testEP} className="inline-block
 px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs
-leading-tight uppercase rounded shadow-md hover:bg-blue-500
+leading-tight rounded shadow-md hover:bg-blue-500
 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none
 focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150
 ease-in-out" >
@@ -1302,7 +1379,7 @@ src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/ic
 
       <div className="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div className="h-12 text-sm text-grey-dark flex items-left justify-left">
-      <div id="{id}-thumb" >{ showThumbnail(file, index) }</div>
+      <div id="{id}-thumb" >{ showErrThumbnail(file, index) }</div>
          </div>
       </div>
 

@@ -1,16 +1,15 @@
 {
   "name": "progress-up-vue-demo",
-  "private": true,
-  "version": "0.0.1",
+  "version": "0.0.3",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "progress-up-vue": "0.0.8",
     "pdfobject": "*",
-    "progress-up-vue": "0.0.5",
-    "vue": "^3.2.41"
+    "vue": "^3.2.45"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.2.0",
