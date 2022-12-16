@@ -6,6 +6,9 @@
   "files": [
     "dist"
   ],
+"publishConfig": {
+   "@girish1729:registry": "https://npm.pkg.github.com"
+ },
   "main": "./dist/progress-up.umd.cjs",
   "module": "./dist/progress-up.ts",
   "exports": {
