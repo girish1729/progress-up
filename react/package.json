@@ -1,6 +1,6 @@
 {
   "name": "progress-up-react",
-  "version": "0.0.3",
+  "version": "0.0.7",
   "type": "module",
   "style": "./dist/style.css",
   "files": [
@@ -24,8 +24,7 @@
     "babel-plugin-macros": "^3.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-dropzone": "^14.2.3",
-    "react-pdfobject": "^1.2.0"
+    "react-dropzone": "^14.2.3"
   },
   "devDependencies": {
     "@types/react": "^18.0.22",
