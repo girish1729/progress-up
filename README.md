@@ -104,20 +104,12 @@ Still work in progress. Watch out.
 ## Screenshots gallery
 
 Some are here. For complete list 
-[go here](https://progress-up.live/screenshots")
+[go here](https://progress-up.live/screenshots)
 
-- [Video of Drag and drop](https://raw.githubusercontent.com/girish1729/progress.up/main/images/dnd.gif)
-- [Video of upload](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-video.gif)
-- [Dark mode](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-darkmode.png)
-- [Preview](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-preview2.png)
-
-### This is before upload
-
-![Progess-up start upload](https://raw.githubusercontent.com/girish1729/progress.up/main/images/start-upload.png)
-
-### This is after uploading
-
-![Progess-up finish upload](https://raw.githubusercontent.com/girish1729/progress.up/main/images/finish-upload.png)
+- ![Video of Drag and drop](https://raw.githubusercontent.com/girish1729/progress.up/main/images/dnd.gif)
+- ![Video of upload](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-video.gif)
+- ![Dark mode](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-darkmode.png)
+- ![Preview](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-preview2.png)
 
 ## Why should you care?
 
