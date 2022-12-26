@@ -75,6 +75,19 @@ var fileTypeIcons = {
         createBars();
 	errInfos.set([...$errInfos]);
 	uploadFileInfos.set([...$uploadFileInfos]);
+	 if(($inputs.uploadURL.length > 3) && ($inputs.filesName.length > 3)) {
+            console.log('Enable upload button if Files in Q');
+            if (uploadFileInfos && uploadFileInfos.length > 0) {
+                console.log('Enabled upload button');
+                setBut(false);
+            } else {
+                setBut(true);
+	    }
+        } else {
+            console.log('Disable upload without configuration');
+            setBut(true);
+        }
+
         console.log("DOM Updated");
    })
 
@@ -213,59 +226,8 @@ var fileTypeIcons = {
             }
             return false;
         }
-        return false;
+        return true;
     };
-
-    const applyFilter = () => {
-        let filt = $inputs.fileTypeFilter;
-        let action = $inputs.fileTypeAction;
-        console.log(filt, action);
-        switch (filt) {
-            case "All":
-                break;
-            case "PDF only":
-                filtFiles = {
-                    "type": "application/pdf",
-                    "action": action
-                };
-                break;
-            case "Image only":
-                filtFiles = {
-                    "type": "image",
-                    "action": action
-                };
-                break;
-            case "Video only":
-                filtFiles = {
-                    "type": "video",
-                    "action": action
-                };
-                break;
-            case "Audio only":
-                filtFiles = {
-                    "type": "audio",
-                    "action": action
-                };
-                break;
-            case "Zip only":
-                filtFiles = {
-                    "type": "application/zip",
-                    "action": action
-                };
-                break;
-            case "Text only":
-                filtFiles = {
-                    "type": "text",
-                    "action": action
-                };
-                break;
-            default:
-                console.log("Filter not understood");
-                break;
-        }
-
-    };
-
 
     const wordCount = (val:string) => {
         var wom = val.match(/\S+/g);
@@ -283,20 +245,23 @@ var fileTypeIcons = {
             console.log("No file type filters active");
             return true;
         }
-        if (mime.match(filtFiles.type) && filtFiles.action == "allow") {
+        if (filtFiles.action == "allow" && mime.match(filtFiles.type) ) {
             return true;
         }
-        if (mime.match(filtFiles.type) && filtFiles.action == "deny") {
+        if (filtFiles.action == "deny" && !mime.match(filtFiles.type) ) {
             return true;
         }
         return false;
     };
 
     const checkSize = (size:number) => {
+        if ($inputs.sizeLimitType == "Single file limit") {
         if (size <= ($inputs.fileSizeLimit * 1024 * 1024)) {
             return true;
         }
         return false;
+	}
+	return true;
     };
 
     const printBannedBanner = (file:File, id: string, ts:string,
@@ -483,7 +448,7 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
             let f = $uploadFileList && $uploadFileList[i];
             let mime = f.type;
             let name = f.name;
-            let ts = f.lastModifiedDate.toLocaleString();
+            let ts = f.lastModifiedDate.toLocaleDateString();
             let size = humanFileSize(f.size);
             let id = 'a' + i;
             $totalsize  += f.size;
@@ -503,7 +468,7 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
                 continue;
             }
 		
-            if ($uploadFileList && i == $uploadFileList.length - 1) {
+            if ($uploadFileInfos && i == $uploadFileInfos.length - 1) {
                 console.log("Total size check:: total size is " +
                     $totalsize);
                 if (!checkTotalSize()) {
@@ -511,6 +476,22 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
                     isUploadDisabled = true;
                 }
             }
+            $totalfiles += 1;
+        }
+
+var tmpFileList = Array.from(this.uploadFileList).filter(function(value, index) {
+                return delQ.indexOf(index) == -1;
+            });
+	    console.log(tmpFileList);
+            for (var i = 0; i < tmpFileList.length; i++) {
+                let f = tmpFileList[i];
+                let mime = f.type;
+                let name = f.name;
+                let ts = f.lastModifiedDate.toLocaleDateString();
+                this.totalsize += f.size;
+                let size = this.humanFileSize(f.size);
+                let id = 'a' + i;
+   
             let fInfo; 
             fInfo = {
                 file: f,
@@ -524,14 +505,7 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
                 rate: '0',
             };
 	    uploadFileInfos.set([...$uploadFileInfos,fInfo]);
-            $totalfiles += 1;
-        }
-    if($uploadFileList) {
-    $uploadFileList = [...$uploadFileList].filter(function(value:any,
-index:number) {
-        return delQ.indexOf(index) == -1;
-    });
-    }
+	}
         isUploadDisabled = false;
     };
 </script>
@@ -562,7 +536,11 @@ src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/ic
 
 	<div id="config">
 
-    {#if $inputs.uploadURL || $inputs.filesName}
+    {#if $inputs.uploadURL && $inputs.filesName}
+		<h2 class="leading-tight pb-2">
+	Please configure first
+		</h2>
+   {:else}
 		<h2 class="leading-tight pb-2">
 	&#128202; Progress type <span
 class='text-sm'>{$inputs.progType}</span>  
@@ -570,10 +548,6 @@ class='text-sm'>{$inputs.progType}</span>
 class='text-sm'>{$inputs.uploadURL}</span> 
 		&#128218; FilesName <span
 class='text-sm'>{$inputs.filesName}</span>
-		</h2>
-   {:else}
-		<h2 class="leading-tight pb-2">
-	Please configure first
 		</h2>
   {/if}
 

@@ -7,16 +7,16 @@ export default {
     data() {
         return {
             openTab: 1,
-	    errAlert: false,
-	    thumbNailsDone: false,
+            errAlert: false,
+            thumbNailsDone: false,
             dragging: false,
-	    totalsize: 0,
-	    totalfiles: 0,
-	    totaltime: 0,
+            totalsize: 0,
+            totalfiles: 0,
+            totaltime: 0,
             authEnabled: false,
-            filterLabel : "Allow file type",
-            sizeLabel : "Single file limit",
-            filtFiles : {
+            filterLabel: "Allow file type",
+            sizeLabel: "Single file limit",
+            filtFiles: {
                 "type": "all",
                 "action": "allow"
             },
@@ -33,24 +33,24 @@ export default {
                 fileTypeAction: "Allow file type"
             },
 
-    fileTypes:  {
-        "video": 'avi.svg',
-        "css": 'css.svg',
-        "csv": 'csv.svg',
-        "eps": 'eps.svg',
-        "excel": 'excel.svg',
-        "html": 'html.svg',
-        "movie": 'mov.svg',
-        "mp3": 'mp3.svg',
-        "other": 'other.svg',
-        "pdf": 'pdf.svg',
-        "ppt": 'ppt.svg',
-        "rar": 'rar.svg',
-        "text": 'txt.svg',
-        "audio": 'wav.svg',
-        "word": 'word.svg',
-        "zip": 'zip.svg'
-    },
+            fileTypes: {
+                "video": 'avi.svg',
+                "css": 'css.svg',
+                "csv": 'csv.svg',
+                "eps": 'eps.svg',
+                "excel": 'excel.svg',
+                "html": 'html.svg',
+                "movie": 'mov.svg',
+                "mp3": 'mp3.svg',
+                "other": 'other.svg',
+                "pdf": 'pdf.svg',
+                "ppt": 'ppt.svg',
+                "rar": 'rar.svg',
+                "text": 'txt.svg',
+                "audio": 'wav.svg',
+                "word": 'word.svg',
+                "zip": 'zip.svg'
+            },
             uploadFileInfos: [],
             uploadFileList: [],
             errInfos: [],
@@ -67,10 +67,12 @@ export default {
             if (this.form.uploadURL == '' || this.form.filesName == '') {
                 this.disableUpload = true;
             } else {
-		if(this.uploadFileList.length > 0) {
-                	this.disableUpload = false;
-		}
-	    }
+                if (this.uploadFileInfos.length > 0) {
+                    this.disableUpload = false;
+                } else {
+                    this.disableUpload = true;
+                }
+            }
         });
     },
 
@@ -101,7 +103,7 @@ export default {
 
                 var ts = new Date().toLocaleString();
                 var tot = self.uploadFileList.length;
-                var status = self.totalfiles == tot ?  "<img src=\"https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/success-icon.svg\" >" : "<img src=\"https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg\" >";
+                var status = self.totalfiles == tot ? "<img src=\"https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/success-icon.svg\" >" : "<img src=\"https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg\" >";
                 self.details = `${self.totalfiles}/${tot} files of size ${this.totalsize} sent in ${self.totaltime} ms`;
                 var id = self.statsTable.length + 1;
 
@@ -139,7 +141,7 @@ export default {
                     console.log(perc + " is the percentage uploaded");
                     self.progressBars[idx].set(perc);
                     file.bytesSent = self.humanFileSize(e.progress *
-file.file.size);
+                        file.file.size);
                     file.eta = e.estimated;
                     file.rate = (e.rate / 1024 / 1024).toFixed(2);
                 }
@@ -157,17 +159,17 @@ file.file.size);
             axios.post(this.form.uploadURL, uplFormData, options).then((resp) => {
                 this.spitStatistics(self, idx);
             }).catch((error) => {
-		if(!this.errAlert) {
-                alert("Upload failed. Please check endpoint in Setup");
-                alert(error);
-		this.errAlert = true;
-		}
+                if (!this.errAlert) {
+                    alert("Upload failed. Please check endpoint in Setup");
+                    alert(error);
+                    this.errAlert = true;
+                }
             });
         },
 
         uploadAll() {
             console.log("Starting upload...");
-	    this.errAlert = false;
+            this.errAlert = false;
             this.startUploadts = Date.now();
             for (let i = 0; i < this.uploadFileInfos.length; i++) {
                 let f = this.uploadFileInfos[i];
@@ -235,15 +237,15 @@ file.file.size);
             this.totalsize = 0;
             this.totaltime = 0;
             this.disableUpload = true;
-	    this.thumbNailsDone = false;
+            this.thumbNailsDone = false;
             console.log("Cleared");
 
         },
         openFileBrowser() {
- let fileUpload = document.getElementById('fileInput')
-  if (fileUpload != null) {
-    fileUpload.click()
-  }
+            let fileUpload = document.getElementById('fileInput')
+            if (fileUpload != null) {
+                fileUpload.click()
+            }
         },
         uploadFile(file, onUploadProgress) {
             let formData = new FormData();
@@ -276,15 +278,20 @@ file.file.size);
         },
 
         applyFilter() {
-            filt = this.form.fileFilter.value;
-            filtType = this.form.filterAction;
-            console.log(filt, filtType);
+            let filt = this.form.fileTypeFilter;
+            let action;
+            if (this.filterLabel === "Allow file type") {
+                action = "allow";
+            } else {
+                action = "deny";
+            }
+            console.log("Setting:: mime " + filt + " action " + action);
             switch (filt) {
                 case "All":
                     break;
                 case "PDF only":
                     this.filtFiles = {
-                        "type": "application/pdf",
+                        "type": "pdf",
                         "action": action
                     };
                     break;
@@ -324,22 +331,23 @@ file.file.size);
             }
         },
 
-        toggleSizeQ() {
+        toggleSizeQ(e) {
             let val = this.form.sizeLimitType;
-            if (val.checked === true) {
+            if (val) {
                 this.sizeLabel = "Total limit";
             } else {
                 this.sizeLabel = "Single file limit";
             }
         },
 
-        toggleFilterQ() {
+        toggleFilterQ(e) {
             let val = this.form.fileTypeAction;
-            if (val.checked === true) {
+            if (val) {
                 this.filterLabel = "Deny file type";
             } else {
                 this.filterLabel = "Allow file type";
             }
+            this.applyFilter();
         },
 
         wordCount(val) {
@@ -352,25 +360,34 @@ file.file.size);
         },
 
         checkFilter(mime) {
+            console.log("Checking file type - Action :: " +
+                this.filtFiles.action + "  Type :: " +
+                this.filtFiles.type + "  Our mime :: " +
+                mime);
             /* No filter XXX */
             if (this.filtFiles.type == 'all') {
                 console.log("No file type filters active");
                 return true;
             }
-            if (mime.match(this.filtFiles.type) && this.filtFiles.action == "allow") {
+            if (this.filtFiles.action == "allow" && mime.match(this.filtFiles.type)) {
+                console.log("This MIME Is allowed ::" + mime);
                 return true;
             }
-            if (mime.match(this.filtFiles.type) && this.filtFiles.action == "deny") {
+            if (this.filtFiles.action == "deny" && !mime.match(this.filtFiles.type)) {
+                console.log("This MIME is NOT denied ::" + mime);
                 return true;
             }
             return false;
         },
 
         checkSize(size) {
-            if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
-                return true;
+            if (this.sizeLimitType == "Single file limit") {
+                if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
+                    return true;
+                }
+                return false;
             }
-            return false;
+            return true;
         },
 
         checkTotalSize() {
@@ -380,153 +397,155 @@ file.file.size);
                 }
                 return false;
             }
-            return false;
+            return true;
         },
-        showThumbnail(f, i ) {
-        let id = 'a' + i;
-        let target = '#' + id + '-thumb';
-	let self = this;
-	let type = f.file.type.split('/')[0];
-        switch (true) {
-            case /text/.test(f.file.type):
-                console.log("Text type detected");
-                var reader = new FileReader();
-                reader.onload = (function(locf) {
-                    return function(e) {
-			let res ;
-			if(e.target) {
-                        	res = e.target.result;
-			}
-                        let wc = self.wordCount(res);
-                        f.meta = ` 
+        showThumbnail(f, i) {
+            let id = 'a' + i;
+            let target = '#' + id + '-thumb';
+            let self = this;
+            let type = f.file.type.split('/')[0];
+            switch (true) {
+                case /text/.test(f.file.type):
+                    console.log("Text type detected");
+                    var reader = new FileReader();
+                    reader.onload = (function(locf) {
+                        return function(e) {
+                            let res;
+                            if (e.target) {
+                                res = e.target.result;
+                            }
+                            let wc = self.wordCount(res);
+                            f.meta = ` 
    			Chars : ${wc.chars}
    			Words: ${wc.words}
    			Lines: ${wc.lines}
 			`;
-                        var dataArray = res.split("\n");
-                        dataArray = dataArray.slice(0, 20);
-                        let txt = dataArray.join("\n");
+                            var dataArray = res.split("\n");
+                            dataArray = dataArray.slice(0, 20);
+                            let txt = dataArray.join("\n");
 
-             var fileIcon = 'https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/' + self.fileTypes[type];
-                        f.thumb = [
+                            var fileIcon = 'https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/' + self.fileTypes[type];
+                            f.thumb = [
                                 '<img width="125" height="125" src="',
                                 fileIcon,
                                 '" title="',
                                 txt,
-				 '" alt="',
+                                '" alt="',
                                 locf.name,
                                 '" class="w-12 h-12" />'
                             ].join('');
 
-                    };
-                })(f.file);
-                reader.readAsText(f.file);
-                break;
-            case /image/.test(f.file.type):
-                console.log("Image type detected");
-                var reader = new FileReader();
-                reader.onload = (function(locf) {
-                    return function(e) {
-			let pic;
-			if(e.target) {
-                        	pic = e.target.result;
-			}
-                        f.thumb = [
+                        };
+                    })(f.file);
+                    reader.readAsText(f.file);
+                    break;
+                case /image/.test(f.file.type):
+                    console.log("Image type detected");
+                    var reader = new FileReader();
+                    reader.onload = (function(locf) {
+                        return function(e) {
+                            let pic;
+                            if (e.target) {
+                                pic = e.target.result;
+                            }
+                            f.thumb = [
                                 '<img width="125" height="125" src="',
                                 pic,
                                 '" title="',
                                 locf.name,
-				 '" alt="',
+                                '" alt="',
                                 locf.name,
                                 '" class="w-12 h-12" />'
-                            ].join(''); 
+                            ].join('');
                             f.meta = locf.name;
-                    };
-                })(f.file);
-                reader.readAsDataURL(f.file);
-                break;
-            case /audio/.test(f.file.type):
-                console.log("Audio type detected");
-                var audioUrl = window.URL.createObjectURL(f.file);
-                f.thumb = [
-                    '<audio controls class="h-9 w-9" width="125" height="125"> ',
-		    '<source src="',
-                    audioUrl,
-                    '" title="',
-                    f.file.name,
-                    '" alt="',
-                    f.file.name,
-                    '" > </source> </audio> />'
-                ].join('');
-                f.meta = f.file.name;
-                break;
-            case /video/.test(f.file.type):
-                console.log("Video type detected");
-                var videoUrl = window.URL.createObjectURL(f.file);
-                f.thumb = [
-                    '<video controls class="h-9 w-9" width="125" height="125">',
-		    '<source src="',
-                    videoUrl,
-                    '" title="',
-                    f.file.name,
-                    '" alt="',
-                    f.file.name,
-                    '" > </source> </video> />'
-                ].join('');
-                f.meta = f.file.name;
-                break;
-            case /pdf/.test(f.file.type):
-                console.log("PDF type detected");
-                var pdfURL = window.URL.createObjectURL(f.file);
-                f.meta = f.file.name;
-                PDFObject.embed(pdfURL, target);
-                break;
-            default:
-                console.log("default type detected");
-                var fileIcon = this.fileTypeIcons[type];
-                if (fileIcon == undefined) {
-                    fileIcon = "file.svg";
-                }
-                f.meta = f.file.name;
-                let pic = "/filetypes/" + fileIcon;
-                f.thumb = [
-                    '<img width="125" height="125" src=',
-                    pic,
-                    '" title="',
-                    f.file.name,
-		    '" alt="',
-                    f.file.name,
-                    '" class="w-12 h-12" />'
-                ].join('');
-                break;
-        }
-    },
-        createBars() {
-	    if(this.thumbNailsDone) {
-			console.log("CreateBars():: Returning now");
-		return;
-	    }
-	    if(this.uploadFileInfos.length > 0) {
-            for (var i = 0; i < this.uploadFileInfos.length; i++) {
-                let f = this.uploadFileInfos[i];
-                var selector = '#a' + i;
-                var bar = new ldBar(selector, {
-                    preset: this.form.progType.toLowerCase()
-                });
-                bar.set(0);
-                this.progressBars.push(bar);
-                this.showThumbnail(f, i);
-            }
-	    this.thumbNailsDone = true;
-	    }
-            for (var i = 0; i < this.errInfos.length; i++) {
-                let f = this.errInfos[i];
-                this.showThumbnail(f, i);
+                        };
+                    })(f.file);
+                    reader.readAsDataURL(f.file);
+                    break;
+                case /audio/.test(f.file.type):
+                    console.log("Audio type detected");
+                    var audioUrl = window.URL.createObjectURL(f.file);
+                    f.thumb = [
+                        '<audio controls class="h-9 w-9" width="125" height="125"> ',
+                        '<source src="',
+                        audioUrl,
+                        '" title="',
+                        f.file.name,
+                        '" alt="',
+                        f.file.name,
+                        '" > </source> </audio> '
+                    ].join('');
+                    f.meta = f.file.name;
+                    break;
+                case /video/.test(f.file.type):
+                    console.log("Video type detected");
+                    var videoUrl = window.URL.createObjectURL(f.file);
+                    f.thumb = [
+                        '<video controls class="h-9 w-9" width="125" height="125">',
+                        '<source src="',
+                        videoUrl,
+                        '" title="',
+                        f.file.name,
+                        '" alt="',
+                        f.file.name,
+                        '" > </source> </video> '
+                    ].join('');
+                    f.meta = f.file.name;
+                    break;
+                case /pdf/.test(f.file.type):
+                    console.log("PDF type detected");
+                    var pdfURL = window.URL.createObjectURL(f.file);
+                    f.meta = f.file.name;
+                    PDFObject.embed(pdfURL, target);
+                    break;
+                default:
+                    console.log("default type detected");
+                    var fileIcon = this.fileTypeIcons[type];
+                    if (fileIcon == undefined) {
+                        fileIcon = "file.svg";
+                    }
+                    f.meta = f.file.name;
+                    let pic = "/filetypes/" + fileIcon;
+                    f.thumb = [
+                        '<img width="125" height="125" src=',
+                        pic,
+                        '" title="',
+                        f.file.name,
+                        '" alt="',
+                        f.file.name,
+                        '" class="w-12 h-12" />'
+                    ].join('');
+                    break;
             }
         },
-	        setupUpload() {
+        createBars() {
+            if (this.thumbNailsDone) {
+                console.log("CreateBars():: Returning now");
+                return;
+            }
+            if (this.uploadFileInfos.length > 0) {
+                for (var i = 0; i < this.uploadFileInfos.length; i++) {
+                    let f = this.uploadFileInfos[i];
+                    var selector = '#a' + i;
+                    console.log("selector is ::" + selector);
+                    var bar = new ldBar(selector, {
+                        preset: this.form.progType.toLowerCase()
+                    });
+                    bar.set(0);
+                    this.progressBars.push(bar);
+                    this.showThumbnail(f, i);
+                }
+                this.thumbNailsDone = true;
+            }
+            if (this.errInfos.length > 0) {
+                for (var i = 0; i < this.errInfos.length; i++) {
+                    let f = this.errInfos[i];
+                    this.showThumbnail(f, i);
+                }
+            }
+        },
+        setupUpload() {
             var delQ = [];
-		console.log(this.uploadFileList);
             for (var i = 0; i < this.uploadFileList.length; i++) {
                 let f = this.uploadFileList[i];
                 let mime = f.type;
@@ -559,6 +578,20 @@ file.file.size);
                     }
                 }
                 this.totalfiles += 1;
+            }
+
+           var tmpFileList = Array.from(this.uploadFileList).filter(function(value, index) {
+                return delQ.indexOf(index) == -1;
+            });
+	    console.log(tmpFileList);
+            for (var i = 0; i < tmpFileList.length; i++) {
+                let f = tmpFileList[i];
+                let mime = f.type;
+                let name = f.name;
+                let ts = f.lastModifiedDate.toLocaleDateString();
+                this.totalsize += f.size;
+                let size = this.humanFileSize(f.size);
+                let id = 'a' + i;
                 this.uploadFileInfos.push({
                     file: f,
                     id: id,
@@ -571,31 +604,26 @@ file.file.size);
                     rate: ' ',
                 });
             }
-	    console.log(this.uploadFileInfos);
-            this.uploadFileList = Array.from(this.uploadFileList).filter(function(value, index) {
-                return delQ.indexOf(index) == -1;
-            });
             this.disableUpload = false;
         },
         delItem(index) {
-            let list = [...this.uploadFileList];
+            this.totalsize -= this.uploadFileInfos[index].file.size;
+            let list = [...this.uploadFileInfos];
             list.splice(index, 1);
-            this.uploadFileList = list;
             this.uploadFileInfos = list;
-            this.totalsize -= this.upLoadFileList[index].size;
             this.checkTotalSize();
         },
-	printBannedBanner(file, id , size, ts, msg) {
-        this.errInfos.push({
-            file: file,
-            id: id,
-            meta: '',
-            size: size,
-            thumb: '',
-            ts: ts,
-            msg: msg
-        });
-    },
+        printBannedBanner(file, id, size, ts, msg) {
+            this.errInfos.push({
+                file: file,
+                id: id,
+                meta: '',
+                size: size,
+                thumb: '',
+                ts: ts,
+                msg: msg
+            });
+        },
 
     }
 };
@@ -785,7 +813,8 @@ step=10 />
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="sizeToggle" >
 <span>{{sizeLabel}}</span>
-  <input v-model="form.sizeToggle" name="sizeToggle" @change="toggleSizeQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <input v-model="form.sizeToggle" name="sizeToggle"
+@change="toggleSizeQ(e)" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
 bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
 </label>
@@ -801,7 +830,7 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 	          File type Filters 
 	         </label>
 	         <div class="relative">
-	           <select name="fileTypeFilter" v-model='form.fileTypeFilter'
+	           <select name="fileTypeFilter" @change="applyFilter()" v-model='form.fileTypeFilter'
  class="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
@@ -824,7 +853,8 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="filterAction" >
 <span>{{filterLabel}}</span>
-  <input v-model="form.fileTypeAction" name="fileTypeAction" @change="toggleFilterQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+  <input v-model="form.fileTypeAction" name="fileTypeAction"
+@change="toggleFilterQ()" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
 bg-green-600 rounded-full duration-300 ease-in-out peer-checked:bg-red-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
 </label>
@@ -991,6 +1021,71 @@ font-medium text-dark-900">filesName</td>
 py-4 whitespace-nowrap"> The name of files configured in backend </td>
 		   </tr>
 
+		   <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">Progress type</td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Select option </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The progress indicator one of 
+	   			Fan
+	   			Bubble
+	   			Energy
+	   			Rainbow
+	   			Stripe
+	   			Text
+	   			Circle
+	   			Line
+
+</td>
+		   </tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">File size limit </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Input range (integer) </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The max file size in MB</td>
+		   </tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">File size limit type</td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Slide toggle </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The limit is either per file or total</td>
+		   </tr>
+
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">File MIME type filter</td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Select dropdown </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The file types allowed/denied
+One of 
+- PDF only
+- Image only
+- Video only
+- Audio only
+- Zip only
+- Text only
+
+</td>
+</tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">Filter action </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Slide toggle </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The filter is either allow/deny</td>
+		   </tr>
+
 	            <tr class="bg-light-100 border-b">
 	              <td class="px-6 py-4 whitespace-nowrap text-sm
 font-medium text-dark-900">HTTP auth </td>
@@ -1040,23 +1135,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 	  </div>
 	</div>
 
-	<img src="./assets/progress-types.png" alt="Progress-up types" />
-
-       <ul class='marker:text-green list-outside'>
-         <li class='pb-2'> There is also the ability to perform a test Upload to validate the endpoint.  </li>
-         <li>
-       	Remember that the configuration is active only for the session.
-         </li>
-       
-         <li>
-       	There is also statistics for upload and profiling available.
-         </li>
-         <li>
-       	If using absolute URL please ensure <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS is enabled</a>.
-         </li>
-       </ul>
-  </div>
-
+   </div>
  </div>
 </div>
 <!-- XXX tabs -->
@@ -1123,22 +1202,20 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 </div>
 
 
-
-  <div id="progress-up-errArea"> 
+<div id="progress-up-errArea"> 
     <div v-for="(err,id) in errInfos" :key="id" >
       <section class="bg-red-200 m-4 p-4 mt-4 mb-4 transition-colors
   text-light-100 dark:text-white">
    <div class="bg-red-600 dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
   
       <div title="Removed from uploads" class="absolute cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
-            <img width="25" height="25"
-  :src="failureIcon" />
+            <img width="25" height="25" src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg" />
       </div>
   
       <div class="flex flex-wrap -mx-2 mb-8">
         <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
            <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
-		<div  v-html="err.thumb" id="{{err.id}}-thumb"></div>
+		<div  v-html="err.thumb" :id="err.id + '-thumb'"></div>
            </div>
         </div>
         <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
@@ -1172,8 +1249,8 @@ py-4 whitespace-nowrap"> See below for possible options </td>
   	 
       </div>
       </section>
-    </div>
   </div>
+</div>
 
 </section>
 

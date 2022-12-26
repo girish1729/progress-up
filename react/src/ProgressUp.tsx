@@ -66,7 +66,6 @@ function ProgressUp() {
 
     let [uploadFileInfos, setFileInfos] = useState < Array < fileInfo >> ([]);
     let [errInfos, setErrInfos] = useState < Array < errInfo > > ([]);
-    let [uploadFileList, setUpload] = useState < Array < File >> ();
     let [progressBars, setProgress] = useState < [] > ([]);
     let [statsTable, setStats] = useState < [] > ([]);
     let [isUploadDisabled, setBut] = useState(true);
@@ -92,7 +91,7 @@ function ProgressUp() {
     const [totalsize, setSize] = useState(0);
     const [sizeLabel, setSLabel] = useState("Single file limit");
     const [filterLabel, setFLabel] = useState("Allow file type");
-
+    let uploadFileList = [];
     let startUploadts = 0;
     let errAlert = false;
     const inputRef: any = useRef();
@@ -102,12 +101,10 @@ function ProgressUp() {
         "action": "allow"
     };
 
-    // From drag and drop
     const onDrop = (files: any) => {
-        setUpload(files);
+	uploadFileList = files;
         console.log(files);
-        uploadFileList = files;
-        setupUpload();
+        setupUpload(files);
     };
 
     const {
@@ -151,6 +148,7 @@ function ProgressUp() {
             [name]: value
         }));
 
+        applyFilter();
         return (value);
     };
 
@@ -228,7 +226,7 @@ function ProgressUp() {
     const fileSelectFinish = (e: any) => {
         let files = e.target.files;
         console.log(files);
-        setUpload(files);
+        uploadFileList = files;
         setupUpload();
     };
 
@@ -335,11 +333,13 @@ function ProgressUp() {
     };
 
 
-    const clearAll = () => {
+    const clearAll = (event) => {
+	console.log("ClearAll()::");
+ 	if(event !== undefined) {	
+		console.log("Clear file list()::");
+		uploadFileList = [];
+	}	
         setDetails("");
-        if (inputRef.current) {
-            inputRef.current.value = "";
-        }
         setFileInfos([]);
         setErrInfos([]);
         setProgress([]);
@@ -349,11 +349,16 @@ function ProgressUp() {
         console.log("Cleared");
     };
 
-
     const applyFilter = () => {
         let filt = inputs.fileTypeFilter;
-        let action = inputs.fileTypeAction;
-        console.log(filt, action);
+            let action;
+            if (this.filterLabel === "Allow file type") {
+                action = "allow";
+            } else {
+                action = "deny";
+            }
+            console.log("Setting:: mime " + filt + " action " + action);
+         
         switch (filt) {
             case "All":
                 break;
@@ -401,7 +406,6 @@ function ProgressUp() {
     };
 
     const toggleSizeQ = (e: any) => {
-        //let val = inputs.sizeLimitType;
         let val = e.target.checked;
         if (val) {
             setSLabel("Total limit");
@@ -414,7 +418,6 @@ function ProgressUp() {
     };
 
     const toggleFilterQ = (e: any) => {
-        //let val = inputs.fileTypeAction;
         let val = e.target.checked;
         if (val) {
             setFLabel("Deny file type");
@@ -436,37 +439,39 @@ function ProgressUp() {
         };
     };
 
-
     const checkFilter = (mime: string) => {
         /* No filter XXX */
         if (filtFiles.type == 'all') {
             console.log("No file type filters active");
             return true;
         }
-        if (mime.match(filtFiles.type) && filtFiles.action == "allow") {
+        if (filtFiles.action == "allow" && mime.match(filtFiles.type)) {
             return true;
         }
-        if (mime.match(filtFiles.type) && filtFiles.action == "deny") {
+        if (filtFiles.action == "deny" && !mime.match(filtFiles.type)) {
             return true;
         }
         return false;
     };
 
     const checkSize = (size: number) => {
+        if (inputs.sizeLimitType == "Single file limit") {
         if (size <= (inputs.fileSizeLimit * 1024 * 1024)) {
             return true;
         }
         return false;
+        }
+        return true;
     };
 
-    const checkTotalSize = () => {
+    const checkTotalSize = (totalSize) => {
         if (inputs.sizeLimitType == "Total limit") {
-            if (totalsize <= (inputs.fileSizeLimit * 1024 * 1024)) {
+            if (totalSize <= (inputs.fileSizeLimit * 1024 * 1024)) {
                 return true;
             }
             return false;
         }
-        return false;
+        return true;
     };
     const pFileReader = (file: File) => {
         return new Promise((resolve, reject) => {
@@ -477,23 +482,25 @@ function ProgressUp() {
             reader.readAsDataURL(file);
         })
     };
+
     useEffect(() => {
-	if(uploadFileInfos && uploadFileList) {
-	if(uploadFileInfos.length == uploadFileList.length) {
-        createBars();
+	if(uploadFileInfos) {
+        	createBars();
 	}
-	}
-        if (inputs.uploadURL || inputs.filesName) {
+      if((inputs.uploadURL.length > 3) && (inputs.filesName.length > 3)) {
             console.log('Enable upload button if Files in Q');
-            if (uploadFileList && uploadFileList.length > 0) {
+            if (uploadFileInfos && uploadFileInfos.length > 0) {
                 console.log('Enabled upload button');
                 setBut(false);
-            }
+            } else {
+                setBut(true);
+	    }
         } else {
             console.log('Disable upload without configuration');
             setBut(true);
         }
     }, [uploadFileInfos]);
+
     const figuretype = (type: string) => {
         if (type.includes('image')) {
             return 'image';
@@ -604,141 +611,153 @@ function ProgressUp() {
                     ].join("");
 			cb(thumb, meta);
                     }
-            };
+    };
 
+const createBars = () => {
+    console.log("createBars():: creating progress bars");
+    const allBars: any = [];
+    console.log("progress bars :: " +
+        progressBars.length);
+    console.log("infos:: " +
+        uploadFileInfos.length);
+    if (progressBars.length == uploadFileInfos.length) {
+        console.log("Progress bars are drawn:: so returning");
+        return;
+    }
+    if (uploadFileInfos) {
+	console.log("Yes DOM updated, so drawing bars");
+        for (let j = 0; j < uploadFileInfos.length; j++) {
+            let id = 'a' + j;
+            let bar = new ldBar('#' + id, {
+                preset: inputs.progType.toLowerCase()
+            });
+            bar.set(0);
+            allBars.push(bar);
+        }
+        setProgress(allBars);
+    }
+};
 
-                    const createBars = () => {
-                        console.log("createBars():: creating progress bars");
-                        const allBars: any = [];
-                        if (progressBars.length == uploadFileInfos.length) {
-                            return;
-                        }
-                        if (uploadFileInfos) {
-                            for (let j = 0; j < uploadFileInfos.length; j++) {
-                                let id = 'a' + j;
-                                let bar = new ldBar('#' + id, {
-                                    preset: inputs.progType.toLowerCase()
-                                });
-                                bar.set(0);
-                                allBars.push(bar);
-                            }
-                            setProgress(allBars);
-                        }
-                    };
+const printBannedBanner = (file: File, id: string, size: string, ts: string,
+    msg: string) => {
 
-                    const printBannedBanner = (file: File, id: string, size: string, ts: string,
-                        msg: string) => {
+    showThumbnail(file, function(thumb: any, meta: string) {
+        let errInfo = {
+            file: file,
+            meta: meta,
+            thumb: thumb,
+            size: size,
+            id: id,
+            txt: '',
+            ts: ts,
+            msg: msg
+        };
 
-			showThumbnail(file, function(thumb:any,meta:string) {
-                        let errInfo = {
-                            file: file,
-                            meta: meta,
-                            thumb: thumb,
-                            size: size,
-                            id: id,
-                            txt: '',
-                            ts: ts,
-                            msg: msg
-                        };
+        setErrInfos(prev => {
+            const newState = [...prev];
+            newState.push(errInfo);
+            return newState;
+        });
+    });
+};
 
-                        setErrInfos(prev => {
-                            const newState = [...prev];
-                            newState.push(errInfo);
-                            return newState;
-                        });
-			});
-                    };
+const setupUpload = () => {
 
-                    const setupUpload = () => {
-                        clearAll();
-                        console.log("SetupUpload():...");
+    let totalSize = 0;
+    clearAll();
+    console.log("SetupUpload():...");
 
-                        if (!uploadFileList) {
-                            return;
-                        }
-                        var delQ: number[] = [];
-                        for (var i = 0; i < uploadFileList.length; i++) {
-                            let f = uploadFileList && uploadFileList[i];
-                            let mime = f.type;
-                            let name = f.name;
-                            console.log("Checking " + name);
-                            let ts = new Date(f.lastModified).toLocaleDateString();
-                            let size = humanFileSize(f.size);
-                            let id = 'a' + i;
-                            if (!checkSize(f.size)) {
-                                console.log("Size check:: size is " + f.size);
-                                let msg = "{name} too big for upload";
-                                console.log(msg);
-                                printBannedBanner(f, id, size, ts, msg);
-                                delQ.push(i);
-                                continue;
-                            }
-                            if (!checkFilter(mime)) {
-                                console.log("Hit banned file type:: filter issue");
-                                let msg = "{name} cannot be uploaded due to policy.";
-                                printBannedBanner(f, id, size, ts, msg);
-                                delQ.push(i);
-                                continue;
-                            }
+    if (!uploadFileList) {
+        return;
+    }
+    var delQ: number[] = [];
+    for (var i = 0; i < uploadFileList.length; i++) {
+        let f = uploadFileList && uploadFileList[i];
+        let mime = f.type;
+        let name = f.name;
+        console.log("Checking " + name);
+        let ts = new Date(f.lastModified).toLocaleDateString();
+        let size = humanFileSize(f.size);
+        let id = 'a' + i;
+	totalSize += f.size;
+        if (!checkFilter(mime)) {
+            console.log("Hit banned file type:: filter issue");
+            let msg = "{name} cannot be uploaded due to policy.";
+            printBannedBanner(f, id, size, ts, msg);
+            delQ.push(i);
+            continue;
+        }
+        if (!checkSize(f.size)) {
+             console.log("Size check:: size is " + f.size);
+             let msg = "{name} too big for upload";
+             console.log(msg);
+             printBannedBanner(f, id, size, ts, msg);
+             delQ.push(i);
+            continue;
+        }
+	if (uploadFileInfos && i == uploadFileList.length - 1) {
+		console.log("Total size check:: total size is " +
+		  totalSize) ;
+		if (!checkTotalSize(totalSize)) {
+			let msg = `Total size exceeds policy, delete some`;
+			setBut(true);
+		}
+	}
+        setSize(prev => {prev + f.size});
+        setNumberFiles(prev => {prev + 1});
+    } // XXX for loop 
 
-                            if (uploadFileList && i == uploadFileList.length - 1) {
-                                console.log("Total size check:: total size is " +
-                                    totalsize);
-                                if (!checkTotalSize()) {
-                                    let msg = `Total size exceeds policy, delete some`;
-                                    setBut(true);
-                                }
-                            }
-			showThumbnail(f,
-function(thumb:any,meta:string) {
-                            let fInfo = {
-                                file: f,
-                                id: id,
-                                size: size,
- 				thumb: thumb,
-                                meta: meta,
-                                bytesSent: '',
-                                eta: '',
-                                ts: ts,
-                                rate: '',
-                            };
-                            setFileInfos(prev => {
-                                const newState = [...prev];
-                                newState.push(fInfo);
-                                return newState;
-                            });
-			});
-                            setSize(prev => prev + f.size);
-                            setNumberFiles(prev => prev + 1);
-                        }
-                        if (uploadFileList) {
-                            uploadFileList = [...uploadFileList].filter(function(value: any,
-                                index: number) {
-                                return delQ.indexOf(index) == -1;
-                            });
-                        }
-                        setBut(false);
-                        console.log("SetupUpload():... done");
-                    };
+  var tmpFileList = Array.from(this.uploadFileList).filter(function(value, index) {
+                return delQ.indexOf(index) == -1;
+            });
+	    console.log(tmpFileList);
+            for (var i = 0; i < tmpFileList.length; i++) {
+                let f = tmpFileList[i];
+                let mime = f.type;
+                let name = f.name;
+                let ts = f.lastModifiedDate.toLocaleDateString();
+                this.totalsize += f.size;
+                let size = this.humanFileSize(f.size);
+                let id = 'a' + i;
+          
+        showThumbnail(f,
+            function(thumb: any, meta: string) {
+                let fInfo = {
+                    file: f,
+                    id: id,
+                    size: size,
+                    thumb: thumb,
+                    meta: meta,
+                    bytesSent: '',
+                    eta: '',
+                    ts: ts,
+                    rate: '',
+                };
+                setFileInfos(prev => {
+                    const newState = [...prev];
+                    newState.push(fInfo);
+                    return newState;
+                });
+           });
+    } // XXX for loop 
 
-                    const delItem = (index: number) => {
-                        let s: number;
-                        if (uploadFileList) {
-                            s = uploadFileList[index].size;
-                            s = totalsize - s;
-                            setSize(s);
-                        }
-                        uploadFileList && uploadFileList.splice(index, 1);
-                        let list = uploadFileList as File[];
-                        setUpload(list);
+    setBut(false);
+    console.log("SetupUpload():... done");
+    console.log(uploadFileList);
+};
 
-                        uploadFileInfos && uploadFileInfos.splice(index, 1);
-                        setFileInfos(uploadFileInfos);
-                        checkTotalSize();
-                    };
+const delItem = (index: number) => {
+    let s: number;
+    console.log(uploadFileInfos);
+    s = uploadFileInfos[index].file.size;
+    s = totalsize - s;
+    setSize(s);
+    uploadFileInfos && uploadFileInfos.splice(index, 1);
+    setFileInfos(uploadFileInfos);
+    checkTotalSize(totalsize);
+};
 
-                    return ( <
-                            Fragment >
+return ( <Fragment>
 
 <section className="dark:bg-gray-800 dark:text-white">
 
@@ -851,7 +870,11 @@ src={uploadIcon} alt="progress-up file submit icon" />
 	</div>
 
 	<div id="config">
-    {inputs.uploadURL || inputs.filesName ? (
+    {(inputs.uploadURL.length < 3) && (inputs.filesName.length < 3) ? (
+		<h2 className="leading-tight pb-2">
+	Please configure first
+		</h2>
+      ) : (
 		<h2 className="leading-tight pb-2">
 	&#128202; Progress type <span
 className='text-sm'>{inputs.progType}</span>  
@@ -859,10 +882,6 @@ className='text-sm'>{inputs.progType}</span>
 className='text-sm'>{inputs.uploadURL}</span> 
 		&#128218; FilesName <span
 className='text-sm'>{inputs.filesName}</span>
-		</h2>
-      ) : (
-		<h2 className="leading-tight pb-2">
-	Please configure first
 		</h2>
       )}
 
@@ -1084,6 +1103,7 @@ ease-in-out" >
 	    Test file upload
 	   </button>
 	   </form>
+
   </div>
 
 
@@ -1148,6 +1168,7 @@ font-medium text-gray-900">{id}</td>
 
 
  <div className={openTab === 4 ? "block" : "hidden"} id="link4">
+
     <div className="flex flex-col">
       <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
 	 <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
@@ -1186,6 +1207,71 @@ font-medium text-dark-900">filesName</td>
 	              <td className="text-sm text-dark-900 font-light px-6 py-4 whitespace-nowrap"> String </td>
 	              <td className="text-sm text-dark-900 font-light px-6
 py-4 whitespace-nowrap"> The name of files configured in backend </td>
+		   </tr>
+
+		   <tr className="bg-light-100 border-b">
+	              <td className="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">Progress type</td>
+	              <td className="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Select option </td>
+	              <td className="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The progress indicator one of 
+	   			Fan
+	   			Bubble
+	   			Energy
+	   			Rainbow
+	   			Stripe
+	   			Text
+	   			Circle
+	   			Line
+
+</td>
+		   </tr>
+
+	            <tr className="bg-light-100 border-b">
+	              <td className="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">File size limit </td>
+	              <td className="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Input range (integer) </td>
+	              <td className="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The max file size in MB</td>
+		   </tr>
+
+	            <tr className="bg-light-100 border-b">
+	              <td className="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">File size limit type</td>
+	              <td className="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Slide toggle </td>
+	              <td className="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The limit is either per file or total</td>
+		   </tr>
+
+
+	            <tr className="bg-light-100 border-b">
+	              <td className="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">File MIME type filter</td>
+	              <td className="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Select dropdown </td>
+	              <td className="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The file types allowed/denied
+One of 
+- PDF only
+- Image only
+- Video only
+- Audio only
+- Zip only
+- Text only
+
+</td>
+</tr>
+
+	            <tr className="bg-light-100 border-b">
+	              <td className="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">Filter action </td>
+	              <td className="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Slide toggle </td>
+	              <td className="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The filter is either allow/deny</td>
 		   </tr>
 
 	            <tr className="bg-light-100 border-b">
@@ -1237,24 +1323,9 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 	  </div>
 	</div>
 
-	<img src={progressTypes} alt="Progress-up types" />
 
-       <ul className='marker:text-green list-outside'>
-         <li className='pb-2'> There is also the ability to perform a test Upload to validate the endpoint.  </li>
-         <li>
-       	Remember that the configuration is active only for the session.
-         </li>
-       
-         <li>
-       	There is also statistics for upload and profiling available.
-         </li>
-         <li>
-       	If using absolute URL please ensure <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS is enabled</a>.
-         </li>
-       </ul>
-  </div>
-
- </div>
+     </div>
+   </div>
 </div>
 
 

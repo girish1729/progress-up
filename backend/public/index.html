@@ -333,6 +333,7 @@ px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-ti
 
 <!-- Fourth tab -->
   <div id="fourth" class="hidden p-4">
+
     <div class="flex flex-col">
       <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
 	 <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
@@ -371,6 +372,71 @@ font-medium text-dark-900">filesName</td>
 	              <td class="text-sm text-dark-900 font-light px-6 py-4 whitespace-nowrap"> String </td>
 	              <td class="text-sm text-dark-900 font-light px-6
 py-4 whitespace-nowrap"> The name of files configured in backend </td>
+		   </tr>
+
+		   <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">Progress type</td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Select option </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The progress indicator one of 
+	   			Fan
+	   			Bubble
+	   			Energy
+	   			Rainbow
+	   			Stripe
+	   			Text
+	   			Circle
+	   			Line
+
+</td>
+		   </tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">File size limit </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Input range (integer) </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The max file size in MB</td>
+		   </tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">File size limit type</td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Slide toggle </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The limit is either per file or total</td>
+		   </tr>
+
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">File MIME type filter</td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Select dropdown </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The file types allowed/denied
+One of 
+- PDF only
+- Image only
+- Video only
+- Audio only
+- Zip only
+- Text only
+
+</td>
+</tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">Filter action </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Slide toggle </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The filter is either allow/deny</td>
 		   </tr>
 
 	            <tr class="bg-light-100 border-b">
@@ -422,23 +488,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 	  </div>
 	</div>
 
-	<img src="images/progress-types.png" alt="Progress-up types" />
-
-       <ul class='marker:text-green list-outside'>
-         <li class='pb-2'> There is also the ability to perform a test Upload to validate the endpoint.  </li>
-         <li>
-       	Remember that the configuration is active only for the session.
-         </li>
-       
-         <li>
-       	There is also statistics for upload and profiling available.
-         </li>
-         <li>
-       	If using absolute URL please ensure <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS is enabled</a>.
-         </li>
-       </ul>
-  </div>
-
+ </div>
  </div>
 </div>
 <!-- XXX tabs -->

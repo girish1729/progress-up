@@ -4,10 +4,29 @@ import {
     ViewChild,
     ViewEncapsulation
 } from '@angular/core';
-import { Component, OnInit, ElementRef,Renderer2,Inject } from '@angular/core';
-import { Pipe, PipeTransform, SecurityContext } from '@angular/core';
-import { DomSanitizer, SafeHtml, SafeStyle, SafeScript, SafeUrl, SafeResourceUrl } from '@angular/platform-browser';
-import {catchError} from 'rxjs/operators';
+import {
+    Component,
+    OnInit,
+    ElementRef,
+    Renderer2,
+    Inject
+} from '@angular/core';
+import {
+    Pipe,
+    PipeTransform,
+    SecurityContext
+} from '@angular/core';
+import {
+    DomSanitizer,
+    SafeHtml,
+    SafeStyle,
+    SafeScript,
+    SafeUrl,
+    SafeResourceUrl
+} from '@angular/platform-browser';
+import {
+    catchError
+} from 'rxjs/operators';
 import {
     DOCUMENT
 } from '@angular/common';
@@ -45,7 +64,7 @@ interface fileInfo {
     bytesSent: string;
     rate: string;
     eta: string;
-    size:string;
+    size: string;
 };
 
 interface errInfo {
@@ -57,7 +76,7 @@ interface errInfo {
     pic: string;
     meta: string;
     msg: string;
-    size:string;
+    size: string;
 };
 
 
@@ -72,7 +91,7 @@ interface errInfo {
 
 export class ProgressUpComponent {
 
-	/*
+    /*
  transform(value: string): SafeUrl {
     return this.sanitize.bypassSecurityTrustUrl(value);
   }
@@ -104,7 +123,6 @@ export class ProgressUpComponent {
         "action": "allow"
     };
     /* XXX these are backend variables */
-    ///uploadURL = 'https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34';
     form = {
         uploadURL: '',
         filesName: "",
@@ -157,18 +175,18 @@ export class ProgressUpComponent {
     progress: any = {};
     showProgress: boolean = true;
 
-    constructor( private sanitizer: DomSanitizer,
+    constructor(private sanitizer: DomSanitizer,
 
-private ref: ChangeDetectorRef,private http:HttpClient, @Inject(DOCUMENT) document: Document) {}
+        private ref: ChangeDetectorRef, private http: HttpClient, @Inject(DOCUMENT) document: Document) {}
 
     openTab = 1;
-  ngAfterContentChecked() {
-    this.ref.detectChanges();
-  }
+    ngAfterContentChecked() {
+        this.ref.detectChanges();
+    }
 
-transform(html: string): SafeHtml {
-      return this.sanitizer.bypassSecurityTrustHtml(html);
-   }
+    transform(html: string): SafeHtml {
+        return this.sanitizer.bypassSecurityTrustHtml(html);
+    }
 
     toggleTabs($tabNumber: number) {
         this.openTab = $tabNumber;
@@ -179,24 +197,23 @@ transform(html: string): SafeHtml {
     }
 
     handleError(error: HttpErrorResponse) {
-            alert("Upload failed to (" + this.form.uploadURL 
-	+ "). Please check endpoint in Setup");
-            alert(error);
-   }
+        alert("Upload failed to (" + this.form.uploadURL +
+            "). Please check endpoint in Setup");
+        alert(error);
+    }
 
     uploadOneFile(file: fileInfo, idx: number) {
         const formData: FormData = new FormData();
         formData.append(this.form.filesName, file.file);
         console.log("Uploading to " + this.form.uploadURL);
         console.log("Uploading file name" + this.form.filesName);
-	var self = this;
+        var self = this;
         let options = {
-            onUploadProgress: function(e:any) {
-            },
-	    headers: {
+            onUploadProgress: function(e: any) {},
+            headers: {
                 'Content-Type': "multipart/form-data",
-		Authorization: ""
-	    } 
+                Authorization: ""
+            }
         };
         if (this.form.authEnabled) {
             var username = 'user';
@@ -204,49 +221,51 @@ transform(html: string): SafeHtml {
             var basicAuth = 'Basic ' + btoa(username + ':' + password);
             options['headers'] = {
                 'Content-Type': "multipart/form-data",
-		Authorization:  basicAuth
-	    };
+                Authorization: basicAuth
+            };
         }
 
 
-	console.log(options);
-        this.http.post(this.form.uploadURL, formData, {reportProgress:
-true, observe: 'events'}). subscribe((e: HttpEvent<any>) => {
-	  switch(e.type) {
-		case HttpEventType.UploadProgress:
-		if(e.total && e.loaded) {
-                let perc = Number(e.loaded / e.total * 100);
-		console.log("Perc::" + perc);
-                self.progressBars[idx].set(perc);
-                file.bytesSent = self.humanFileSize(e.loaded *
-file.file.size);
-		
-var duration = ( new Date().getTime() - self.startUploadts ) / 1000;
-        var bps = e.loaded / duration;
-        var kbps = bps / 1024;
-        kbps = Math.floor(kbps);
-        file.rate = String(kbps.toFixed(2) + " KBPS");
+        console.log(options);
+        this.http.post(this.form.uploadURL, formData, {
+            reportProgress: true,
+            observe: 'events'
+        }).subscribe((e: HttpEvent < any > ) => {
+                switch (e.type) {
+                    case HttpEventType.UploadProgress:
+                        if (e.total && e.loaded) {
+                            let perc = Number(e.loaded / e.total * 100);
+                            console.log("Perc::" + perc);
+                            self.progressBars[idx].set(perc);
+                            file.bytesSent = self.humanFileSize(e.loaded *
+                                file.file.size);
 
-        var time = (e.total - e.loaded) / bps;
-        var seconds = time % 60;
-        var minutes = time / 60;
- 
-        let sec = Math.floor(seconds);
-        let min = Math.floor(minutes);
+                            var duration = (new Date().getTime() - self.startUploadts) / 1000;
+                            var bps = e.loaded / duration;
+                            var kbps = bps / 1024;
+                            kbps = Math.floor(kbps);
+                            file.rate = String(kbps.toFixed(2) + " KBPS");
 
-                file.eta = String(min + ':' + sec);
-		console.log(file.bytesSent, file.eta, file.rate);
-		}
-		break;
-		case HttpEventType.Response:
-            self.spitStatistics(self, idx);
-		break;
-	}
-	},
-        err => {
+                            var time = (e.total - e.loaded) / bps;
+                            var seconds = time % 60;
+                            var minutes = time / 60;
+
+                            let sec = Math.floor(seconds);
+                            let min = Math.floor(minutes);
+
+                            file.eta = String(min + ':' + sec);
+                            console.log(file.bytesSent, file.eta, file.rate);
+                        }
+                        break;
+                    case HttpEventType.Response:
+                        self.spitStatistics(self, idx);
+                        break;
+                }
+            },
+            err => {
                 self.progressBars[idx].set(0);
             }
- );
+        );
     }
 
     uploadAll() {
@@ -300,7 +319,7 @@ var duration = ( new Date().getTime() - self.startUploadts ) / 1000;
             self.totaltime = endUploadts - self.startUploadts;
             let totalsize: any = self.humanFileSize(self.totalsize);
 
-            var ts = new Date().toLocaleString();
+            var ts = new Date().toLocaleDateString();
             var tot = self.uploadFileList.length;
             var status = self.totalfiles == tot ?
                 '<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/success-icon.svg" >' :
@@ -363,31 +382,17 @@ var duration = ( new Date().getTime() - self.startUploadts ) / 1000;
         }
 
         await this.http.post(this.form.uploadURL,
-testForm).subscribe((resp:any) => {
-            alert("Test succeeded");
-        },
+            testForm).subscribe((resp: any) => {
+                alert("Test succeeded");
+            },
             err => {
-		this.handleError(err);
-        });
+                this.handleError(err);
+            });
     }
 
     testEP() {
         this.saveConfig();
         this.testUpload();
-    }
-
-    setIndicator() {
-        console.log(this.form.progType);
-        switch (this.form.progType) {
-            case "Bubble":
-                this.extra = 'data-img-size="100,100"';
-                break;
-            case "Rainbow":
-                this.extra = 'data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"';
-                break;
-            default:
-                break;
-        }
     }
 
 
@@ -405,10 +410,31 @@ testForm).subscribe((resp:any) => {
         console.log("Cleared");
     }
 
+    disableCheck() {
+        if ((this.form.uploadURL.length > 3) && (this.form.filesName.length > 3)) {
+            console.log('Enable upload button if Files in Q');
+            if (this.uploadFileInfos && this.uploadFileInfos.length > 0) {
+                console.log('Enabled upload button');
+                this.disableUpload = false;
+            } else {
+                this.disableUpload = true;
+            }
+        } else {
+            console.log('Disable upload without configuration');
+            this.disableUpload = true;
+        }
+    }
+
     applyFilter() {
         let filt = this.form.fileTypeFilter;
-        let action = this.form.fileTypeAction;
-        console.log(filt, action);
+        let action;
+        if (this.filterLabel === "Allow file type") {
+            action = "allow";
+        } else {
+            action = "deny";
+        }
+        console.log("Setting:: mime " + filt + " action " + action);
+
         switch (filt) {
             case "All":
                 break;
@@ -471,10 +497,11 @@ testForm).subscribe((resp:any) => {
         } else {
             this.filterLabel = "Allow file type";
         }
+        this.applyFilter();
     }
 
 
-    wordCount(val:string) {
+    wordCount(val: string) {
         var wom = val.match(/\S+/g);
         return {
             chars: val.length,
@@ -482,26 +509,29 @@ testForm).subscribe((resp:any) => {
             lines: val.split(/\r*\n/).length
         };
     }
-    checkFilter(mime:string) {
+    checkFilter(mime: string) {
         /* No filter XXX */
         if (this.filtFiles.type == 'all') {
             console.log("No file type filters active");
             return true;
         }
-        if (mime.match(this.filtFiles.type) && this.filtFiles.action == "allow") {
+        if (this.filtFiles.action == "allow" && mime.match(this.filtFiles.type)) {
             return true;
         }
-        if (mime.match(this.filtFiles.type) && this.filtFiles.action == "deny") {
+        if (this.filtFiles.action == "deny" && !mime.match(this.filtFiles.type)) {
             return true;
         }
         return false;
     }
 
-    checkSize(size:number) {
-        if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
-            return true;
+    checkSize(size: number) {
+        if (this.form.sizeLimitType == "Single file limit") {
+            if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
+                return true;
+            }
+            return false;
         }
-        return false;
+        return true;
     }
 
     checkTotalSize() {
@@ -511,42 +541,42 @@ testForm).subscribe((resp:any) => {
             }
             return false;
         }
-        return false;
+        return true;
     }
 
-    showThumbnail(f:File, i: number, cb: Function) {
-	let self = this;
-	let meta = '';
-	let pic:any = '';
-	let title = '';
-	let url:SafeUrl = '';
-	let turl = '';
-	let ftype = f.type;
-	let fkey = ftype.split('/')[0];
+    showThumbnail(f: File, i: number, cb: Function) {
+        let self = this;
+        let meta = '';
+        let pic: any = '';
+        let title = '';
+        let url: SafeUrl = '';
+        let turl = '';
+        let ftype = f.type;
+        let fkey = ftype.split('/')[0];
         switch (true) {
             case ftype.includes('text'):
                 console.log("Text type detected");
                 var reader = new FileReader();
                 reader.onload = (function(locf) {
                     return function(e) {
-			let res:any;
-			if(e.target) {
-                        	res = e.target.result;
-			}
+                        let res: any;
+                        if (e.target) {
+                            res = e.target.result;
+                        }
                         let wc = self.wordCount(res);
                         meta = ` 
    			Chars : ${wc.chars}
    			Words: ${wc.words}
    			Lines: ${wc.lines}
 			`;
-                        var dataArray = (<string>res).split("\n");
+                        var dataArray = ( < string > res).split("\n");
                         dataArray = dataArray.slice(0, 20);
                         let txt = dataArray.join("\n");
                         var fileIcon = self.fileTypeIcons[fkey];
                         pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" + fileIcon;
-			title = txt;
-			url = '';
-			cb(i, title, url, pic, meta);
+                        title = txt;
+                        url = '';
+                        cb(i, title, url, pic, meta);
                     };
                 })(f);
                 reader.readAsText(f);
@@ -556,48 +586,48 @@ testForm).subscribe((resp:any) => {
                 var reader = new FileReader();
                 reader.onload = (function(locf) {
                     return function(e) {
-			if(e.target) {
-                        	pic = e.target.result;
-			}
+                        if (e.target) {
+                            pic = e.target.result;
+                        }
                         meta = locf.name;
-			title = locf.name;
-			url = '';
-			cb(i, title, url, pic, meta);
+                        title = locf.name;
+                        url = '';
+                        cb(i, title, url, pic, meta);
                     };
                 })(f);
                 reader.readAsDataURL(f);
                 break;
             case ftype.includes('audio'):
                 console.log("Audio type detected");
-		turl = window.URL.createObjectURL(f);
+                turl = window.URL.createObjectURL(f);
                 url =
-	this.sanitizer.bypassSecurityTrustUrl(turl) ;
+                    this.sanitizer.bypassSecurityTrustUrl(turl);
                 meta = f.name;
-		title = f.name;
-		pic = '';
-		cb(i, title, url, pic, meta);
+                title = f.name;
+                pic = '';
+                cb(i, title, url, pic, meta);
                 break;
             case ftype.includes('video'):
                 console.log("Video type detected");
                 meta = f.name;
-		turl = window.URL.createObjectURL(f);
-                url = 
-	this.sanitizer.bypassSecurityTrustUrl(turl) ;
+                turl = window.URL.createObjectURL(f);
+                url =
+                    this.sanitizer.bypassSecurityTrustUrl(turl);
                 meta = f.name;
-		title = f.name;
-		pic = '';
-		cb(i, title, url, pic, meta);
+                title = f.name;
+                pic = '';
+                cb(i, title, url, pic, meta);
                 break;
             case ftype.includes('pdf'):
                 console.log("PDF type detected");
                 turl = window.URL.createObjectURL(f);
-		let b:any = 
-		   this.sanitizer.bypassSecurityTrustResourceUrl(turl);
- 		url = b;
+                let b: any =
+                    this.sanitizer.bypassSecurityTrustResourceUrl(turl);
+                url = b;
                 meta = f.name;
-		title = f.name;
-		pic = '';
-		cb(i, title, url, pic, meta);
+                title = f.name;
+                pic = '';
+                cb(i, title, url, pic, meta);
                 break;
             default:
                 console.log("default type detected");
@@ -607,8 +637,8 @@ testForm).subscribe((resp:any) => {
                 }
                 pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" + fileIcon;
                 meta = f.name;
-		title = f.name;
-		cb(i, title, url, pic, meta);
+                title = f.name;
+                cb(i, title, url, pic, meta);
                 break;
         }
     }
@@ -616,7 +646,7 @@ testForm).subscribe((resp:any) => {
 
     createBars() {
         if (this.thumbNailsDone) {
-	   console.log("createBars():: returning immediately");
+            console.log("createBars():: returning immediately");
             return;
         }
         this.progressBars = [];
@@ -629,42 +659,42 @@ testForm).subscribe((resp:any) => {
             console.log("Creating progress bar::" + id);
             this.progressBars.push(bar);
         }
-	this.thumbNailsDone = true;
-   }
+        this.thumbNailsDone = true;
+    }
 
-    showErrThumbnail(f:File, cb: Function) {
-	let self = this;
-	let meta = '';
-	let pic:any = '';
-	let title = '';
-	let url:SafeUrl = '';
-	let turl = '';
-	let ftype = f.type;
-	let fkey = ftype.split('/')[0];
+    showErrThumbnail(f: File, cb: Function) {
+        let self = this;
+        let meta = '';
+        let pic: any = '';
+        let title = '';
+        let url: SafeUrl = '';
+        let turl = '';
+        let ftype = f.type;
+        let fkey = ftype.split('/')[0];
         switch (true) {
             case ftype.includes('text'):
                 console.log("Text type detected");
                 var reader = new FileReader();
                 reader.onload = (function(locf) {
                     return function(e) {
-			let res:any;
-			if(e.target) {
-                        	res = e.target.result;
-			}
+                        let res: any;
+                        if (e.target) {
+                            res = e.target.result;
+                        }
                         let wc = self.wordCount(res);
                         meta = ` 
    			Chars : ${wc.chars}
    			Words: ${wc.words}
    			Lines: ${wc.lines}
 			`;
-                        var dataArray = (<string>res).split("\n");
+                        var dataArray = ( < string > res).split("\n");
                         dataArray = dataArray.slice(0, 20);
                         let txt = dataArray.join("\n");
                         var fileIcon = self.fileTypeIcons[fkey];
                         pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" + fileIcon;
-			title = txt;
-			url = '';
-			cb(title, url, pic, meta);
+                        title = txt;
+                        url = '';
+                        cb(title, url, pic, meta);
                     };
                 })(f);
                 reader.readAsText(f);
@@ -674,48 +704,48 @@ testForm).subscribe((resp:any) => {
                 var reader = new FileReader();
                 reader.onload = (function(locf) {
                     return function(e) {
-			if(e.target) {
-                        	pic = e.target.result;
-			}
+                        if (e.target) {
+                            pic = e.target.result;
+                        }
                         meta = locf.name;
-			title = locf.name;
-			url = '';
-			cb(title, url, pic, meta);
+                        title = locf.name;
+                        url = '';
+                        cb(title, url, pic, meta);
                     };
                 })(f);
                 reader.readAsDataURL(f);
                 break;
             case ftype.includes('audio'):
                 console.log("Audio type detected");
-		turl = window.URL.createObjectURL(f);
+                turl = window.URL.createObjectURL(f);
                 url =
-	this.sanitizer.bypassSecurityTrustUrl(turl) ;
+                    this.sanitizer.bypassSecurityTrustUrl(turl);
                 meta = f.name;
-		title = f.name;
-		pic = '';
-		cb(title, url, pic, meta);
+                title = f.name;
+                pic = '';
+                cb(title, url, pic, meta);
                 break;
             case ftype.includes('video'):
                 console.log("Video type detected");
                 meta = f.name;
-		turl = window.URL.createObjectURL(f);
-                url = 
-	this.sanitizer.bypassSecurityTrustUrl(turl) ;
+                turl = window.URL.createObjectURL(f);
+                url =
+                    this.sanitizer.bypassSecurityTrustUrl(turl);
                 meta = f.name;
-		title = f.name;
-		pic = '';
-		cb(title, url, pic, meta);
+                title = f.name;
+                pic = '';
+                cb(title, url, pic, meta);
                 break;
             case ftype.includes('pdf'):
                 console.log("PDF type detected");
                 turl = window.URL.createObjectURL(f);
-		let b:any = 
-		   this.sanitizer.bypassSecurityTrustResourceUrl(turl);
- 		url = b;
+                let b: any =
+                    this.sanitizer.bypassSecurityTrustResourceUrl(turl);
+                url = b;
                 meta = f.name;
-		title = f.name;
-		pic = '';
-		cb(title, url, pic, meta);
+                title = f.name;
+                pic = '';
+                cb(title, url, pic, meta);
                 break;
             default:
                 console.log("default type detected");
@@ -725,33 +755,33 @@ testForm).subscribe((resp:any) => {
                 }
                 pic = "https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/filetypes/" + fileIcon;
                 meta = f.name;
-		title = f.name;
-		cb(title, url, pic, meta);
+                title = f.name;
+                cb(title, url, pic, meta);
                 break;
         }
     }
 
 
-    printBannedBanner(file:File, size: string, id: string, ts:string, msg:string) {
-	var self = this;
-            this.showErrThumbnail(file, function(title:
-string, url: string, pic: string, meta: string) {
-        self.errInfos.push({
-            file: file,
-            id: id,
-            size: size,
-            meta: meta,
-    	    title: title,
-    	    url: url,
-    	    pic: pic,
-            ts: ts,
-            msg: msg
+    printBannedBanner(file: File, size: string, id: string, ts: string, msg: string) {
+        var self = this;
+        this.showErrThumbnail(file, function(title:
+            string, url: string, pic: string, meta: string) {
+            self.errInfos.push({
+                file: file,
+                id: id,
+                size: size,
+                meta: meta,
+                title: title,
+                url: url,
+                pic: pic,
+                ts: ts,
+                msg: msg
+            });
         });
-	    });
     }
 
     setupUpload() {
-        var delQ:number[] = [];
+        var delQ: number[] = [];
         for (var i = 0; i < this.uploadFileList.length; i++) {
             let f = this.uploadFileList[i];
             let mime = f.type;
@@ -775,44 +805,52 @@ string, url: string, pic: string, meta: string) {
                 delQ.push(i);
                 continue;
             }
-            if (i == this.uploadFileList.length - 1) {
+            if (i == this.uploadFileInfos.length - 1) {
                 console.log("Total size check:: total size is " + this.totalsize);
                 if (!this.checkTotalSize()) {
                     let msg = `Total size exceeds policy, delete some`;
                     this.disableUpload = true;
                 }
             }
-	var self = this;
-        this.showThumbnail(f, i, function(i:number, title: string, url:
-string, pic: any, meta:string) {
-            self.uploadFileInfos.push({
-                file: f,
-                id: id,
-                ts: ts,
-    		title: title,
-    		url: url,
-    		pic: pic,
-		size: size,
-                meta: meta,
-                bytesSent: '0 Bytes',
-                eta: '',
-                rate: '',
-            });
-	    });
             this.totalfiles += 1;
         }
-        this.uploadFileList = Array.from(this.uploadFileList).filter(function(value:
-any, index:any) {
+        var self = this;
+
+        var tmpFileList = Array.from(this.uploadFileList).filter(function(value, index) {
             return delQ.indexOf(index) == -1;
         });
+        console.log(tmpFileList);
+        for (var i = 0; i < tmpFileList.length; i++) {
+            let f = tmpFileList[i];
+            let mime = f.type;
+            let name = f.name;
+            let ts = f.lastModified.toLocaleString();
+            this.totalsize += f.size;
+            let size = this.humanFileSize(f.size);
+            let id = 'a' + i;
+
+            this.showThumbnail(f, i, function(i: number, title: string, url:
+                string, pic: any, meta: string) {
+                self.uploadFileInfos.push({
+                    file: f,
+                    id: id,
+                    ts: ts,
+                    title: title,
+                    url: url,
+                    pic: pic,
+                    size: size,
+                    meta: meta,
+                    bytesSent: '0 Bytes',
+                    eta: '',
+                    rate: '',
+                });
+            });
+        }
         this.disableUpload = false;
     }
 
-    delItem(index:number) {
-        let list = [...this.uploadFileList];
-        this.totalsize -= this.uploadFileList[index].size;
-        list.splice(index, 1);
-        this.uploadFileList = list;
+    delItem(index: number) {
+        this.totalsize -= this.uploadFileInfos[index].file.size;
         let list2 = [...this.uploadFileInfos];
         list2.splice(index, 1);
         this.uploadFileInfos = list2;

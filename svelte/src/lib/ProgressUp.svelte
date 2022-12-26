@@ -28,12 +28,8 @@ let darkMode = false;
 
        const delItem = (index:number) => {
 	let s:number;
-	s = $uploadFileList[index].size;
+	s = $uploadFileInfos[index].size;
         $totalsize -= s;
-        $uploadFileList.splice(index, 1);
-	let list = $uploadFileList as File[];
-        $uploadFileList = list;
-
         $uploadFileInfos && $uploadFileInfos.splice(index, 1);
         checkTotalSize();
     };

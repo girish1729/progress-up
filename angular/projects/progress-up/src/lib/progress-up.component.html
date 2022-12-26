@@ -30,7 +30,6 @@ File upload</a>
     </li>
 
     <li class="px-4 text-dark-800 font-semibold py-2 rounded-t">
-
 	<a  (click)="toggleTabs(2)" [ngClass]=
 "{'px-4 text-dark-800 font-semibold py-2 rounded-t': openTab !== 2, 'bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px' : openTab === 2}"> Setup</a>
     </li> 
@@ -57,8 +56,6 @@ File upload</a>
 	<div id="uploadStats">
 		<h2 class="text-5xl leading-tight border-b"> {{details}} </h2>
 	</div>
-
-
 	</div>
 
 	<div  id='progress-up-form' class="bg-light p-4 rounded mx-auto">
@@ -90,8 +87,6 @@ height="100" src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/pub
 		</h2>
 	    </ng-template>
 	    
-	
-	
 	</div>
 	
 	<button [ngClass]=" disableUpload ? 'opacity-20': ''"
@@ -102,13 +97,11 @@ height="100" src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/pub
 px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
 	 Reset form
 	</button>
- 	
   </div>
 
 <!-- Second tab -->
 
   <div [ngClass]="{'hidden': openTab !== 2, 'block': openTab === 2}">
-
 	<h2>File upload config</h2>
 
         <form class="w-full max-w-lg">
@@ -118,7 +111,7 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	   font-bold mb-2" for="form.uploadURL">
 	          POST endpoint  
 	         </label>
-	         <input name='uploadURL' class="form-control"
+	         <input (onChange)="disableCheck()" name='uploadURL' class="form-control"
 [(ngModel)]='form.uploadURL' class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	   focus:outline-none focus:bg-light" type="text"
@@ -131,7 +124,7 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	   font-bold mb-2" for="form.filesName">
 	   	Name of files input field
 	         </label>
-	         <input name='filesName' class="form-control"
+	         <input (onChange)="disableCheck()" name='filesName' class="form-control"
 [(ngModel)]='form.filesName' class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
@@ -147,7 +140,8 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	         </label>
 	         <div class="relative">
 	           <select class='form-control' name='progType'
-[(ngModel)]='form.progType' (onChange)="setIndicator()" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
+[(ngModel)]='form.progType' class="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
+
 	   			<option default>Line</option>
 	   			<option>Fan</option>
 	   			<option>Bubble</option>
@@ -207,6 +201,7 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 	         </label>
 	         <div class="relative">
 	           <select [(ngModel)]='form.fileTypeFilter'
+(change)="applyFilter()"
   name='fileTypeFilter' class='form-control'
  class="block appearance-none w-full bg-gray-200 border
 
@@ -369,7 +364,6 @@ px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-ti
 	        <table class="min-w-full">
 	          <thead class="bg-light border-b">
 	            <tr>
-
 	              <th scope="col" class="text-sm font-medium text-dark-900 px-6 py-4 text-left">
 	               Param
 	              </th>
@@ -400,6 +394,71 @@ font-medium text-dark-900">filesName</td>
 	              <td class="text-sm text-dark-900 font-light px-6 py-4 whitespace-nowrap"> String </td>
 	              <td class="text-sm text-dark-900 font-light px-6
 py-4 whitespace-nowrap"> The name of files configured in backend </td>
+		   </tr>
+
+		   <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">Progress type</td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Select option </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The progress indicator one of 
+	   			Fan
+	   			Bubble
+	   			Energy
+	   			Rainbow
+	   			Stripe
+	   			Text
+	   			Circle
+	   			Line
+
+</td>
+		   </tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">File size limit </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Input range (integer) </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The max file size in MB</td>
+		   </tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">File size limit type</td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Slide toggle </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The limit is either per file or total</td>
+		   </tr>
+
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">File MIME type filter</td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Select dropdown </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The file types allowed/denied
+One of 
+- PDF only
+- Image only
+- Video only
+- Audio only
+- Zip only
+- Text only
+
+</td>
+</tr>
+
+	            <tr class="bg-light-100 border-b">
+	              <td class="px-6 py-4 whitespace-nowrap text-sm
+font-medium text-dark-900">Filter action </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> Slide toggle </td>
+	              <td class="text-sm text-dark-900 font-light px-6
+py-4 whitespace-nowrap"> The filter is either allow/deny</td>
 		   </tr>
 
 	            <tr class="bg-light-100 border-b">
@@ -451,24 +510,8 @@ py-4 whitespace-nowrap"> See below for possible options </td>
 	  </div>
 	</div>
 
-	<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/images/progress-types.png" alt="Progress-up types" />
-
-       <ul class='marker:text-green list-outside'>
-         <li class='pb-2'> There is also the ability to perform a test Upload to validate the endpoint.  </li>
-         <li>
-       	Remember that the configuration is active only for the session.
-         </li>
-       
-         <li>
-       	There is also statistics for upload and profiling available.
-         </li>
-         <li>
-       	If using absolute URL please ensure <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS is enabled</a>.
-         </li>
-       </ul>
   </div>
-
-  </div>
+</div>
 </div>
 <!-- XXX tabs -->
 
@@ -640,5 +683,6 @@ dark:text-white">
     </section>
   </div>
 </div>
+
 </main> <!--- XXX same as body -->
 

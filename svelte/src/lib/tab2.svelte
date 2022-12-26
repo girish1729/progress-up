@@ -6,9 +6,67 @@
     let authEnabled:boolean = false;
 
 
+    const applyFilter = () => {
+   let filt = $inputs.fileTypeFilter;
+            let action;
+            if (this.filterLabel === "Allow file type") {
+                action = "allow";
+            } else {
+                action = "deny";
+            }
+            console.log("Setting:: mime " + filt + " action " + action);
+      
+        switch (filt) {
+            case "All":
+                break;
+            case "PDF only":
+                filtFiles = {
+                    "type": "application/pdf",
+                    "action": action
+                };
+                break;
+            case "Image only":
+                filtFiles = {
+                    "type": "image",
+                    "action": action
+                };
+                break;
+            case "Video only":
+                filtFiles = {
+                    "type": "video",
+                    "action": action
+                };
+                break;
+            case "Audio only":
+                filtFiles = {
+                    "type": "audio",
+                    "action": action
+                };
+                break;
+            case "Zip only":
+                filtFiles = {
+                    "type": "application/zip",
+                    "action": action
+                };
+                break;
+            case "Text only":
+                filtFiles = {
+                    "type": "text",
+                    "action": action
+                };
+                break;
+            default:
+                console.log("Filter not understood");
+                break;
+        }
+
+    };
+
+
      const handleChange = (event) => {
         const name = event.target.name;
         const value = event.target.value;
+	applyFilter();
     };
 
     const needsAuth = (event) => {
@@ -96,6 +154,7 @@
         } else {
             sizeLabel = "Single file limit";
         }
+	applyFilter();
     };
 
     const toggleFilterQ = () => {
