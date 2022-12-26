@@ -106,10 +106,21 @@ Still work in progress. Watch out.
 Some are here. For complete list 
 [go here](https://progress-up.live/screenshots)
 
-- ![Video of Drag and drop](https://raw.githubusercontent.com/girish1729/progress.up/main/images/dnd.gif)
-- ![Video of upload](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-video.gif)
-- ![Dark mode](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-darkmode.png)
-- ![Preview](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-preview2.png)
+### Video of drag and drop
+
+ ![Video of Drag and drop](https://raw.githubusercontent.com/girish1729/progress.up/main/images/dnd.gif)
+
+### Video of upload 
+
+ ![Video of upload](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-video.gif)
+
+### Dark mode
+
+ ![Dark mode](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-darkmode.png)
+
+### Preview before upload
+
+ ![Preview](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-preview2.png)
 
 ## Why should you care?
 
@@ -129,7 +140,7 @@ touch](https://twitter.com/girish1729).
 
 ## Screencast of upload
 
-![Progess.up screencast](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-html5-upload-capture.gif)
+![Progess.up screencast](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-uploading.gif)
 
 ## Resources for file upload
 
