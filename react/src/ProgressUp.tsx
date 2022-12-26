@@ -91,7 +91,7 @@ function ProgressUp() {
     const [totalsize, setSize] = useState(0);
     const [sizeLabel, setSLabel] = useState("Single file limit");
     const [filterLabel, setFLabel] = useState("Allow file type");
-    let uploadFileList = [];
+    let uploadFileList: File[] = [];
     let startUploadts = 0;
     let errAlert = false;
     const inputRef: any = useRef();
@@ -104,7 +104,7 @@ function ProgressUp() {
     const onDrop = (files: any) => {
 	uploadFileList = files;
         console.log(files);
-        setupUpload(files);
+        setupUpload();
     };
 
     const {
@@ -239,15 +239,14 @@ function ProgressUp() {
         return (ret);
     };
 
-
     const spitStatistics = (idx: number) => {
-        if (uploadFileList && idx == uploadFileList.length - 1) {
+        if (uploadFileInfos && idx == uploadFileInfos.length - 1) {
             let endUploadts = Date.now();
             let totaltime = endUploadts - startUploadts;
             let tsize = humanFileSize(totalsize);
 
             var ts = new Date().toLocaleString();
-            var tot = uploadFileList.length;
+            var tot = uploadFileInfos.length;
             var status = totalfiles == tot ? true : false;
 
             var details = totalfiles + '/' + tot +
@@ -333,7 +332,7 @@ function ProgressUp() {
     };
 
 
-    const clearAll = (event) => {
+    const clearAll = (event:any) => {
 	console.log("ClearAll()::");
  	if(event !== undefined) {	
 		console.log("Clear file list()::");
@@ -352,7 +351,7 @@ function ProgressUp() {
     const applyFilter = () => {
         let filt = inputs.fileTypeFilter;
             let action;
-            if (this.filterLabel === "Allow file type") {
+            if (filterLabel === "Allow file type") {
                 action = "allow";
             } else {
                 action = "deny";
@@ -464,7 +463,7 @@ function ProgressUp() {
         return true;
     };
 
-    const checkTotalSize = (totalSize) => {
+    const checkTotalSize = (totalSize:number) => {
         if (inputs.sizeLimitType == "Total limit") {
             if (totalSize <= (inputs.fileSizeLimit * 1024 * 1024)) {
                 return true;
@@ -664,7 +663,7 @@ const printBannedBanner = (file: File, id: string, size: string, ts: string,
 const setupUpload = () => {
 
     let totalSize = 0;
-    clearAll();
+    clearAll(undefined);
     console.log("SetupUpload():...");
 
     if (!uploadFileList) {
@@ -703,11 +702,11 @@ const setupUpload = () => {
 			setBut(true);
 		}
 	}
-        setSize(prev => {prev + f.size});
-        setNumberFiles(prev => {prev + 1});
+        setSize(prev => prev + f.size);
+        setNumberFiles(prev => prev + 1);
     } // XXX for loop 
 
-  var tmpFileList = Array.from(this.uploadFileList).filter(function(value, index) {
+  var tmpFileList = Array.from(uploadFileList).filter(function(value, index) {
                 return delQ.indexOf(index) == -1;
             });
 	    console.log(tmpFileList);
@@ -715,9 +714,9 @@ const setupUpload = () => {
                 let f = tmpFileList[i];
                 let mime = f.type;
                 let name = f.name;
-                let ts = f.lastModifiedDate.toLocaleDateString();
-                this.totalsize += f.size;
-                let size = this.humanFileSize(f.size);
+                let ts = new Date(f.lastModified).toLocaleDateString();
+                totalSize += f.size;
+                let size = humanFileSize(f.size);
                 let id = 'a' + i;
           
         showThumbnail(f,
@@ -743,7 +742,6 @@ const setupUpload = () => {
 
     setBut(false);
     console.log("SetupUpload():... done");
-    console.log(uploadFileList);
 };
 
 const delItem = (index: number) => {
