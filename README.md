@@ -7,6 +7,14 @@
 This is a HTML5 multiple files Upload plugin with progress bar
 indicator.
 
+Plugins for 
+
+- Vue
+- Svelte
+- Angular
+- React
+
+available.
 
 This uses the [HTTP File API](https://www.w3.org/TR/FileAPI/) to show continuous progress.
 
@@ -24,7 +32,6 @@ Demos are [here](https://progress-up.live/demo)
 
 ### The backend is [CORS enabled](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
 
-
 So you don't have to deal with pesky same origin security errors with
 file uploads. Also each plugin enables you to name the file array in the
 HTML `<input>` file selector.
@@ -33,8 +40,6 @@ By specifying backend URL and file name in `input HTML element` file
 upload is no longer a hassle.
 
 With that out of the way let us focus on the frontend.
-
-**Instructions for frameworks coming soon**
 
 ```shell
 $ git clone https://github.com/girish1729/progress.up
@@ -51,7 +56,7 @@ $ mkdir uploads
 $ npm start
 ```
 
-Go to [http://localhost:2324](http://localhost:2324)
+Go to [https://localhost:2324](https://localhost:2324)
 
  and try uploading files.
 
@@ -89,14 +94,22 @@ Still work in progress. Watch out.
 ## Detailed instructions
 
 - [Developer docs](https://progress-up.live/docs)
-- [Live demo](https://progress-up.live/demo)
-- [Vue](https://progress-up.live/vue)
-- [Svelte.ts](https://progress-up.live/svelte)
-- [Angular](https://progress-up.live/angular)
-- [React](https://progress-up.live/react)
+- [Live demo](https://progress-up.live/progress-up-html5)
+- [Vue](https://progress-up.live/docs/vue-docs)
+- [Svelte.ts](https://progress-up.live/docs/svelte-docs)
+- [Angular](https://progress-up.live/docs/angular-docs)
+- [React](https://progress-up.live/docs/react-docs)
  
 
 ## Screenshots gallery
+
+Some are here. For complete list 
+[go here](https://progress-up.live/screenshots")
+
+- [Video of Drag and drop](https://raw.githubusercontent.com/girish1729/progress.up/main/images/dnd.gif)
+- [Video of upload](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-video.gif)
+- [Dark mode](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-darkmode.png)
+- [Preview](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-preview2.png)
 
 ### This is before upload
 
@@ -114,7 +127,7 @@ cool way to give user feedback.
 Nowadays HTML5 File API based progress is the best way to achieve your
 goal.
 
-This project was written ground up with latest technology as of Oct 22,
+This project was written ground up with latest technology as of Dec 26,
 2022.
 
 However the status of project is `Beta`.
