@@ -96,13 +96,13 @@ export default {
         },
 
         spitStatistics(self, idx) {
-            if (idx == self.uploadFileList.length - 1) {
+            if (idx == self.uploadFileInfos.length - 1) {
                 let endUploadts = Date.now();
                 self.totaltime = `${endUploadts - self.startUploadts}`;
                 self.totalsize = self.humanFileSize(self.totalsize);
 
                 var ts = new Date().toLocaleString();
-                var tot = self.uploadFileList.length;
+                var tot = self.uploadFileInfos.length;
                 var status = self.totalfiles == tot ? "<img src=\"https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/success-icon.svg\" >" : "<img src=\"https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg\" >";
                 self.details = `${self.totalfiles}/${tot} files of size ${this.totalsize} sent in ${self.totaltime} ms`;
                 var id = self.statsTable.length + 1;
