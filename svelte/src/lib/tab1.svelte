@@ -7,7 +7,8 @@
 <script lang='ts'>
    import ldBar from 'https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/progressBar/loading-bar.js';
    import {afterUpdate} from 'svelte';
-   import {inputs, totalsize, totalfiles, statsTable, progressBars, errInfos, uploadFileInfos, uploadFileList } from './store.js';
+   import {inputs, totalsize, totalfiles, statsTable, progressBars,
+errInfos, uploadFileInfos, uploadFileList, errMsg } from './store.js';
   let isUploadDisabled = true;
   let browseInput;
   let details = '';
@@ -166,13 +167,13 @@ var fileTypeIcons = {
 
 
     const spitStatistics = (idx: number) => {
-        if ($uploadFileList && idx == $uploadFileList.length - 1) {
+        if ($uploadFileInfos && idx == $uploadFileInfos.length - 1) {
             let endUploadts = Date.now();
             let totaltime = endUploadts - startUploadts;
             let tsize = humanFileSize($totalsize);
 
             var ts = new Date().toLocaleString();
-            var tot = $uploadFileList.length;
+            var tot = $uploadFileInfos.length;
             var status = $totalfiles == tot ? true : false;
 
             details = $totalfiles + '/' + tot +
@@ -215,18 +216,9 @@ var fileTypeIcons = {
         isUploadDisabled = true;
 	$totalfiles = 0;
 	$totalsize = 0;
+	$errMsg = '';
 	thumbNailsDone = false;
         console.log("Cleared");
-    };
-
- const checkTotalSize =() => {
-        if ($inputs.sizeLimitType == "Total limit") {
-            if ($totalsize <= ($inputs.fileSizeLimit * 1024 * 1024)) {
-                return true;
-            }
-            return false;
-        }
-        return true;
     };
 
     const wordCount = (val:string) => {
@@ -253,6 +245,38 @@ var fileTypeIcons = {
         }
         return false;
     };
+    const checkSize = (size) => {
+            console.log("Size check:: size is " +
+		this.humanFileSize(size));
+            if (this.sizeLabel == "Single file limit") {
+            	console.log("Single file limit");
+                if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
+                    return true;
+                }
+            	console.log("Single file limit exceeded");
+                return false;
+            }
+            console.log("Total limit");
+            return true;
+        };
+        const checkTotalSize = () => {
+            console.log("Total size check:: total size is " +
+              humanFileSize(this.totalsize));
+            console.log("Allowed size is :: " +
+              humanFileSize($inputs.fileSizeLimit * 1024 * 1024));
+            if (sizeLabel == "Total limit") {
+                if (totalsize <= ($inputs.fileSizeLimit * 1024 * 1024)) {
+		    $errMsg = '';
+                    isUploadDisabled = false;
+                    return true;
+                }
+                isUploadDisabled = true;
+                $errMsg = `Total size exceeds policy, delete some files`;
+            	console.log("Total file limit exceeded");
+                return false;
+            }
+            return true;
+        },
 
     const checkSize = (size:number) => {
         if ($inputs.sizeLimitType == "Single file limit") {
@@ -488,7 +512,6 @@ var tmpFileList = Array.from(this.uploadFileList).filter(function(value, index) 
                 let mime = f.type;
                 let name = f.name;
                 let ts = f.lastModifiedDate.toLocaleDateString();
-                this.totalsize += f.size;
                 let size = this.humanFileSize(f.size);
                 let id = 'a' + i;
    
@@ -565,7 +588,12 @@ transition duration-150 ease-in-out  {isUploadDisabled ? ' opacity-20' : ''}" >B
 px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
 	 Reset form
 	</button>
- 	
+
+ 	<h3 class="text-red-500 text-3xl">
+		{errMsg}
+	</h3>
+
+
 
 
 

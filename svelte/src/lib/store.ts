@@ -49,4 +49,5 @@ export const statsTable = writable<statsTableType[]> ([]);
 export const openTab = writable(1);
 export const totalsize = writable(0);
 export const totalfiles = writable(0);
+export const errMsg = writable('');
 

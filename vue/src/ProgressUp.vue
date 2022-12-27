@@ -8,6 +8,7 @@ export default {
         return {
             openTab: 1,
             errAlert: false,
+	    errMsg: '',
             thumbNailsDone: false,
             dragging: false,
             totalsize: 0,
@@ -28,9 +29,9 @@ export default {
                 pass: '',
                 progType: 'Rainbow',
                 fileSizeLimit: 10,
-                sizeLimitType: "Single file limit",
+                sizeLimitType: false,
                 fileTypeFilter: "All",
-                fileTypeAction: "Allow file type"
+                fileTypeAction: false
             },
 
             fileTypes: {
@@ -230,7 +231,6 @@ export default {
         clearAll() {
             this.details = "";
             this.uploadFileInfos = [];
-            this.uploadFiles = [];
             this.errInfos = [];
             this.progressBars = [];
             this.totalfiles = 0;
@@ -238,6 +238,7 @@ export default {
             this.totaltime = 0;
             this.disableUpload = true;
             this.thumbNailsDone = false;
+	    this.errMsg = '';
             console.log("Cleared");
 
         },
@@ -381,31 +382,62 @@ export default {
         },
 
         checkSize(size) {
-            if (this.sizeLimitType == "Single file limit") {
+            console.log("Size check:: size is " +
+		this.humanFileSize(size));
+            if (this.sizeLabel == "Single file limit") {
+            	console.log("Single file limit");
                 if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
                     return true;
                 }
+            	console.log("Single file limit exceeded");
+                return false;
+            }
+            console.log("Total limit");
+            return true;
+        },
+
+        checkTotalSize() {
+            console.log("Total size check:: total size is " +
+              this.humanFileSize(this.totalsize));
+            console.log("Allowed size is :: " +
+              this.humanFileSize(this.form.fileSizeLimit * 1024 * 1024));
+            if (this.sizeLabel == "Total limit") {
+                if (this.totalsize <= (this.form.fileSizeLimit * 1024 * 1024)) {
+		    this.errMsg = '';
+                    this.disableUpload = false;
+                    return true;
+                }
+                this.disableUpload = true;
+                this.errMsg = `Total size exceeds policy, delete some files`;
+            	console.log("Total file limit exceeded");
                 return false;
             }
             return true;
         },
 
-        checkTotalSize() {
-            if (this.sizeLimitType == "Total limit") {
-                if (totalsize <= (this.form.fileSizeLimit * 1024 * 1024)) {
-                    return true;
-                }
-                return false;
-            }
-            return true;
-        },
+    figuretype(type) {
+        if (type.includes('image')) {
+            return 'image';
+        } else if (type.includes('pdf')) {
+            return 'pdf';
+        } else if (type.includes('video')) {
+            return 'video';
+        } else if (type.includes('audio')) {
+            return 'audio';
+        } else if (type.includes('image')) {
+            return 'image';
+        } else if (type.includes('text')) {
+            return 'text';
+        }
+    },
         showThumbnail(f, i) {
             let id = 'a' + i;
             let target = '#' + id + '-thumb';
             let self = this;
             let type = f.file.type.split('/')[0];
-            switch (true) {
-                case /text/.test(f.file.type):
+            let ftype = this.figuretype(f.file.type);
+            switch (ftype) {
+                 case 'text':
                     console.log("Text type detected");
                     var reader = new FileReader();
                     reader.onload = (function(locf) {
@@ -439,7 +471,7 @@ export default {
                     })(f.file);
                     reader.readAsText(f.file);
                     break;
-                case /image/.test(f.file.type):
+                case 'image':
                     console.log("Image type detected");
                     var reader = new FileReader();
                     reader.onload = (function(locf) {
@@ -462,7 +494,7 @@ export default {
                     })(f.file);
                     reader.readAsDataURL(f.file);
                     break;
-                case /audio/.test(f.file.type):
+                 case 'audio':
                     console.log("Audio type detected");
                     var audioUrl = window.URL.createObjectURL(f.file);
                     f.thumb = [
@@ -473,11 +505,11 @@ export default {
                         f.file.name,
                         '" alt="',
                         f.file.name,
-                        '" > </source> </audio> '
+                        '" /> </audio> '
                     ].join('');
                     f.meta = f.file.name;
                     break;
-                case /video/.test(f.file.type):
+                 case 'video':
                     console.log("Video type detected");
                     var videoUrl = window.URL.createObjectURL(f.file);
                     f.thumb = [
@@ -488,11 +520,11 @@ export default {
                         f.file.name,
                         '" alt="',
                         f.file.name,
-                        '" > </source> </video> '
+                        '" />  </video> '
                     ].join('');
                     f.meta = f.file.name;
                     break;
-                case /pdf/.test(f.file.type):
+                 case 'pdf':
                     console.log("PDF type detected");
                     var pdfURL = window.URL.createObjectURL(f.file);
                     f.meta = f.file.name;
@@ -545,6 +577,7 @@ export default {
             }
         },
         setupUpload() {
+	    this.clearAll();
             var delQ = [];
             for (var i = 0; i < this.uploadFileList.length; i++) {
                 let f = this.uploadFileList[i];
@@ -555,27 +588,23 @@ export default {
                 let size = this.humanFileSize(f.size);
                 let id = 'a' + i;
                 if (!this.checkSize(f.size)) {
-                    console.log("Size check:: size is " + f.size);
                     let msg = `${name} too big for upload`;
                     console.log(msg);
-                    this.printBannedBanner(f, id, ts, msg);
+                    this.printBannedBanner(f, id, size, ts, msg);
                     delQ.push(i);
                     continue;
                 }
                 if (!this.checkFilter(mime)) {
                     console.log("Hit banned file type:: filter issue");
                     let msg = `${name} cannot be uploaded due to policy.`;
-                    this.printBannedBanner(f, id, ts, msg);
+                    this.printBannedBanner(f, id, size, ts, msg);
                     delQ.push(i);
                     continue;
                 }
                 if (i == this.uploadFileList.length - 1) {
                     console.log("Total size check:: total size is " +
-                        this.totalsize);
-                    if (!this.checkTotalSize()) {
-                        let msg = `Total size exceeds policy, delete some`;
-                        this.disableUpload = true;
-                    }
+                        this.humanFileSize(this.totalsize));
+                    this.checkTotalSize();
                 }
                 this.totalfiles += 1;
             }
@@ -589,7 +618,6 @@ export default {
                 let mime = f.type;
                 let name = f.name;
                 let ts = f.lastModifiedDate.toLocaleDateString();
-                this.totalsize += f.size;
                 let size = this.humanFileSize(f.size);
                 let id = 'a' + i;
                 this.uploadFileInfos.push({
@@ -607,7 +635,9 @@ export default {
             this.disableUpload = false;
         },
         delItem(index) {
+	    console.log(this.totalsize);
             this.totalsize -= this.uploadFileInfos[index].file.size;
+	    console.log(this.totalsize);
             let list = [...this.uploadFileInfos];
             list.splice(index, 1);
             this.uploadFileInfos = list;
@@ -687,7 +717,7 @@ Help</a>
 
  <div :class="{'hidden': openTab !== 1, 'block': openTab === 1}">
 	<div id='progress-up-statsArea'>
-		<h2 className="text-5xl leading-tight border-b">{{details}} </h2>
+		<h2 class="text-5xl leading-tight border-b">{{details}} </h2>
 	</div>
 
 
@@ -707,14 +737,14 @@ Help</a>
 
 
 	<div id="config">
-		<h2 className="leading-tight pb-2">
+		<h2 class="leading-tight pb-2">
 	  <div v-if="form.uploadURL && form.filesName">
 			&#128202; Progress type <span
-className='text-sm'>{{form.progType}}</span>  
+class='text-sm'>{{form.progType}}</span>  
 			 &#128228; Upload URL <span
-className='text-sm'>{{form.uploadURL}}</span> 
+class='text-sm'>{{form.uploadURL}}</span> 
 		&#128218; FilesName <span
-className='text-sm'>{{form.filesName}}</span>
+class='text-sm'>{{form.filesName}}</span>
 	   </div>
            <div v-else>
 		Please configure first
@@ -736,6 +766,9 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	 Reset Form
 	</button>
  	
+	<h3 class="text-red-500 text-3xl">
+		{{errMsg}}
+	</h3>
 
   </div>
 
@@ -813,7 +846,7 @@ step=10 />
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="sizeToggle" >
 <span>{{sizeLabel}}</span>
-  <input v-model="form.sizeToggle" name="sizeToggle"
+  <input v-model="form.sizeLimitType" name="sizeToggle"
 @change="toggleSizeQ(e)" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
 bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6"></span>
@@ -1208,7 +1241,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
   text-light-100 dark:text-white">
    <div class="bg-red-600 dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
   
-      <div title="Removed from uploads" class="absolute cursor-pointer top-0 right-0 mr-2 dark:bg-white" >
+      <div title="Removed from uploads" class="absolute top-0 right-0 mr-2 dark:bg-white" >
             <img width="25" height="25" src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg" />
       </div>
   
@@ -1244,9 +1277,7 @@ py-4 whitespace-nowrap"> See below for possible options </td>
           </div>
          </div>
          </div>
-  
   		{{err.msg}}
-  	 
       </div>
       </section>
   </div>

@@ -91,6 +91,7 @@ function ProgressUp() {
     const [totalsize, setSize] = useState(0);
     const [sizeLabel, setSLabel] = useState("Single file limit");
     const [filterLabel, setFLabel] = useState("Allow file type");
+    const [errMsg, setErr] = useState('');
     let uploadFileList: File[] = [];
     let startUploadts = 0;
     let errAlert = false;
@@ -345,6 +346,7 @@ function ProgressUp() {
         setBut(true);
         setNumberFiles(0);
         setSize(0);
+	setErr('');
         console.log("Cleared");
     };
 
@@ -452,26 +454,40 @@ function ProgressUp() {
         }
         return false;
     };
-
-    const checkSize = (size: number) => {
-        if (inputs.sizeLimitType == "Single file limit") {
-        if (size <= (inputs.fileSizeLimit * 1024 * 1024)) {
-            return true;
-        }
-        return false;
-        }
-        return true;
-    };
-
-    const checkTotalSize = (totalSize:number) => {
-        if (inputs.sizeLimitType == "Total limit") {
-            if (totalSize <= (inputs.fileSizeLimit * 1024 * 1024)) {
-                return true;
+    const checkSize = (size:number) => {
+            console.log("Size check:: size is " +
+		humanFileSize(size));
+            if (sizeLabel == "Single file limit") {
+            	console.log("Single file limit");
+                if (size <= (inputs.fileSizeLimit * 1024 * 1024)) {
+                    return true;
+                }
+            	console.log("Single file limit exceeded");
+                return false;
             }
-            return false;
-        }
-        return true;
-    };
+            console.log("Total limit");
+            return true;
+        };
+
+        const checkTotalSize = (tot: number) => {
+            console.log("Total size check:: total size is " +
+              humanFileSize(tot));
+            console.log("Allowed size is :: " +
+              humanFileSize(inputs.fileSizeLimit * 1024 * 1024));
+            if (sizeLabel == "Total limit") {
+                if (tot <= (inputs.fileSizeLimit * 1024 * 1024)) {
+		    setErr('');
+                    setBut(false);
+                    return true;
+                }
+                setBut(true);
+                setErr(`Total size exceeds policy, delete some files`);
+            	console.log("Total file limit exceeded");
+                return false;
+            }
+            return true;
+        };
+
     const pFileReader = (file: File) => {
         return new Promise((resolve, reject) => {
             var reader = new FileReader()
@@ -661,11 +677,9 @@ const printBannedBanner = (file: File, id: string, size: string, ts: string,
 };
 
 const setupUpload = () => {
-
     let totalSize = 0;
     clearAll(undefined);
     console.log("SetupUpload():...");
-
     if (!uploadFileList) {
         return;
     }
@@ -715,7 +729,6 @@ const setupUpload = () => {
                 let mime = f.type;
                 let name = f.name;
                 let ts = new Date(f.lastModified).toLocaleDateString();
-                totalSize += f.size;
                 let size = humanFileSize(f.size);
                 let id = 'a' + i;
           
@@ -894,6 +907,12 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	 Reset form
 	</button>
  	
+  	 
+  	 <h3 className="text-red-500 text-3xl">
+		{errMsg}
+	</h3>
+
+
 
   </div>
 

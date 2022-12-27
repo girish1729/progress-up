@@ -51,9 +51,8 @@ var totalsize = 0;
 var totaltime = 0;
 var startUploadts = 0;
 var endUploadts = 0;
-var bytesSent = 0;
-var rate = 0;
-var eta = 0;
+
+var errMsg = '';
 
 const uplform = document.querySelector("#progress-up-form form");
 var upBut = document.getElementById("upButton");
@@ -70,6 +69,7 @@ uplform.addEventListener('dragleave', (e) =>
 const fileInput = document.getElementById("progress-up-fileInput");
 const progressArea = document.getElementById("progress-up-progressArea");
 const errArea = document.getElementById("progress-up-errArea");
+const errMsgArea = document.getElementById("progress-up-errMsgArea");
 const statsArea = document.getElementById("progress-up-statsArea");
 const configSummary = document.getElementById("progress-up-configSummary");
 
@@ -95,6 +95,7 @@ function clearAll() {
     progressArea.innerHTML = '';
     statsArea.innerHTML = '';
     errArea.innerHTML = '';
+    errMsgArea.innerHTML = '';
     configSummary.innerHTML = '';
     uploadFileList = [];
     uploadFileList = [];
@@ -160,10 +161,27 @@ function wordCount(val) {
     };
 }
 
+function figuretype(type) {
+        if (type.includes('image')) {
+            return 'image';
+        } else if (type.includes('pdf')) {
+            return 'pdf';
+        } else if (type.includes('video')) {
+            return 'video';
+        } else if (type.includes('audio')) {
+            return 'audio';
+        } else if (type.includes('image')) {
+            return 'image';
+        } else if (type.includes('text')) {
+            return 'text';
+        }
+    }
+
 function showThumbnail(f, i) {
     let id = 'a' + i;
-    switch (true) {
-        case /text/.test(f.type):
+    let ftype = figuretype(f.file.type);
+    switch (ftype) {
+        case 'text':
             console.log("Text type detected");
             var reader = new FileReader();
             reader.onload = (function(f) {
@@ -187,7 +205,7 @@ function showThumbnail(f, i) {
             })(f);
             reader.readAsText(f);
             break;
-        case /image/.test(f.type):
+        case 'image':
             console.log("Image type detected");
             var reader = new FileReader();
             // Closure to capture the file information.  
@@ -205,7 +223,7 @@ function showThumbnail(f, i) {
             })(f);
             reader.readAsDataURL(f);
             break;
-        case /audio/.test(f.type):
+        case 'audio':
             console.log("Audio type detected");
             var audioUrl = window.URL.createObjectURL(f);
 
@@ -218,7 +236,7 @@ function showThumbnail(f, i) {
             ].join('');
             document.getElementById(f.name).innerHTML = icon;
             break;
-        case /video/.test(f.type):
+        case 'video':
             console.log("Video type detected");
             var videoUrl = window.URL.createObjectURL(f);
 
@@ -231,7 +249,7 @@ function showThumbnail(f, i) {
             ].join('');
             document.getElementById(f.name).innerHTML = icon;
             break;
-        case /pdf/.test(f.type):
+        case 'pdf':
             console.log("PDF type detected");
             var pdfURL = window.URL.createObjectURL(f);
             var loc = document.getElementById(f.name);
@@ -250,30 +268,51 @@ function checkFilter(mime) {
         console.log("No file type filters active");
         return true;
     }
-    if (mime.match(filtFiles.type) && filtFiles.action == "allow") {
+    if (filtFiles.action == "allow" && mime.match(filtFiles.type)  ) {
         return true;
     }
-    if (mime.match(filtFiles.type) && filtFiles.action == "deny") {
+    if ( filtFiles.action == "deny" && !mime.match(filtFiles.type) ) {
         return true;
     }
     return false;
 }
 
 function checkSize(size) {
-    if (size <= (allowedSize * 1024 * 1024)) {
-        return true;
-    }
-    return false;
-}
+            console.log("Size check:: size is " +
+		humanFileSize(size));
+    const label = document.querySelector("#progress-up-sizeToggle");
+            if (label.textContent == "Single file limit") {
+            	console.log("Single file limit");
+                if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
+                    return true;
+                }
+            	console.log("Single file limit exceeded");
+                return false;
+            }
+            console.log("Total limit");
+            return true;
+        }
 
 function checkTotalSize() {
-    if (totalsize <= (allowedTotalSize * 1024 * 1024)) {
-        enableUploadButton();
-        return true;
-    }
-    return false;
-}
-
+            console.log("Total size check:: total size is " +
+              humanFileSize(this.totalsize));
+            console.log("Allowed size is :: " +
+              this.humanFileSize(this.form.fileSizeLimit * 1024 * 1024));
+    const label = document.querySelector("#progress-up-sizeToggle");
+            if (label.textContent == "Total limit") {
+                if (this.totalsize <= (this.form.fileSizeLimit * 1024 * 1024)) {
+		    errMsgArea.innerHTML = '';
+		    enableUploadButton();
+                    return true;
+                }
+		    disableUploadButton();
+                    return true;
+                errMsgArea.innerHTML = `Total size exceeds policy, delete some files`;
+            	console.log("Total file limit exceeded");
+                return false;
+            }
+            return true;
+        }
 
 function printBannedBanner(errHTML, id, name, mime, ts, size, msg) {
 
@@ -565,10 +604,10 @@ async function uploadOneFile(f, idx) {
             }*/
             let perc = parseInt(e.progress * 100);
             progressBars[idx].set(perc);
-            bytesSent = humanFileSize(e.progress * size);
+            let bytesSent = humanFileSize(e.progress * size);
             Mysize = humanFileSize(size);
-            eta = e.estimated;
-            rate = (e.rate / 1024 / 1024).toFixed(2);
+            let eta = e.estimated;
+            let rate = (e.rate / 1024 / 1024).toFixed(2);
 
             p.innerHTML = `
 		<span>${bytesSent} of ${Mysize} uploaded  ${rate} MB/s ETA ${eta} s</span>

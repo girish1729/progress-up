@@ -117,7 +117,7 @@ export class ProgressUpComponent {
         "zip": "zip.svg"
     };
 
-
+    errMsg = '';
     filtFiles = {
         "type": "all",
         "action": "allow"
@@ -314,13 +314,13 @@ export class ProgressUpComponent {
 
 
     spitStatistics(self: any, idx: number) {
-        if (idx == self.uploadFileList.length - 1) {
+        if (idx == self.uploadFileInfos.length - 1) {
             let endUploadts = Date.now();
             self.totaltime = endUploadts - self.startUploadts;
             let totalsize: any = self.humanFileSize(self.totalsize);
 
             var ts = new Date().toLocaleDateString();
-            var tot = self.uploadFileList.length;
+            var tot = self.uploadFileInfos.length;
             var status = self.totalfiles == tot ?
                 '<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/success-icon.svg" >' :
                 '<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg" >';
@@ -401,6 +401,7 @@ export class ProgressUpComponent {
         this.uploadFileList = [];
         this.uploadFileInfos = [];
         this.errInfos = [];
+	this.errMsg = '';
         this.progressBars = [];
         this.totalfiles = 0;
         this.totalsize = 0;
@@ -523,28 +524,42 @@ export class ProgressUpComponent {
         }
         return false;
     }
-
+    
     checkSize(size: number) {
-        if (this.form.sizeLimitType == "Single file limit") {
-            if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
-                return true;
+            console.log("Size check:: size is " +
+		this.humanFileSize(size));
+            if (this.sizeLabel == "Single file limit") {
+            	console.log("Single file limit");
+                if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
+                    return true;
+                }
+            	console.log("Single file limit exceeded");
+                return false;
             }
-            return false;
+            console.log("Total limit");
+            return true;
         }
-        return true;
-    }
 
-    checkTotalSize() {
-        if (this.form.sizeLimitType == "Total limit") {
-            if (this.totalsize <= (this.form.fileSizeLimit * 1024 * 1024)) {
-                return true;
+        checkTotalSize() {
+            console.log("Total size check:: total size is " +
+              this.humanFileSize(this.totalsize));
+            console.log("Allowed size is :: " +
+              this.humanFileSize(this.form.fileSizeLimit * 1024 * 1024));
+            if (this.sizeLabel == "Total limit") {
+                if (this.totalsize <= (this.form.fileSizeLimit * 1024 * 1024)) {
+		    this.errMsg = '';
+                    this.disableUpload = false;
+                    return true;
+                }
+                this.disableUpload = true;
+                this.errMsg = `Total size exceeds policy, delete some files`;
+            	console.log("Total file limit exceeded");
+                return false;
             }
-            return false;
+            return true;
         }
-        return true;
-    }
 
-    showThumbnail(f: File, i: number, cb: Function) {
+       showThumbnail(f: File, i: number, cb: Function) {
         let self = this;
         let meta = '';
         let pic: any = '';
@@ -807,10 +822,7 @@ export class ProgressUpComponent {
             }
             if (i == this.uploadFileInfos.length - 1) {
                 console.log("Total size check:: total size is " + this.totalsize);
-                if (!this.checkTotalSize()) {
-                    let msg = `Total size exceeds policy, delete some`;
-                    this.disableUpload = true;
-                }
+                this.checkTotalSize();
             }
             this.totalfiles += 1;
         }
@@ -825,7 +837,6 @@ export class ProgressUpComponent {
             let mime = f.type;
             let name = f.name;
             let ts = f.lastModified.toLocaleString();
-            this.totalsize += f.size;
             let size = this.humanFileSize(f.size);
             let id = 'a' + i;
 
