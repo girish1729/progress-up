@@ -42,6 +42,8 @@ var fileTypeIcons = {
 
 /* XXX Internal variables */
 var uploadFileList = [];
+var uploadFileInfos = [];
+var errInfos = [];
 /* stats variables */
 
 var progressBars = [];
@@ -97,8 +99,7 @@ function clearAll() {
     errArea.innerHTML = '';
     errMsgArea.innerHTML = '';
     configSummary.innerHTML = '';
-    uploadFileList = [];
-    uploadFileList = [];
+    uploadFileInfos = [];
     progressBars = [];
     totalfiles = 0;
     totalsize = 0;
@@ -149,7 +150,7 @@ function setIconImage(name, type, title) {
         '" title="', title,
         '" class="h-9 w-9" />'
     ].join('');
-    document.getElementById(name).innerHTML = icon;
+    document.getElementById(name + '-thumb').innerHTML = icon;
 }
 
 function wordCount(val) {
@@ -184,7 +185,7 @@ function showThumbnail(f, i) {
         case 'text':
             console.log("Text type detected");
             var reader = new FileReader();
-            reader.onload = (function(f) {
+            reader.onload = (function(theFile) {
                 return function(e) {
                     txt = e.target.result;
                     wc = wordCount(txt);
@@ -195,15 +196,13 @@ function showThumbnail(f, i) {
    			Words: ${wc.words}
    			Lines: ${wc.lines}
   			`);
-
-
                     var dataArray = txt.split("\n");
                     dataArray = dataArray.slice(0, 20);
                     txt = dataArray.join("\n");
-                    setIconImage(f.name, f.type, txt);
+                    setIconImage(f.file.name, f.file.type, txt);
                 };
-            })(f);
-            reader.readAsText(f);
+            })(f.file);
+            reader.readAsText(f.file);
             break;
         case 'image':
             console.log("Image type detected");
@@ -218,14 +217,14 @@ function showThumbnail(f, i) {
                         '" alt="', theFile.name,
                         '" class="w-12 h-12" />'
                     ].join('');
-                    document.getElementById(theFile.name).innerHTML = thumb;
+                    document.getElementById(theFile.name + '-thumb').innerHTML = thumb;
                 };
-            })(f);
-            reader.readAsDataURL(f);
+            })(f.file);
+            reader.readAsDataURL(f.file);
             break;
         case 'audio':
             console.log("Audio type detected");
-            var audioUrl = window.URL.createObjectURL(f);
+            var audioUrl = window.URL.createObjectURL(f.file);
 
             var icon = [
                 '<audio controls width="125" height="125"><source src="',
@@ -234,11 +233,11 @@ function showThumbnail(f, i) {
                 '" alt="', name,
                 '" class="h-9 w-9" </source> </audio>'
             ].join('');
-            document.getElementById(f.name).innerHTML = icon;
+            document.getElementById(f.name + '-thumb').innerHTML = icon;
             break;
         case 'video':
             console.log("Video type detected");
-            var videoUrl = window.URL.createObjectURL(f);
+            var videoUrl = window.URL.createObjectURL(f.file);
 
             var icon = [
                 '<video controls width="125" height="125"><source src="',
@@ -247,17 +246,17 @@ function showThumbnail(f, i) {
                 '" alt="', name,
                 '" class="h-9 w-9"</source> </video>'
             ].join('');
-            document.getElementById(f.name).innerHTML = icon;
+            document.getElementById(f.name + '-thumb').innerHTML = icon;
             break;
         case 'pdf':
             console.log("PDF type detected");
-            var pdfURL = window.URL.createObjectURL(f);
-            var loc = document.getElementById(f.name);
+            var pdfURL = window.URL.createObjectURL(f.file);
+            var loc = document.getElementById(f.file.name + '-thumb');
             PDFObject.embed(pdfURL, loc);
             break;
         default:
             console.log("default type detected");
-            setIconImage(f.name, f.type, f.name);
+            setIconImage(f.file.name, f.file.type, f.file.name);
             break;
     }
 }
@@ -283,7 +282,7 @@ function checkSize(size) {
     const label = document.querySelector("#progress-up-sizeToggle");
             if (label.textContent == "Single file limit") {
             	console.log("Single file limit");
-                if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
+                if (size <= (fileSizeLimit * 1024 * 1024)) {
                     return true;
                 }
             	console.log("Single file limit exceeded");
@@ -295,12 +294,12 @@ function checkSize(size) {
 
 function checkTotalSize() {
             console.log("Total size check:: total size is " +
-              humanFileSize(this.totalsize));
+              humanFileSize(totalsize));
             console.log("Allowed size is :: " +
-              this.humanFileSize(this.form.fileSizeLimit * 1024 * 1024));
+              humanFileSize(fileSizeLimit * 1024 * 1024));
     const label = document.querySelector("#progress-up-sizeToggle");
             if (label.textContent == "Total limit") {
-                if (this.totalsize <= (this.form.fileSizeLimit * 1024 * 1024)) {
+                if (totalsize <= (fileSizeLimit * 1024 * 1024)) {
 		    errMsgArea.innerHTML = '';
 		    enableUploadButton();
                     return true;
@@ -314,8 +313,18 @@ function checkTotalSize() {
             return true;
         }
 
-function printBannedBanner(errHTML, id, name, mime, ts, size, msg) {
+function printBannedBanner(errHTML, file, id, name, mime, ts, size, msg) {
 
+    errInfos.push({
+                file: file,
+                id: id,
+                meta: '',
+                size: size,
+                thumb: '',
+                ts: ts,
+                msg: msg
+            });
+        
     errHTML.push(
         `
 <section class="bg-red-200 m-4 p-4 mt-4 mb-4 transition-colors
@@ -330,7 +339,7 @@ src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/ic
     <div class="flex flex-wrap -mx-2 mb-8">
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
-		<div id="${name}"></div>
+		<div id="${name}-thumb"></div>
          </div>
       </div>
       <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4">
@@ -374,7 +383,7 @@ dark:text-white">
 }
 
 function createBars() {
-    for (var i = 0; i < uploadFileList.length; i++) {
+    for (var i = 0; i < uploadFileInfos.length; i++) {
         var selector = '#a' + i;
         var bar = new ldBar(selector, {
             preset: progType.toLowerCase()
@@ -385,16 +394,20 @@ function createBars() {
 }
 
 function createThumbnails() {
-    for (var i = 0; i < uploadFileList.length; i++) {
-        f = uploadFileList[i];
+    for (var i = 0; i < uploadFileInfos.length; i++) {
+        f = uploadFileInfos[i];
         showThumbnail(f, i);
     }
+    for (var i = 0; i < errInfos.length; i++) {
+        f = errInfos[i];
+        showThumbnail(f, i);
+    }
+
 }
 
 function createSection(prog, id, i, name, ts, mime, size) {
     prog.push(
         `
-
 <section id="${id}-section" class="m-4 p-4 mt-4 mb-4 transition-colors
 text-light-100 dark:text-white">
  <div class="bg-dark dark:bg-gray dark:text-white rounded-md border border-red-800 rounded py-3 px-3 border-gray-300 text-gray-600 dark:text-white relative">
@@ -406,7 +419,7 @@ text-light-100 dark:text-white">
     <div class="flex -mx-2 mb-8">
       <div class="w-1/3 md:w-1/3 lg:w-1/4 px-2 mb-4">
          <div class="h-12 text-sm text-grey-dark flex items-left justify-left">
-		<div id="${name}"></div>
+		<div id="${name}-thumb"></div>
          </div>
       </div>
 
@@ -454,6 +467,7 @@ dark:text-white">
 }
 
 function setupUpload() {
+    clearAll();
     var progressHTML = [];
     var errHTML = [];
     var delQ = [];
@@ -469,14 +483,14 @@ function setupUpload() {
             console.log("Size check:: size is " + f.size);
             msg = `${name} too big for upload`;
             console.log(msg);
-            printBannedBanner(errHTML, id, name, mime, ts, size, msg);
+            printBannedBanner(errHTML, f, id, name, mime, ts, size, msg);
             delQ.push(i);
             continue;
         }
         if (!checkFilter(mime)) {
             console.log("Hit banned file type:: filter issue");
             msg = `${name} cannot be uploaded due to policy.`;
-            printBannedBanner(errHTML, id, name, mime, ts, size, msg);
+            printBannedBanner(errHTML, f, id, name, mime, ts, size, msg);
             delQ.push(i);
             continue;
         }
@@ -488,24 +502,43 @@ function setupUpload() {
             }
         }
         totalfiles += 1;
-        createSection(progressHTML, id, i, name, ts, mime, size);
     }
 
-    progressArea.innerHTML = progressHTML.join('');
     errArea.innerHTML = errHTML.join('');
-    createThumbnails();
-    uploadFileList = uploadFileList.filter(function(value, index) {
+    var tmpFileList = Array.from(uploadFileList).filter(function(value, index) {
         return delQ.indexOf(index) == -1;
     });
+    for (var i = 0; i < tmpFileList.length; i++) {
+        let f = tmpFileList[i];
+        let mime = f.type;
+        let name = f.name;
+        let ts = f.lastModifiedDate.toLocaleDateString();
+        let size = humanFileSize(f.size);
+        let id = 'a' + i;
+        uploadFileInfos.push({
+                    file: f,
+                    id: id,
+                    meta: '',
+                    size: size,
+                    ts: ts,
+                    thumb: '',
+                    bytesSent: ' ',
+                    eta: ' ',
+                    rate: ' ',
+                });
+        createSection(progressHTML, id, i, name, ts, mime, size);
+    }
+    progressArea.innerHTML = progressHTML.join('');
     createBars();
+    createThumbnails();
     enableUploadButton();
 }
 
 function delItem(index) {
-    let list = [...uploadFileList];
-    totalsize -= upLoadFileList[index].size;
+    let list = [...uploadFileInfos];
+    totalsize -= upLoadFileInfos[index].size;
     list.splice(index, 1);
-    uploadFileList = list;
+    uploadFileInfos = list;
     el = document.getElementById('a' + index + '-section');
     el.remove();
     checkTotalSize();
@@ -538,14 +571,14 @@ class='text-sm'>${filesName}</span>
 }
 
 function spitStatistics(idx) {
-    if (idx == uploadFileList.length - 1) {
+    if (idx == uploadFileInfos.length - 1) {
         endUploadts = Date.now();
         totaltime = `${endUploadts - startUploadts}`;
         totalsize = humanFileSize(totalsize);
-        tot = uploadFileList.length;
+        tot = uploadFileInfos.length;
 
         var ts = new Date().toLocaleString();
-        var tot = uploadFileList.length;
+        var tot = uploadFileInfos.length;
         var status = totalfiles == tot ?
             '<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/success-icon.svg" >' :
             '<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/icons/misc/failure-icon.svg" >';
@@ -635,8 +668,8 @@ async function uploadOneFile(f, idx) {
 function uploadAll() {
     console.log("Starting upload...");
     startUploadts = Date.now();
-    for (i = 0; i < uploadFileList.length; i++) {
-        f = uploadFileList[i];
+    for (i = 0; i < uploadFileInfos.length; i++) {
+        f = uploadFileInfos[i];
         uploadOneFile(f, i);
     }
 }
@@ -863,30 +896,29 @@ function dataFileDnD() {
             );
         },
         remove(index) {
-            let files = [...this.files];
+            let files = [...files];
             files.splice(index, 1);
 
-            this.files = createFileList(files);
+            files = createFileList(files);
         },
         drop(e) {
             let removed, add;
-            let files = [...this.files];
+            let files = [...files];
 
             removed = files.splice(this.fileDragging, 1);
             files.splice(this.fileDropping, 0, ...removed);
 
-            this.files = createFileList(files);
-
+            files = createFileList(files);
             this.fileDropping = null;
             this.fileDragging = null;
         },
         dragenter(e) {
             let targetElem = e.target.closest("[draggable]");
 
-            this.fileDropping = targetElem.getAttribute("data-index");
+            fileDropping = targetElem.getAttribute("data-index");
         },
         dragstart(e) {
-            this.fileDragging = e.target
+            fileDragging = e.target
                 .closest("[draggable]")
                 .getAttribute("data-index");
             e.dataTransfer.effectAllowed = "move";
