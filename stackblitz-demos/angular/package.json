@@ -19,7 +19,7 @@
     "@angular/platform-browser": "^15.1.0-next.2",
     "@angular/platform-browser-dynamic": "^15.1.0-next.2",
     "@npmcli/fs": "*",
-    "progress-up-angular": "*",
+    "progress-up-angular": "../../angular/dist/progress-up/",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

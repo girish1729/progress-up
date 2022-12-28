@@ -15,11 +15,6 @@ errInfos, uploadFileInfos, uploadFileList, errMsg } from './store.js';
   let startUploadts = 0;
   let thumbNailsDone = false;
 
-    var filtFiles = {
-        "type": "all",
-        "action": "allow"
-    };
-
 
    
   let isDragActive = false;
@@ -80,13 +75,13 @@ var fileTypeIcons = {
             console.log('Enable upload button if Files in Q');
             if (uploadFileInfos && uploadFileInfos.length > 0) {
                 console.log('Enabled upload button');
-                setBut(false);
+            	isUploadDisabled = false;
             } else {
-                setBut(true);
+            	isUploadDisabled = true;
 	    }
         } else {
             console.log('Disable upload without configuration');
-            setBut(true);
+            isUploadDisabled = true;
         }
 
         console.log("DOM Updated");
@@ -232,25 +227,27 @@ var fileTypeIcons = {
 
 
     const checkFilter = (mime:string) => {
+	console.log($inputs.filtFiles.type);
+	console.log($inputs.filtFiles.action);
         /* No filter XXX */
-        if (filtFiles.type == 'all') {
+        if ($inputs.filtFiles.type == 'all') {
             console.log("No file type filters active");
             return true;
         }
-        if (filtFiles.action == "allow" && mime.match(filtFiles.type) ) {
+        if ($inputs.filtFiles.action == "allow" && mime.match($inputs.filtFiles.type) ) {
             return true;
         }
-        if (filtFiles.action == "deny" && !mime.match(filtFiles.type) ) {
+        if ($inputs.filtFiles.action == "deny" && !mime.match($inputs.filtFiles.type) ) {
             return true;
         }
         return false;
     };
     const checkSize = (size) => {
             console.log("Size check:: size is " +
-		this.humanFileSize(size));
-            if (this.sizeLabel == "Single file limit") {
+		humanFileSize(size));
+            if (sizeLabel == "Single file limit") {
             	console.log("Single file limit");
-                if (size <= (this.form.fileSizeLimit * 1024 * 1024)) {
+                if (size <= ($inputs.fileSizeLimit * 1024 * 1024)) {
                     return true;
                 }
             	console.log("Single file limit exceeded");
@@ -261,32 +258,22 @@ var fileTypeIcons = {
         };
         const checkTotalSize = () => {
             console.log("Total size check:: total size is " +
-              humanFileSize(this.totalsize));
+              humanFileSize($totalsize));
             console.log("Allowed size is :: " +
               humanFileSize($inputs.fileSizeLimit * 1024 * 1024));
             if (sizeLabel == "Total limit") {
-                if (totalsize <= ($inputs.fileSizeLimit * 1024 * 1024)) {
+                if ($totalsize <= ($inputs.fileSizeLimit * 1024 * 1024)) {
 		    $errMsg = '';
                     isUploadDisabled = false;
                     return true;
                 }
                 isUploadDisabled = true;
-                $errMsg = `Total size exceeds policy, delete some files`;
+                $errMsg = "Total size exceeds policy, delete some files";
             	console.log("Total file limit exceeded");
                 return false;
             }
             return true;
         },
-
-    const checkSize = (size:number) => {
-        if ($inputs.sizeLimitType == "Single file limit") {
-        if (size <= ($inputs.fileSizeLimit * 1024 * 1024)) {
-            return true;
-        }
-        return false;
-	}
-	return true;
-    };
 
     const printBannedBanner = (file:File, id: string, ts:string,
 msg:string)  => {
@@ -503,7 +490,7 @@ const showThumbnail = (f:fileInfo, i: number, cb) => {
             $totalfiles += 1;
         }
 
-var tmpFileList = Array.from(this.uploadFileList).filter(function(value, index) {
+var tmpFileList = Array.from($uploadFileList).filter(function(value, index) {
                 return delQ.indexOf(index) == -1;
             });
 	    console.log(tmpFileList);
@@ -512,7 +499,7 @@ var tmpFileList = Array.from(this.uploadFileList).filter(function(value, index) 
                 let mime = f.type;
                 let name = f.name;
                 let ts = f.lastModifiedDate.toLocaleDateString();
-                let size = this.humanFileSize(f.size);
+                let size = humanFileSize(f.size);
                 let id = 'a' + i;
    
             let fInfo; 
@@ -590,7 +577,7 @@ px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-
 	</button>
 
  	<h3 class="text-red-500 text-3xl">
-		{errMsg}
+		{$errMsg}
 	</h3>
 
 

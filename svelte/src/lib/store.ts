@@ -10,8 +10,11 @@ export const inputs = writable({
         pass: "",
         fileSizeLimit: 10,
         sizeLimitType: "Single file limit",
-        fileTypeFilter: "All",
-        fileTypeAction: "Allow file type"
+        fileTypeAction: "Allow file type",
+	filtFiles : {
+        "type": "all",
+        "action": "allow"
+    	}
 });
 
 type statsTableType = {

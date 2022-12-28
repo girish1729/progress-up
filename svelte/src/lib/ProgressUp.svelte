@@ -1,8 +1,6 @@
 <script lang='ts'>
    import {openTab, totalsize, totalfiles, inputs, uploadFileList, uploadFileInfos, errInfos, progressBars, } from './store.js';
 
-
-
 let darkMode = false;
 
     let disableUpload = true;

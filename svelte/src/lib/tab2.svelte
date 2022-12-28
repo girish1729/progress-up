@@ -4,53 +4,55 @@
    let sizeLabel =  "Single file limit";
     let filterLabel:string =  "Allow file type";
     let authEnabled:boolean = false;
+    let fileTypeFilter:string = "All";
 
 
     const applyFilter = () => {
-   let filt = $inputs.fileTypeFilter;
+	console.log($inputs);
+   	let filt = fileTypeFilter;
             let action;
-            if (this.filterLabel === "Allow file type") {
+            if (filterLabel === "Allow file type") {
                 action = "allow";
             } else {
                 action = "deny";
             }
-            console.log("Setting:: mime " + filt + " action " + action);
+       console.log("Setting:: mime " + filt + " action " + action);
       
         switch (filt) {
             case "All":
                 break;
             case "PDF only":
-                filtFiles = {
+                $inputs.filtFiles = {
                     "type": "application/pdf",
                     "action": action
                 };
                 break;
             case "Image only":
-                filtFiles = {
+                $inputs.filtFiles = {
                     "type": "image",
                     "action": action
                 };
                 break;
             case "Video only":
-                filtFiles = {
+                $inputs.filtFiles = {
                     "type": "video",
                     "action": action
                 };
                 break;
             case "Audio only":
-                filtFiles = {
+                $inputs.filtFiles = {
                     "type": "audio",
                     "action": action
                 };
                 break;
             case "Zip only":
-                filtFiles = {
+                $inputs.filtFiles = {
                     "type": "application/zip",
                     "action": action
                 };
                 break;
             case "Text only":
-                filtFiles = {
+                $inputs.filtFiles = {
                     "type": "text",
                     "action": action
                 };
@@ -59,6 +61,8 @@
                 console.log("Filter not understood");
                 break;
         }
+        console.log("Setting:: " + $inputs.filtFiles.type);
+        console.log("Setting:: " + $inputs.filtFiles.action);
 
     };
 
@@ -83,7 +87,7 @@
         }
         console.log($inputs.fileSizeLimit);
         console.log($inputs.sizeLimitType);
-        console.log($inputs.fileTypeFilter);
+        console.log(fileTypeFilter);
         console.log($inputs.fileTypeAction);
 	$openTab = 1;
     };
@@ -148,7 +152,7 @@
     };
 
     const toggleSizeQ = () => {
-        let val = inputs.sizeLimitType;
+        let val = $inputs.sizeLimitType;
         if (val) {
             sizeLabel = "Total limit";
         } else {
@@ -158,7 +162,7 @@
     };
 
     const toggleFilterQ = () => {
-        let val = inputs.fileTypeAction;
+        let val = $inputs.fileTypeAction;
         if (val) {
             filterLabel = "Deny file type";
         } else {
@@ -177,7 +181,7 @@
 	          POST endpoint  
 	         </label>
 	         <input name="inputs.uploadURL" bind:value={$inputs.uploadURL} 
-        onChange={handleChange}
+        on:change={handleChange}
 class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	   focus:outline-none focus:bg-light" type="text"
@@ -191,7 +195,7 @@ CORS]" />
 	   font-bold mb-2" for="progress-up-filesName">
 	   	Name of files input field
 	         </label>
-	         <input name="inputs.filesName" bind:value={$inputs.filesName} onChange={handleChange} id='filesName' class="appearance-none block w-full bg-gray-200
+	         <input name="inputs.filesName" bind:value={$inputs.filesName} on:change={handleChange} id='filesName' class="appearance-none block w-full bg-gray-200
 	   text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	    type="text" placeholder="Name of files input field" />
@@ -205,7 +209,7 @@ CORS]" />
 	           Progress indicator type
 	         </label>
 	         <div class="relative">
-	           <select name='progType' onChange={setIndicator}
+	           <select name='progType' on:change={setIndicator}
 bind:value={$inputs.progType} class="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
@@ -233,7 +237,7 @@ bind:value={$inputs.progType} class="block appearance-none w-full bg-gray-200 bo
 for="fileSizeLimit" />
 <span>File Size Limit (MB)</span>
   <input name="fileSizeLimit" bind:value={$inputs.fileSizeLimit}
-onChange={handleChange} class="m-6 p-6 form-range" type="range"
+on:change={handleChange} class="m-6 p-6 form-range" type="range"
  min="10" max="1000" step="10" 
  />                      
 <output id="sizeLimit" name="sizeLimit"
@@ -248,7 +252,7 @@ for="fileSizeLimit">{$inputs.fileSizeLimit}</output>
 for="sizeToggle" >
 <span>{sizeLabel}</span>
   <input name="inputs.sizeLimitType" bind:value={$inputs.sizeLimitType}
-onChange={toggleSizeQ}
+on:change={toggleSizeQ}
 
  type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
@@ -266,19 +270,19 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 	          File type Filters 
 	         </label>
 	         <div class="relative">
-	           <select name="progress-up-filter"
-onChange={handleChange} bind:value={$inputs.fileTypeFilter}
+	           <select name="fileTypeFilter"
+on:change={handleChange} id="fileTypeFilter" bind:value={fileTypeFilter}
  class="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	   >
-	   			<option>All</option>
-	   			<option>PDF only</option>
-	   			<option>Image only</option>
-	   			<option>Video only</option>
-	   			<option>Audio only</option>
-	   			<option>Zip only</option>
-	   			<option>Text only</option>
+	   			<option value="All" >All</option>
+	   			<option value="PDF only" >PDF only</option>
+	   			<option value="Image only">Image only</option>
+	   			<option value="Video only">Video only</option>
+	   			<option value="Audio only">Audio only</option>
+	   			<option value="Zip only">Zip only</option>
+	   			<option value="Text only">Text only</option>
 	           </select>
 	           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-dark-700">
 	             <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
@@ -290,7 +294,7 @@ onChange={handleChange} bind:value={$inputs.fileTypeFilter}
 <label class="relative flex justify-between items-center p-2 text-xl"
 for="filterAction" >
 <span>{filterLabel}</span>
-  <input name='inputs.fileTypeAction' onChange={toggleFilterQ}
+  <input name='inputs.fileTypeAction' on:change={toggleFilterQ}
 
 type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
   <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1
@@ -303,7 +307,7 @@ bg-green-600 rounded-full duration-300 ease-in-out peer-checked:bg-red-600 after
 	         <span class="text-sm">
 	           HTTP Auth required?
 	         </span>
-	         <input name='inputs.authEnabled' onChange={needsAuth}
+	         <input name='inputs.authEnabled' on:change={needsAuth}
 checked={inputs.authEnabled || false} class="mr-2 leading-tight" type="checkbox" />
 	       </label>
 	      </div>
@@ -318,7 +322,7 @@ text-dark-700 text-xs font-bold mb-2" for="authType">
 	              Auth type
 	            </label>
 	            <div class="relative">
-	              <select id='authType' onChange={setAuth}
+	              <select id='authType' on:change={setAuth}
 bind:value={$inputs.authType} class="block appearance-none w-full bg-gray-200 border border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-light focus:border-gray-500" >
 	                <option>HTTP basic auth</option>
 	                <option>HTTP digest auth</option>
@@ -335,7 +339,8 @@ bind:value={$inputs.authType} class="block appearance-none w-full bg-gray-200 bo
 	      font-bold mb-2" for="user">
 	             Username  
 	            </label>
-	            <input name='inputs.user' bind:value={$inputs.user} onChange={handleChange} class="appearance-none block w-full bg-gray-200
+	            <input name='inputs.user' bind:value={$inputs.user}
+on:change={handleChange} class="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight
 	      focus:outline-none focus:bg-light"  type="text"
 	      placeholder="username" />
@@ -347,7 +352,7 @@ bind:value={$inputs.authType} class="block appearance-none w-full bg-gray-200 bo
 	      font-bold mb-2" for="progress-up-pass">
 	      	Password
 	            </label>
-	            <input name='inputs.pass' bind:value={$inputs.pass} onChange={handleChange} class="appearance-none block w-full bg-gray-200
+	            <input name='inputs.pass' bind:value={$inputs.pass} on:change={handleChange} class="appearance-none block w-full bg-gray-200
 	      text-dark-700 border border-gray-200 rounded py-3 px-4 leading-tight
 	      focus:outline-none focus:bg-light focus:border-gray-500"
 	       type="password" placeholder="Password" />
