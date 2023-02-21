@@ -1,10 +1,10 @@
-# Progress.up HTML5 File Upload Progress indicator
+# Progress.up - HTML5 File Upload Progress indicator
 
 ![Progess.up](https://raw.githubusercontent.com/girish1729/progress.up/main//images/progress-up-logo.svg)
 
 ## What is this?
 
-This is a HTML5 multiple files Upload plugin with progress bar
+Progress-up is a HTML5 multiple files Upload plugin with progress bar
 indicator.
 
 Plugins for 
@@ -14,13 +14,14 @@ Plugins for
 - Angular
 - React
 
-available.
+are available.
 
 This uses the [HTTP File API](https://www.w3.org/TR/FileAPI/) to show continuous progress.
 
-
 >This is the very first attempt to create a clean no frills upload plugin
 >in 100% Typescript. Now available for Angular, Vue, Svelte and React.
+
+Uses the HTML input file for file uploads.
 
 [Canonical home page](https://progress-up.live)
 
@@ -133,11 +134,6 @@ goal.
 This project was written ground up with latest technology as of Dec 26,
 2022.
 
-However the status of project is `Beta`.
-
-Most testing is needed. If you volunteer please [get in
-touch](https://twitter.com/girish1729).
-
 ## Screencast of upload
 
 ![Progess.up screencast](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-uploading.gif)
@@ -153,20 +149,7 @@ touch](https://twitter.com/girish1729).
 - [Uploading files over HTTP
   article](https://themightyprogrammer.dev/article/uploading-files)
 
-## Next steps
-
-Plugins for 
-
-- [Vue.js](https://www.vuejs.org) 
-- [Svelte](https://www.svelte.dev) 
-- [Angular 12](https://angular.io) 
-- [React JS](https://reactjs.org) 
-
-are on the way.
-
-- Adding drag and drop and image preview.
-
-- Options for the plugin (theming, backend endpoint)
+## Collaboration
 
 If you wish to collaborate or send pull requests 
 please get in touch using my Github profile.
