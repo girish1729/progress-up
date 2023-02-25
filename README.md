@@ -90,16 +90,46 @@ This is a clean way to get progress indicator for file uploads.
 
 ## Instructions for other frameworks
 
-Still work in progress. Watch out.
+
+```shell
+	$ npm install progress-up-angular
+# or 
+	$ yarn add progress-up-angular
+```
+### Vue 3
+
+```shell
+	$ npm install progress-up-vue
+# or 
+	$ yarn add progress-up-vue
+```
+### React.js
+
+```shell
+	$ npm install progress-up-react
+# or 
+	$ yarn add progress-up-react
+```
+### Svelte
+
+```shell
+	$ npm install progress-up-svelte
+# or 
+	$ yarn add progress-up-svelte
+`
 
 ## Detailed instructions
 
 - [Developer docs](https://progress-up.live/docs)
-- [Live demo](https://progress-up.live/progress-up-html5)
 - [Vue](https://progress-up.live/docs/vue-docs)
 - [Svelte.ts](https://progress-up.live/docs/svelte-docs)
 - [Angular](https://progress-up.live/docs/angular-docs)
 - [React](https://progress-up.live/docs/react-docs)
+
+## Demos
+
+- [Native demo](https://progress-up.live/progress-up-html5)
+- [Other demos](https://progress-up.live/demo)
  
 
 ## Screenshots gallery
@@ -175,7 +205,6 @@ You can [follow me](https://twitter.com/intent/follow?screen_name=girish1729
 
 ## Tweet this to followers
 
-
 <a href="https://twitter.com/intent/tweet?text=Tweet+this+to+your+followers&url=https%3A%2F%2Fgithub.com%2Fgirish1729%2Fprogress.up&hashtags=github&original_referer=http%3A%2F%2Fgithub.com%2F&tw_p=tweetbutton" target="_blank">
   <img src="http://jpillora.com/github-twitter-button/img/tweet.png"
        alt="tweet button" title="Tweet this to your followers"></img>
@@ -183,5 +212,5 @@ You can [follow me](https://twitter.com/intent/follow?screen_name=girish1729
 
 ## Buy me a coffee to accelerate development
 
-<a href="https://www.buymeacoffee.com/girish1729" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="girish1729" data-color="#f3ecec" data-emoji="" data-font="Poppins" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#FFDD00" ></script>
 
