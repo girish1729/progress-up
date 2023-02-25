@@ -63,8 +63,6 @@ Go to [https://localhost:2324](https://localhost:2324)
 
 You may use manual upload.
 
-__Drag and drop into the shaded area is not implemented yet.__
-
 The uploaded files are present in `backend/uploads` folder.
 
 ## Backend
@@ -153,6 +151,11 @@ Some are here. For complete list
 
  ![Preview](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-preview2.png)
 
+### Fully uploaded view
+
+ ![Fully uploaded](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-fullyuploaded.png)
+
+
 ## Why should you care?
 
 If you allow multiple large files upload then a progress indicator is a
@@ -161,8 +164,8 @@ cool way to give user feedback.
 Nowadays HTML5 File API based progress is the best way to achieve your
 goal.
 
-This project was written ground up with latest technology as of Dec 26,
-2022.
+There is support for blocking uploads based on total size, individual
+size and MIME type.
 
 ## Screencast of upload
 
