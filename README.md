@@ -217,5 +217,5 @@ You can [follow me](https://twitter.com/intent/follow?screen_name=girish1729
 ## Buy me a coffee to accelerate development
 
 <a href="https://www.buymeacoffee.com/girish1729" target="_blank"><img
-src="https://cdn.buymeacoffee.com/buttons/default-gray.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
