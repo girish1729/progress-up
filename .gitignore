@@ -6,4 +6,5 @@ yarn.lock
 dist
 build
 yarn-error.log
+uploads
 
