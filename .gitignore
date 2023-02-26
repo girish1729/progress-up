@@ -1,6 +1,7 @@
 node_modules
 .angular
 package-lock.json
+package
 yarn.lock
 dist
 build
