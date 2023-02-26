@@ -114,7 +114,8 @@ This is a clean way to get progress indicator for file uploads.
 	$ npm install progress-up-svelte
 # or 
 	$ yarn add progress-up-svelte
-`
+```
+
 
 ## Detailed instructions
 
