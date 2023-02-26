@@ -1,0 +1,652 @@
+   #alternate Edit this page Wikipedia (en)
+
+netcat
+
+   From Wikipedia, the free encyclopedia
+   Jump to navigation Jump to search
+   This article contains instructions, advice, or how-to content. The
+   purpose of Wikipedia is to present facts, not to train. Please help
+   improve this article either by rewriting the how-to content or by
+   moving it to Wikiversity, Wikibooks or Wikivoyage. (June 2016)
+   "Ncat" redirects here. For other uses, see NCAT.
+
+   CAPTION: netcat
+
+   Netcat.png
+   The netcat command
+   Original author(s) *Hobbit*
+      Developer(s)    Avian Research
+    Initial release   October 28, 1995; 26 years ago (1995-10-28)^[1]
+   Stable release
+   1.10 / 2 January 2007; 15 years ago (2007-01-02)
+
+   Operating system Unix and Unix-like, DOS, Microsoft Windows, Windows CE
+   Type Network utility
+   License Original version: custom, permissive license
+   GNU Version: GPL
+   OpenBSD Version: BSD
+   Website nc110.sourceforge.io
+
+   netcat (often abbreviated to nc) is a computer networking utility for
+   reading from and writing to network connections using TCP or UDP. The
+   command is designed to be a dependable back-end that can be used
+   directly or easily driven by other programs and scripts. At the same
+   time, it is a feature-rich network debugging and investigation tool,
+   since it can produce almost any kind of connection its user could need
+   and has a number of built-in capabilities.
+
+   Its list of features includes port scanning, transferring files, and
+   port listening: as with any server, it can be used as a backdoor.
+
+   [ ]
+
+Contents
+
+     * 1 Features
+     * 2 Examples
+          + 2.1 Opening a raw connection to port 25
+          + 2.2 Performing an HTTP request
+          + 2.3 Setting up a one-shot webserver on port 8080 to present
+            the content of a file
+          + 2.4 Checking whether UDP ports (-u) 80–90 are open on
+            192.168.0.1 using zero mode I/O (-z)
+          + 2.5 Test whether UDP port is open: simple UDP server and
+            client
+          + 2.6 Pipe via UDP (-u) with a wait time (-w) of 1 second to
+            "loggerhost" on port 514
+          + 2.7 Port scanning
+          + 2.8 Proxying
+          + 2.9 Making any process a server
+     * 3 ncat
+          + 3.1 Encrypted file transfer
+     * 4 Ports and reimplementations
+     * 5 See also
+     * 6 References
+     * 7 External links
+
+Features[edit]
+
+   The original netcat's features include:^[2]
+     * Outbound or inbound connections, TCP or UDP, to or from any ports
+     * Full DNS forward/reverse checking, with appropriate warnings
+     * Ability to use any local source port
+     * Ability to use any locally configured network source address
+     * Built-in port-scanning capabilities, with randomization
+     * Built-in loose source-routing capability
+     * Can read command line arguments from standard input
+     * Slow-send mode, one line every N seconds
+     * Hex dump of transmitted and received data
+     * Optional ability to let another program service establish
+       connections
+     * Optional telnet-options responder
+
+   Rewrites like GNU's and OpenBSD's support additional features. For
+   example, OpenBSD's nc supports TLS, and GNU netcat natively supports a
+   tunneling mode supporting UDP and TCP (optionally allowing one to be
+   tunneled over the other) in a single command,^[3] where other versions
+   may require piping data from one netcat instance to another.
+
+Examples[edit]
+
+  Opening a raw connection to port 25[edit]
+
+nc mail.server.net 25
+
+  Performing an HTTP request[edit]
+
+printf "GET /index.html HTTP/1.0\r\nHost: info.cern.ch\r\n\r\n" | nc info.cern.c
+h 80
+
+   The full response (including HTTP headers) will be dumped to standard
+   output.
+
+  Setting up a one-shot webserver on port 8080 to present the content of a
+  file[edit]
+
+ { printf 'HTTP/1.0 200 OK\r\nContent-Length: %d\r\n\r\n' "$(wc -c < some.file)"
+; cat some.file; } | nc -l 8080
+
+   The file can then be accessed via a web browser under
+   http://servername:8080/. Netcat only serves the file once to the first
+   client that connects and then exits; it also provides the content
+   length for browsers that expect it. (This should work fine in a LAN,
+   but may potentially fail with any kind of firewall between.) In some
+   versions of netcat like netcat-traditional in Debian 8.6, you need to
+   specify -p before the port number.
+
+  Checking whether UDP ports (-u) 80–90 are open on 192.168.0.1 using zero mode
+  I/O (-z)[edit]
+
+nc -vzu 192.168.0.1 80-90
+
+   Note that UDP tests will always show as "open".
+
+  Test whether UDP port is open: simple UDP server and client[edit]
+
+   This test is useful, if you have shell access to the server that should
+   be tested, but you do not know whether there is a firewall blocking a
+   specific UDP port on the server.
+
+   On the listening host, i.e. on the server whose port needs to be
+   checked, do the following:
+nc -l -u -p 4172
+
+   On the sending host, do the following – note that servname is the
+   hostname of the listening host:
+nc -u servname 4172
+
+   If text typed on the sending host (type something and hit enter) is
+   displayed also on the listening host, then the UDP port 4172 is open.
+   If it is not open, you will get an error such as "Connection refused".
+
+   There is a caveat. On some machines, IPv6 may be the default IP version
+   to use by netcat. Thus, the host specified by the hostname is contacted
+   using IPv6, and the user might not know about this. Ports may appear
+   closed in the test, even though they would be open when using IPv4.
+   This can be difficult to notice and may cause the false impression that
+   the port is blocked, while it is actually open. You can force the use
+   of IPv4 by adding -4 to the options of the nc commands.
+
+  Pipe via UDP (-u) with a wait time (-w) of 1 second to "loggerhost" on port
+  514[edit]
+
+echo 'message' | nc -w 1 -u loggerhost 514
+
+  Port scanning[edit]
+
+   An uncommon use of netcat is port scanning. Netcat is not considered
+   the best tool for this job, but it can be sufficient (a more advanced
+   tool is nmap)
+nc -v -n -z -w 1 192.168.1.2 1-1000
+
+   The -n parameter here prevents DNS lookup, -z makes nc not receive any
+   data from the server, and -w 1 makes the connection timeout after 1
+   second of inactivity.
+
+  Proxying[edit]
+
+   Another useful behaviour is using netcat as a proxy. Both ports and
+   hosts can be redirected. Look at this example:
+nc -l 12345 | nc www.google.com 80
+
+   Port 12345 represents the request.
+
+   This starts a nc server on port 12345 and all the connections get
+   redirected to google.com:80. If a web browser makes a request to nc,
+   the request will be sent to google but the response will not be sent to
+   the web browser. That is because pipes are unidirectional. This can be
+   worked around with a named pipe to redirect the input and output.
+
+$ mkfifo backpipe
+$ nc -l 12345 0<backpipe | nc www.google.com 80 1>backpipe
+
+   The -c option may also be used with the ncat implementation:^[4]
+
+$ ncat -l 12345 -c 'nc www.google.com 80'
+
+   Using a named pipe is a more reliable method because using -c option
+   provides only a one-shot proxy.
+
+   Another useful feature is to proxy SSL connections. This way, the
+   traffic can not be viewed in wire sniffing applications such as
+   wireshark. This can be accomplished on UNIXes by utilizing mkfifo,
+   netcat, and openssl.
+
+ mkfifo tmp
+ mkfifo tmp2
+ nc -l 8080 -k > tmp < tmp2 &
+ while true; do
+  openssl s_client -connect www.google.com:443 -quiet < tmp > tmp2
+ done
+
+  Making any process a server[edit]
+
+   netcat can be used to make any process a network server. It can listen
+   on a port and pipe the input it receives to that process.
+
+   The -e option spawns the executable with its input and output
+   redirected via network socket.
+
+   For example, it is possible to expose a bourne shell process to remote
+   computers.
+
+   To do so, on a computer A with IP address 192.168.1.2, run this
+   command:
+
+$ nc -l -p 1234 -e /bin/sh
+
+   Then, from any other computer on the same network, one could run this
+   nc command:
+
+$ nc 192.168.1.2 1234
+ls -la
+total 4288
+drwxr-xr-x 15 dummy users 4096 2009-02-17 07:47 .
+drwxr-xr-x  4 dummy users 4096 2009-01-18 21:22 ..
+-rw-------  1 dummy users 8192 2009-02-16 19:30 .bash_history
+-rw-r--r--  1 dummy users  220 2009-01-18 21:04 .bash_logout
+...
+
+   In this way, the -e option can be used to create a rudimentary
+   backdoor. Some administrators perceive this as a risk and thus do not
+   allow netcat on a computer. The version of netcat developed by OpenBSD
+   that is often installed by default on distributions such as Debian and
+   Ubuntu lacks this option due to this potential as a security risk.
+
+ncat[edit]
+
+   Ncat is a similar tool to netcat provided by Nmap suite.^[5] "While
+   Ncat isn't built on any code from the “traditional” Netcat (or any
+   other implementation), Ncat is most definitely based on Netcat in
+   spirit and functionality."^[6]
+
+   Ncat features includes: ability to chain Ncats together, redirect both
+   TCP and UDP ports to other sites, SSL support, and proxy connections
+   via SOCKS4 or HTTP (CONNECT method) proxies (with optional proxy
+   authentication as well).^[7]
+     * Connect to example.org on TCP port 8080. : ncat example.org 8080
+     * Listen for connections on TCP port 8080. : ncat -l 8080
+     * Redirect TCP port 8080 on the local machine to host on port 80. : $
+       ncat --sh-exec "ncat example.org 80" -l 8080 --keep-open
+     * Bind to TCP port 8081 and attach /bin/bash for the world to access
+       freely. : $ ncat --exec "/bin/bash" -l 8081 --keep-open
+     * Bind a shell to TCP port 8081, limit access to hosts on a local
+       network, and limit the maximum number of simultaneous connections
+       to 3:
+
+                $ ncat --exec "/bin/bash" --max-conns 3 --allow
+                192.168.0.0/24 -l 8081 --keep-open
+
+     * Connect to smtphost:25 through a SOCKS4 server on port 1080: ncat
+       --proxy socks4host --proxy-type socks4 --proxy-auth user smtphost
+       25
+     * Create an HTTP proxy server on localhost port 8888. : ncat -l
+       --proxy-type http localhost 8888
+     * Send a file over TCP port 9899 from host2 (client) to host1
+       (server).
+user@HOST1$ ncat -l 9899 > outputfile
+user@HOST2$ ncat HOST1 9899 < inputfile
+
+     * Transfer in the other direction, turning Ncat into a “one file”
+       server.
+user@HOST1$ ncat -l 9899 < inputfile
+user@HOST2$ ncat HOST1 9899 > outputfile
+
+  Encrypted file transfer[edit]
+
+   Suppose you have an SSH tunnel, and you want to copy a file to the
+   remote machine. You could just scp it directly, but that opens up
+   another connection. The goal is to re-use the existing connection. You
+   can use ncat to do this:
+
+   When you SSH in, add in -L 31000:127.0.0.1:31000 (this is port
+   forwarding, sending everything from port 31000 on the remote machine to
+   the same port on the local machine)
+     * On the remote: ncat -lvnp 31000 127.0.0.1 > file
+     * On the local: ncat -v -w 2 127.0.0.1 31000 < file
+
+   No extra overhead. TCP takes care of error correction. SSH has already
+   encrypted the pipe.
+
+Ports and reimplementations[edit]
+
+   The original version of netcat was a Unix program. The last version
+   (1.10) was released in March 1996.^[2]
+
+   There are several implementations on POSIX systems, including rewrites
+   from scratch like GNU netcat^[8] or OpenBSD netcat,^[9] the latter of
+   which supports IPv6 and TLS. The OpenBSD version has been ported to the
+   FreeBSD base,^[10] Windows/Cygwin,^[11] and Linux.^[12] Mac OS X comes
+   with netcat installed as of OSX 10.13 or users can use MacPorts to
+   install a variant.^[13]
+
+   A DOS version of netcat called NTOOL is included in the FreeDOS Package
+   group Networking.^[14] It is based on the WatTCP stack and licensed
+   under the European Union Public Licence Version 1.1.^[15]
+
+   Known ports for embedded systems includes versions for Windows CE
+   (named "Netcat 4 wince"^[16]) or for the iPhone.^[17]
+
+   BusyBox includes by default a lightweight version of netcat.
+
+   Solaris 11 includes netcat implementation based on OpenBSD netcat.
+
+   Socat^[18] is a more complex variant of netcat. It is larger and more
+   flexible and has more options that must be configured for a given task.
+   On February 1, 2016, Santiago Zanella-Beguelin and Microsoft
+   Vulnerability Research issued a security advisory regarding a composite
+   Diffie-Hellman parameter which had been hard-coded into the OpenSSL
+   implementation of socat.^[19] The implausibility that a composite might
+   have been unintentionally introduced where a prime number is required
+   has led to the suspicion of sabotage to introduce a backdoor software
+   vulnerability.^[20] This socat bug affected version 1.7.3.0 and
+   2.0.0-b8 it was corrected in following releases from 1.7.3.1 and
+   2.0.0-b9.^[19]
+
+   Cryptcat^[21] is a version of netcat with integrated transport
+   encryption capabilities.
+
+   In the middle of 2005, Nmap announced another netcat incarnation called
+   Ncat.^[5] It features new possibilities such as "Connection Brokering",
+   TCP/UDP Redirection, SOCKS4 client and server support, ability to
+   "Chain" Ncat processes, HTTP CONNECT proxying (and proxy chaining), SSL
+   connect/listen support and IP address/connection filtering. Like Nmap,
+   Ncat is cross-platform.
+
+   On some systems, modified versions or similar netcat utilities go by
+   the command name(s) nc, ncat, pnetcat, socat, sock, socket, sbd.
+
+See also[edit]
+
+     * Free and open-source software portal
+
+     * List of Unix commands
+     * Nmap
+     * OpenSSL
+     * Telnet
+     * Plink
+     * Packet Sender
+     * Banner grabbing
+
+References[edit]
+
+    1. ^ Hobbit (1995-10-28). "New tool available: Netcat". Bugtraq
+       mailing list. Retrieved 2019-06-05.
+    2. ^ ^a ^b "Netcat 1.10". nc110.sourceforge.net. 2008-02-14. Retrieved
+       2019-06-05.
+    3. ^ Giovanni Giacobbi (2006-11-01). "The GNU Netcat project".
+       Retrieved 2020-03-22.
+    4. ^ "Ncat Users' Guide: Command Execution". Nmap. Retrieved
+       2019-06-05.
+    5. ^ ^a ^b "Ncat - Netcat for the 21st Century". Nmap. 2009-07-08.
+       Retrieved 2019-06-05.
+    6. ^ "ncat(1) - Ncat Reference Guide". manpages.debian.org.
+       2016-12-18. Retrieved 2019-06-05.
+    7. ^ "Ncat - Netcat for the 21st Century".
+    8. ^ Giovanni Giacobbi (2006-11-01). "The GNU Netcat project".
+       Retrieved 2019-06-05.
+    9. ^ "OpenBSD CVSWeb: /src/usr.bin/nc/". OpenBSD. Retrieved
+       2019-06-05.
+   10. ^ delphij (2005-02-06). "Contents of
+       /release/5.4.0/usr.bin/nc/Makefile". FreeBSD. Retrieved 2019-06-05.
+   11. ^ Thomas Linden (2011-03-02). "Netcat OpenBSD Cygwin Port
+       1.10.2.3". Daemon.de. Retrieved 2019-06-05.
+   12. ^ Debian netcat-openbsd
+   13. ^ "MacPorts Portfiles: netcat". MacPorts. Retrieved 2019-06-05.
+   14. ^ "ibiblio.org FreeDOS Group -- Networking". ibiblio. 2019-03-03.
+       Retrieved 2019-06-05.
+   15. ^ Jürgen Hoffmann (2018-11-03). "various tools". Retrieved
+       2019-06-05.
+   16. ^ Andreas Bischoff (2010-06-07). "Netcat 4 wince". Retrieved
+       2019-06-05.
+   17. ^ "Revision 835: /trunk/data/netcat". 2008-08-18. Retrieved
+       2019-06-05.
+   18. ^ "socat - Multipurpose relay". 2019-04-06. Retrieved 2019-06-05.
+   19. ^ ^a ^b "Socat security advisory 7". 2016-02-01. Retrieved
+       2019-06-05.
+   20. ^ Chirgwin, Richard (2016-02-03). "Socat slams backdoor, sparks
+       thrilling whodunit". The Register. Retrieved 2019-06-05.
+   21. ^ "CryptCat Project". 2005-10-18. Retrieved 2019-06-05.
+
+External links[edit]
+
+     * Official website
+     * nc(1) – Linux User Commands Manual
+
+     * v
+     * t
+     * e
+
+   Unix command-line interface programs and shell builtins
+
+   File system
+
+     * cat
+     * chmod
+     * chown
+     * chgrp
+     * cksum
+     * cmp
+     * cp
+     * dd
+     * du
+     * df
+     * file
+     * fuser
+     * ln
+     * ls
+     * mkdir
+     * mv
+     * pax
+     * pwd
+     * rm
+     * rmdir
+     * split
+     * tee
+     * touch
+     * type
+     * umask
+
+   Processes
+
+     * at
+     * bg
+     * crontab
+     * fg
+     * kill
+     * nice
+     * ps
+     * time
+
+   User environment
+
+     * env
+     * exit
+     * logname
+     * mesg
+     * talk
+     * tput
+     * uname
+     * who
+     * write
+
+   Text processing
+
+     * awk
+     * basename
+     * comm
+     * csplit
+     * cut
+     * diff
+     * dirname
+     * ed
+     * ex
+     * fold
+     * head
+     * iconv
+     * join
+     * m4
+     * more
+     * nl
+     * paste
+     * patch
+     * printf
+     * read
+     * sed
+     * sort
+     * strings
+     * tail
+     * tr
+     * uniq
+     * vi
+     * wc
+     * xargs
+
+   Shell builtins
+
+     * alias
+     * cd
+     * echo
+     * test
+     * unset
+     * wait
+
+   Searching
+
+     * find
+     * grep
+
+   Documentation
+
+     * man
+
+   Software development
+
+     * ar
+     * ctags
+     * lex
+     * make
+     * nm
+     * strip
+     * yacc
+
+   Miscellaneous
+
+     * bc
+     * cal
+     * expr
+     * lp
+     * od
+     * sleep
+     * true and false
+
+     * Categories
+          + Standard Unix programs
+          + Unix SUS2008 utilities
+     * List
+
+   Retrieved from
+   "https://en.wikipedia.org/w/index.php?title=Netcat&oldid=1098200241"
+
+   Categories:
+     * Free network management software
+     * Network analyzers
+     * Port scanners
+     * Unix network-related software
+     * Windows network-related software
+     * Free software programmed in C
+
+   Hidden categories:
+     * Articles needing cleanup from June 2016
+     * All pages needing cleanup
+     * Articles containing how-to sections
+     * Official website different in Wikidata and Wikipedia
+
+Navigation menu
+
+Personal tools
+
+     * Not logged in
+     * Talk
+     * Contributions
+     * Create account
+     * Log in
+
+Namespaces
+
+     * Article
+     * Talk
+
+   [ ] English
+
+Views
+
+     * Read
+     * Edit
+     * View history
+
+   [ ] More
+
+Search
+
+   ____________________ Search Go
+
+Navigation
+
+     * Main page
+     * Contents
+     * Current events
+     * Random article
+     * About Wikipedia
+     * Contact us
+     * Donate
+
+Contribute
+
+     * Help
+     * Learn to edit
+     * Community portal
+     * Recent changes
+     * Upload file
+
+Tools
+
+     * What links here
+     * Related changes
+     * Upload file
+     * Special pages
+     * Permanent link
+     * Page information
+     * Cite this page
+     * Wikidata item
+
+Print/export
+
+     * Download as PDF
+     * Printable version
+
+Languages
+
+     * Azərbaycanca
+     * Čeština
+     * Deutsch
+     * Español
+     * فارسی
+     * Français
+     * 한국어
+     * Bahasa Indonesia
+     * Italiano
+     * עברית
+     * ქართული
+     * Lombard
+     * Magyar
+     * 日本語
+     * Polski
+     * Português
+     * Română
+     * Русский
+     * Suomi
+     * Türkçe
+     * Українська
+     * 中文
+
+   Edit links
+
+     * This page was last edited on 14 July 2022, at 18:11 (UTC).
+     * Text is available under the Creative Commons Attribution-ShareAlike
+       License 3.0; additional terms may apply. By using this site, you
+       agree to the Terms of Use and Privacy Policy. Wikipedia® is a
+       registered trademark of the Wikimedia Foundation, Inc., a
+       non-profit organization.
+
+     * Privacy policy
+     * About Wikipedia
+     * Disclaimers
+     * Contact Wikipedia
+     * Mobile view
+     * Developers
+     * Statistics
+     * Cookie statement
+
+     * Wikimedia Foundation
+     * Powered by MediaWiki
