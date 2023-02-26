@@ -209,9 +209,8 @@ You can [follow me](https://twitter.com/intent/follow?screen_name=girish1729
 
 ## Tweet this to followers
 
-<a href="https://twitter.com/intent/tweet?text=Tweet+this+to+your+followers&url=https%3A%2F%2Fgithub.com%2Fgirish1729%2Fprogress.up&hashtags=github&original_referer=http%3A%2F%2Fgithub.com%2F&tw_p=tweetbutton" target="_blank">
-  <img src="http://jpillora.com/github-twitter-button/img/tweet.png"
-       alt="tweet button" title="Tweet this to your followers"></img>
+<a class="twitter-share-button mr-10" href="https://twitter.com/intent/tweet?text=Tweet+this+to+your+followers&url=https%3A%2F%2Fgithub.com%2Fgirish1729%2Fprogress.up&hashtags=github&original_referer=http%3A%2F%2Fgithub.com%2F&tw_p=tweetbutton" target="_blank" data-size="large">
+       <img src="images/tweet.png" alt="Tweet this" />
 </a>
 
 ## Buy me a coffee to accelerate development
