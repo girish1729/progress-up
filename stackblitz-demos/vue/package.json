@@ -7,8 +7,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "progress-up-vue": "0.0.8",
     "pdfobject": "*",
+    "progress-up-vue": "file:../../../npm-registry/progress-up/progress-up-vue",
     "vue": "^3.2.45"
   },
   "devDependencies": {
