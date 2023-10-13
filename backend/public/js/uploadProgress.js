@@ -58,8 +58,8 @@ var errMsg = '';
 
 const uplform = document.querySelector("#progress-up-form form");
 var upBut = document.getElementById("upButton");
-uplform.addEventListener("dragover", dragOver, false);
-uplform.addEventListener("drop", drop, false);
+uplform.addEventListener("dragover", dragOver);
+uplform.addEventListener("drop", drop );
 
 uplform.addEventListener('dragenter', (e) =>
     e.target.classList.add('bg-blue-400')
@@ -85,12 +85,12 @@ fileInput.onchange = ({
 
 function enableUploadButton() {
     upBut.removeAttribute('disabled');
-    upBut.classList.remove('opacity-20');
+    upBut.classList.remove('opacity-50');
 }
 
 function disableUploadButton() {
     upBut.setAttribute('disabled');
-    upBut.classList.add('opacity-20');
+    upBut.classList.add('opacity-50');
 }
 
 function clearAll() {
@@ -110,16 +110,17 @@ function clearAll() {
 }
 
 function dragOver(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
     evt.dataTransfer.dropEffect = 'copy';
+    evt.dataTransfer.effectAllowed = 'all';
 }
 
 function drop(evt) {
-    evt.stopPropagation();
     evt.preventDefault();
+    evt.target.classList.remove('bg-blue-400')
     var dropFiles = event.dataTransfer.files;
+    console.log(dropFiles);
     uploadFileList = dropFiles;
+    console.log(uploadFileList);
     setupUpload();
 }
 
@@ -475,7 +476,7 @@ function setupUpload() {
         let f = uploadFileList[i];
         let mime = f.type;
         let name = f.name;
-        let ts = f.lastModifiedDate.toLocaleDateString();
+        let ts = f.lastModified.toLocaleString();
         totalsize += f.size;
         let size = humanFileSize(f.size);
         let id = 'a' + i;
@@ -512,7 +513,7 @@ function setupUpload() {
         let f = tmpFileList[i];
         let mime = f.type;
         let name = f.name;
-        let ts = f.lastModifiedDate.toLocaleDateString();
+        let ts = f.lastModified.toLocaleString();
         let size = humanFileSize(f.size);
         let id = 'a' + i;
         uploadFileInfos.push({
@@ -536,7 +537,7 @@ function setupUpload() {
 
 function delItem(index) {
     let list = [...uploadFileInfos];
-    totalsize -= upLoadFileInfos[index].size;
+    totalsize -= uploadFileInfos[index].size;
     list.splice(index, 1);
     uploadFileInfos = list;
     el = document.getElementById('a' + index + '-section');
@@ -557,14 +558,16 @@ function dumpConfigSummary() {
     } else {
         configSummary.innerHTML = `
 	<div id="config">
-		<h2 class="leading-tight pb-2">
+		<h3 class="leading-tight px-6 pb-2">
 			&#128202; Progress type <span
 class='text-sm'>${progType}</span>  
+		<br/>
 			 &#128228; Upload URL <span
 class='text-sm'>${uploadURL}</span> 
+		<br/>
 		&#128218; FilesName <span
 class='text-sm'>${filesName}</span>
-		</h2>
+		</h3>
 	</div>
 	`;
     }
@@ -605,7 +608,7 @@ font-medium text-gray-900">${id}</td>
     `);
 
         upBut.setAttribute('disabled', true);
-        upBut.classList.add('opacity-20');
+        upBut.classList.add('opacity-50');
         populateStats();
         progressBars = [];
         totalfiles = 0;

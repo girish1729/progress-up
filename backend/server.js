@@ -1,6 +1,7 @@
 const express = require('express')
 const fs = require('fs');
-const https = require('https');
+//const https = require('https');
+const http = require('http');
 const multer = require('multer');
 const morgan = require('morgan-body');
 const cors = require('cors');
@@ -8,20 +9,13 @@ const tus = require('tus');
 const bodyParser = require('body-parser');
 const basicAuth = require('express-basic-auth');
 
-const cert = fs.readFileSync(__dirname + "/localhost.pem", 'utf-8');
-const key = fs.readFileSync(__dirname + "/localhost-key.pem", 'utf-8');
+//const cert = fs.readFileSync(__dirname + "/localhost.pem", 'utf-8');
+//const key = fs.readFileSync(__dirname + "/localhost-key.pem", 'utf-8');
 const app = express();
 morgan(app);
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname + "/public"));
-
-/*
-app.use(basicAuth({
-    users: { 'admin': 'supersecret' }
-}))
-*/
-
 
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ 
@@ -48,6 +42,11 @@ app.post('/uploadmultiple', upload.array('uploadFiles', 12), (req, res, next) =>
     res.send(files)
 })
 
+/*
 https.createServer({key: key, cert: cert}, app).listen(2324, () => {
+    console.log('Server is up on port 2324');
+})
+*/
+http.createServer( app).listen(2324, () => {
     console.log('Server is up on port 2324');
 })

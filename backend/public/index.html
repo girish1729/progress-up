@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Progress.up | HTML5 multiple File Upload with Progress Bar
-indicator</title>
-  <meta description="HTML5 multiple file upload progress bar plugin for
-Vue,js, React and Angular" />
+  <title>Progress-up | HTML5 multi File Uploader </title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@300&display=swap"
+rel="stylesheet">
+
+  <meta description="HTML5 multiple file uploader for Vue,js, React and Angular" />
 
 
 <script
@@ -25,10 +28,9 @@ defer></script>
 </head>
 
 <body class="dark:bg-gray-800 dark:text-white"  onload="initApp()">
-
 <!-- Dark mode controls -->
-<div class="flex justify-end items-center space-x-2 mx-auto relative">
-  <div class="w-14 h-8">
+<div class="flex justify-end space-x-2 mx-auto ">
+  <div class="w-14">
 
   <label for="dark-mode" class="w-full h-full rounded-full p-1 flex justify-between cursor-pointer">
     <span class="hidden dark:inline">&#127774;</span>
@@ -39,19 +41,20 @@ defer></script>
   </div>
 </div>
 
+<!--
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
+-->
 
-<h2 class="text-5xl leading-tight">  HTML5 Multiple File Upload with Progress Bar 
-</h2>
+<h1 class="flex justify-center text-5xl">  Progress-up HTML5 Uploader </h1>
 
-<h3 class="flex justify-center text-3xl text-gray-100 mb-4 pb-4">
-	HTML5 plugin 
+<h3 class="flex justify-center text-xl mb-4 pb-4">
+	Plain JS edition 
 </h3>
 
 <!-- XXX tabs -->
 <div class="bg-light p7 rounded w-9/12 mx-auto">
   <!-- Tabs -->
-  <ul id="tabs" class="inline-flex pt-2 px-1 w-full border-b">
+  <ul id="tabs" class="inline-flex pt-2 px-1 w-full ">
 
     <li class="bg-light px-4 text-dark-800 dark:text-light-800 font-semibold py-2 rounded-t border-t border-r border-l -mb-px">
 	<a id="default-tab" href="#first">File upload</a>
@@ -78,7 +81,6 @@ defer></script>
 <!-- XXX drag drop -->
 	   <h2 id='progress-up-statsArea' class="text-5xl leading-tight border-b"> </h2>
 
-
 	<div id='progress-up-form' class="bg-light p-4 rounded mx-auto">
     	  <div class="text-gold-400 border border-red-800 border-dashed rounded cursor-pointer">
 	   <form class='flex p-8  justify-center'>
@@ -91,20 +93,26 @@ src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/ic
 	  </div>
 	</div>
 
-	<div id='progress-up-configSummary'></div>
 
-	<button id="upButton" onClick="uploadAll()" class="inline-block px-6
-	py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight
-	rounded shadow-md hover:bg-blue-500 hover:shadow-lg
+	<div class="flex justify-end">
+	<button id="upButton" onClick="uploadAll()" class="  inline-block px-6
+	py-2.5 bg-blue-400 text-dark dark:text-white font-medium leading-tight
+	rounded shadow-md text-md hover:bg-blue-500 hover:shadow-lg
 	focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0
 	active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out
-	opacity-20" disabled>Begin Uploading files
+	mr-4 opacity-50" disabled>Begin Upload
 	</button>
 	
-	<button type="button" onClick="clearAll()" class="inline-block
-px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
+	<button type="button" onClick="clearAll()" class=" inline-block
+px-6 py-2.5 bg-orange-500 text-md text-dark dark:text-white
+font-medium  leading-tight rounded shadow-md hover:bg-orange-600
+hover:shadow-lg focus:bg-orange-600 focus:shadow-lg
+focus:outline-none focus:ring-0 active:bg-orange-700 active:shadow-lg transition duration-150 ease-in-out">
 	 Reset form
 	</button>
+	</div>
+
+	<div class='y-4 mb-8' id='progress-up-configSummary'></div>
 
 	<h3 id='progress-up-errMsgArea' class="text-red-500 text-3xl">
 	</h3>
@@ -191,8 +199,6 @@ bg-blue-600 rounded-full duration-300 ease-in-out peer-checked:bg-yellow-600 aft
 </label>
 	</div>
 	</div>
-
-
 
 	      <div class="flex flex-wrap -mx-3 mb-6">
 	       <div class="w-full px-3">
