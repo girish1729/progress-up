@@ -1,20 +1,18 @@
-# Progress.up - HTML5 File Upload Progress indicator
+# Progress.up - File Uploader for HTTP backend
 
-![Progess.up](https://raw.githubusercontent.com/girish1729/progress.up/main//images/progress-up-logo.svg)
+![Progess.up](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-logo.svg)
 
 ## What is this?
 
 Progress-up is a HTML5 multiple files Upload plugin with progress bar
 indicator.
 
-Plugins for 
+There is support for 10 types of progress displays.
 
-- Vue
-- Svelte
-- Angular
-- React
+![Progess.up](https://raw.githubusercontent.com/girish1729/progress.up/main/backend/public/images/progress-types.svg)
 
-are available.
+
+> Plugins for Angular, Svelte, Vue and React
 
 This uses the [HTTP File API](https://www.w3.org/TR/FileAPI/) to show continuous progress.
 
@@ -92,7 +90,7 @@ It is using the HTML5 File API.
 
 This is a clean way to get progress indicator for file uploads.
 
-## Instructions for other frameworks
+## Instructions for Angular, Vue, Svelte and React
 
 
 ```shell
