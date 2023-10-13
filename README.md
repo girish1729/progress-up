@@ -1,6 +1,6 @@
 # Progress.up - File Uploader for HTTP backend
 
-![Progess.up](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-logo.svg)
+![Progess-up](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-logo.svg)
 
 ## What is this?
 
@@ -9,7 +9,7 @@ indicator.
 
 There is support for 10 types of progress displays.
 
-![Progess.up](https://raw.githubusercontent.com/girish1729/progress.up/main/backend/public/images/progress-types.svg)
+![Progess-up progress types](https://raw.githubusercontent.com/girish1729/progress.up/main/backend/public/images/progress-types.png)
 
 
 > Plugins for Angular, Svelte, Vue and React
