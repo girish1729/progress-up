@@ -59,8 +59,8 @@ $ npm start
 
 You also need live-server.
 
-```bash
-# npm install -f live-server
+```shell
+# npm install -g live-server
 ```
 
 Go to [https://localhost:2324](https://localhost:2324)
