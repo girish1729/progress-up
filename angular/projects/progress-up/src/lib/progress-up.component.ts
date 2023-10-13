@@ -143,8 +143,8 @@ export class ProgressUpComponent {
     <span class="inline dark:hidden">&#127769; </span>
   `;
 
-    configVals1 = ' &#128202; Progress type ';
-    configVals2 = '&#128228; Upload URL ';
+    configVals1 = '&#128202; Progress type';
+    configVals2 = '&#128228; Upload URL';
     configVals3 = '&#128218; FilesName';
 
     sizeLabel = "Single file limit";

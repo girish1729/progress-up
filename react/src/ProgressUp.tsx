@@ -787,10 +787,11 @@ return ( <Fragment>
 
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 
-<h2 className="text-5xl leading-tight">  HTML5 Multiple File Upload with Progress Bar 
-</h2>
-	<h3 className="flex justify-center text-3xl text-gray-100 mb-4
-pb-4">React plugin </h3>
+<h1 class="flex justify-center text-5xl">  Progress-up HTTPS Uploader </h1>
+
+<h3 class="flex justify-center text-xl mb-4 pb-4">
+	React edition 
+</h3>
 
 
 
@@ -889,8 +890,10 @@ src={uploadIcon} alt="progress-up file submit icon" />
 		<h2 className="leading-tight pb-2">
 	&#128202; Progress type <span
 className='text-sm'>{inputs.progType}</span>  
+		<br/>
 			 &#128228; Upload URL <span
 className='text-sm'>{inputs.uploadURL}</span> 
+		<br/>
 		&#128218; FilesName <span
 className='text-sm'>{inputs.filesName}</span>
 		</h2>

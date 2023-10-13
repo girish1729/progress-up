@@ -679,9 +679,11 @@ onchange="document.documentElement.classList.toggle('dark')" />
 
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 
-<h2 class="text-5xl leading-tight">  HTML5 Multiple File Upload with Progress Bar 
-</h2>
-	<h3 class="flex justify-center text-3xl text-gray-100 mb-4 pb-4">Vue plugin </h3>
+<h1 class="flex justify-center text-5xl">  Progress-up HTTPS Uploader </h1>
+
+<h3 class="flex justify-center text-xl mb-4 pb-4">
+	Vue edition 
+</h3>
 
 
 <!-- XXX tabs -->
@@ -741,8 +743,10 @@ Help</a>
 	  <div v-if="form.uploadURL && form.filesName">
 			&#128202; Progress type <span
 class='text-sm'>{{form.progType}}</span>  
+			<br/>
 			 &#128228; Upload URL <span
 class='text-sm'>{{form.uploadURL}}</span> 
+			<br/>
 		&#128218; FilesName <span
 class='text-sm'>{{form.filesName}}</span>
 	   </div>
