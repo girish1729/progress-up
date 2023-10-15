@@ -756,19 +756,23 @@ class='text-sm'>{{form.filesName}}</span>
 		</h2>
 	</div>
 
-	<button id="upButton" @click="uploadAll" class="inline-block
-px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs
-leading-tight rounded shadow-md hover:bg-blue-500
-hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none
-focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150
-ease-in-out" :class="(disableUpload ?  'opacity-20':'')"
-:disabled="disableUpload">Begin Uploading 
+	<div class="flex justify-end">
+	<button id="upButton" @click="uploadAll()" class="  inline-block px-6
+	py-2.5 bg-blue-400 text-dark dark:text-white font-medium leading-tight
+	rounded shadow-md text-md hover:bg-blue-500 hover:shadow-lg
+	focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0
+	active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out
+	mr-4 opacity-50" disabled>Begin Upload
 	</button>
 	
-	<button type="button" @click="clearAll" class="inline-block
-px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
-	 Reset Form
+	<button type="button" @click="clearAll()" class=" inline-block
+px-6 py-2.5 bg-orange-500 text-md text-dark dark:text-white
+font-medium  leading-tight rounded shadow-md hover:bg-orange-600
+hover:shadow-lg focus:bg-orange-600 focus:shadow-lg
+focus:outline-none focus:ring-0 active:bg-orange-700 active:shadow-lg transition duration-150 ease-in-out">
+	 Reset form
 	</button>
+	</div>
  	
 	<h3 class="text-red-500 text-3xl">
 		{{errMsg}}

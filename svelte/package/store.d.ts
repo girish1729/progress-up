@@ -1,3 +1,4 @@
+/// <reference types="svelte" />
 export declare const inputs: import("svelte/store").Writable<{
     uploadURL: string;
     filesName: string;

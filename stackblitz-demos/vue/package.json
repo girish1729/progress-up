@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "pdfobject": "*",
-    "progress-up-vue": "file:../../../npm-registry/progress-up/progress-up-vue",
+    "progress-up-vue": "../../vue/",
     "vue": "^3.2.45"
   },
   "devDependencies": {

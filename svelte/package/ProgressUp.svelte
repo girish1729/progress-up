@@ -46,6 +46,15 @@ import Tab4 from './tab4.svelte';
 </div>
 
 
+<img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
+
+<h1 class="flex justify-center text-5xl">  Progress-up HTTPS Uploader </h1>
+
+<h3 class="flex justify-center text-xl mb-4 pb-4">
+	Svelte edition 
+</h3>
+
+
 <div class="bg-light p7 rounded w-9/12 mx-auto">
   <ul id="tabs" class="inline-flex pt-2 px-1 w-full border-b">
 

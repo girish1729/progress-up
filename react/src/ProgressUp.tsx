@@ -787,9 +787,9 @@ return ( <Fragment>
 
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 
-<h1 class="flex justify-center text-5xl">  Progress-up HTTPS Uploader </h1>
+<h1 className="flex justify-center text-5xl">  Progress-up HTTPS Uploader </h1>
 
-<h3 class="flex justify-center text-xl mb-4 pb-4">
+<h3 className="flex justify-center text-xl mb-4 pb-4">
 	React edition 
 </h3>
 
@@ -901,16 +901,16 @@ className='text-sm'>{inputs.filesName}</span>
 
 	</div>
 
-	<button disabled={isUploadDisabled} onClick={uploadAll} className={"inline-block px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium text-xs leading-tight rounded shadow-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out " +  (isUploadDisabled ? " opacity-20" : "")}
->Begin Uploading files </button>
+	<div className="flex justify-end">
+	<button disabled={isUploadDisabled} onClick={uploadAll} className={"inline-block px-6 py-2.5 bg-blue-400 text-dark dark:text-white font-medium leading-tight rounded shadow-md text-md hover:bg-blue-500 hover:shadow-lg focus:bg-blue-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out mr-4  " +  (isUploadDisabled ? " opacity-50" : "")}>Begin Upload
+	</button>
 	
-	
-	<button type="button" onClick={clearAll} className="inline-block
-px-6 py-2.5 bg-yellow-500 text-dark dark:text-white font-medium text-xs leading-tight rounded shadow-md hover:bg-yellow-600 hover:shadow-lg focus:bg-yellow-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-700 active:shadow-lg transition duration-150 ease-in-out">
+	<button type="button" onClick={clearAll} className={"inline-block px-6 py-2.5 bg-orange-500 text-md text-dark dark:text-white font-medium  leading-tight rounded shadow-md hover:bg-orange-600 hover:shadow-lg focus:bg-orange-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-orange-700 active:shadow-lg transition duration-150 ease-in-out"}>
 	 Reset form
 	</button>
- 	
-  	 
+	</div>
+
+	  	 
   	 <h3 className="text-red-500 text-3xl">
 		{errMsg}
 	</h3>

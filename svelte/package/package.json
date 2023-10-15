@@ -24,9 +24,6 @@
   "type": "module",
   "exports": {
     "./package.json": "./package.json",
-    "./.store.ts.swp": "./.store.ts.swp",
-    "./.tab1.svelte.swp": "./.tab1.svelte.swp",
-    "./.tab2.svelte.swp": "./.tab2.svelte.swp",
     "./ProgressUp.svelte": "./ProgressUp.svelte",
     "./assets/icons/filetypes/avi.svg": "./assets/icons/filetypes/avi.svg",
     "./assets/icons/filetypes/css.svg": "./assets/icons/filetypes/css.svg",
