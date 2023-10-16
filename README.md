@@ -1,10 +1,10 @@
-# Progress.up - File Uploader for HTTP backend
+# Progress-up - File Uploader for HTTPS
 
 ![Progess-up](https://raw.githubusercontent.com/girish1729/progress.up/main/images/progress-up-logo.svg)
 
 ## What is this?
 
-Progress-up is a HTML5 multiple files Upload plugin with progress bar
+Progress-up is a HTTPS multiple files Upload plugin with progress bar
 indicator.
 
 There is support for 10 types of progress displays.
@@ -23,9 +23,12 @@ Uses the HTML input file for file uploads.
 
 [Canonical home page](https://progress-up.live)
 
-## What is this?
+## Demo
 
-Demos are [here](https://progress-up.live/demo)
+ [Live demo](https://luxury-kangaroo-af6a24.netlify.app/)
+ 
+
+Other demos are [here](https://progress-up.live/demo)
 
 ## How to build and run as plain js
 
@@ -128,12 +131,6 @@ This is a clean way to get progress indicator for file uploads.
 - [Svelte.ts](https://progress-up.live/docs/svelte-docs)
 - [Angular](https://progress-up.live/docs/angular-docs)
 - [React](https://progress-up.live/docs/react-docs)
-
-## Demos
-
-- [Native demo](https://progress-up.live/progress-up-html5)
-- [Other demos](https://progress-up.live/demo)
- 
 
 ## Screenshots gallery
 
