@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
+   <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@300&display=swap"
@@ -16,6 +17,15 @@ rel="stylesheet">
   <script type='module' src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/backend/public/assets/progressBar/loading-bar.js"></script>
 </head>
 <body>
+   <script>
+      const options = {
+            label: '🌓' 
+      }
+
+      const darkmode = new Darkmode(options);
+      darkmode.showWidget();
+   </script>
+ 
   <app-root></app-root>
 </body>
 </html>

@@ -30,6 +30,39 @@ Uses the HTML input file for file uploads.
 
 Other demos are [here](https://progress-up.live/demo)
 
+## Configuration
+
+There are two types of configuration in Progress-up.
+
+- Static config.json with one time values
+- Dynamic config with runtime form filling
+
+A sample static config is `config.json` inside the root directory of
+proect.
+
+```json
+
+{
+         "uploadURL": "https://localhost:2324/uploadmultiple",
+         "filesName": "uploadFiles",
+         "progressType": "Line"
+}
+  
+```
+
+You can choose one of 10 progress types.
+
+
+- Line
+- Fan
+- Bubble
+- Energy
+- Rainbow
+- Stripe
+- Text
+- Circle
+
+
 ## How to build and run as plain js
 
 ### The backend is [CORS enabled](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).

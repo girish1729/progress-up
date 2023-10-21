@@ -14,7 +14,6 @@
             var details = totalfiles + '/' + tot +
                 " files size " + tsize +
                 " sent in " + totaltime + " ms";
-            setDetails(details);
 
             var id = $statsTable.length + 1;
             let stat = {
@@ -26,12 +25,13 @@
 
             let st = [...$statsTable];
             st.push(stat);
-            setStats(st);
 
+		/*
             setIsUploadDisabled(true);
             setProgress([]);
             setSize(0);
             setNumberFiles(0);
+		*/
         }
     };
 

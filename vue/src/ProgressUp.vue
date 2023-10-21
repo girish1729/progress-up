@@ -27,7 +27,7 @@ export default {
                 authType: '',
                 user: '',
                 pass: '',
-                progType: 'Rainbow',
+                progressType: '',
                 fileSizeLimit: 10,
                 sizeLimitType: false,
                 fileTypeFilter: "All",
@@ -78,6 +78,14 @@ export default {
     },
 
     methods: {
+
+getRuntimeConfig () {
+ fetch('/config.json').then(
+	res => res.json()).then(
+	(res) => {console.log(res);this.form = res});
+},
+
+
         dragover(e) {
             e.preventDefault();
         },
@@ -181,7 +189,7 @@ export default {
             e.preventDefault();
             console.log(this.form.uploadURL);
             console.log(this.form.filesName);
-            console.log(this.form.progType);
+            console.log(this.form.progressType);
 
             if (this.form.authEnabled) {
                 console.log(this.form.authType);
@@ -561,7 +569,7 @@ export default {
                     var selector = '#a' + i;
                     console.log("selector is ::" + selector);
                     var bar = new ldBar(selector, {
-                        preset: this.form.progType.toLowerCase()
+                        preset: this.form.progressType.toLowerCase()
                     });
                     bar.set(0);
                     this.progressBars.push(bar);
@@ -655,27 +663,16 @@ export default {
             });
         },
 
-    }
+    },
+     created() {
+	 this.getRuntimeConfig();
+     }
 };
 </script>
 
 <template>
 
 <section class="dark:bg-gray-800 dark:text-white">
-<!-- Dark mode controls -->
-<div class="flex justify-end items-center space-x-2 mx-auto relative">
-  <div class="w-14 h-8">
-
-  <label for="dark-mode" class="w-full h-full rounded-full p-1 flex justify-between cursor-pointer">
-    <span class="hidden dark:inline">&#127774;</span>
-    <span class="inline dark:hidden">&#127769; </span>
-  </label>
-
-  <input type="checkbox" id="dark-mode" class='hidden'
-onchange="document.documentElement.classList.toggle('dark')" />
-  </div>
-</div>
-
 
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 
@@ -742,7 +739,7 @@ Help</a>
 		<h2 class="leading-tight pb-2">
 	  <div v-if="form.uploadURL && form.filesName">
 			&#128202; Progress type <span
-class='text-sm'>{{form.progType}}</span>  
+class='text-sm'>{{form.progressType}}</span>  
 			<br/>
 			 &#128228; Upload URL <span
 class='text-sm'>{{form.uploadURL}}</span> 
@@ -816,7 +813,7 @@ focus:outline-none focus:ring-0 active:bg-orange-700 active:shadow-lg transition
 	           Progress indicator type
 	         </label>
 	         <div class="relative">
-	           <select name="progType" v-model='form.progType' class="block appearance-none w-full bg-gray-200 border
+	           <select name="progType" v-model='form.progressType' class="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	   >

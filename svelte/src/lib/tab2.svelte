@@ -80,7 +80,7 @@
         console.log($inputs);
         console.log($inputs.uploadURL);
         console.log($inputs.filesName);
-        console.log($inputs.progType);
+        console.log($inputs.progressType);
         if ($inputs.authEnabled) {
             console.log($inputs.authType);
             console.log($inputs.user, inputs.pass);
@@ -209,8 +209,8 @@ CORS]" />
 	           Progress indicator type
 	         </label>
 	         <div class="relative">
-	           <select name='progType' on:change={setIndicator}
-bind:value={$inputs.progType} class="block appearance-none w-full bg-gray-200 border
+	           <select name='progressType' on:change={setIndicator}
+bind:value={$inputs.progressType} class="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	   >

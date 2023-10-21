@@ -10,7 +10,6 @@ const spitStatistics = (idx) => {
         var details = totalfiles + '/' + tot +
             " files size " + tsize +
             " sent in " + totaltime + " ms";
-        setDetails(details);
         var id = $statsTable.length + 1;
         let stat = {
             id: id,
@@ -20,11 +19,12 @@ const spitStatistics = (idx) => {
         };
         let st = [...$statsTable];
         st.push(stat);
-        setStats(st);
-        setIsUploadDisabled(true);
-        setProgress([]);
-        setSize(0);
-        setNumberFiles(0);
+        /*
+            setIsUploadDisabled(true);
+            setProgress([]);
+            setSize(0);
+            setNumberFiles(0);
+        */
     }
 };
 </script>

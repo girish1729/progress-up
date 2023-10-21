@@ -1,4 +1,5 @@
 /* tabs for tailwind */
+
 let tabsContainer = document.querySelector("#tabs");
 let tabTogglers = tabsContainer.querySelectorAll("#tabs a");
 tabTogglers.forEach(function(toggler) {
@@ -681,13 +682,13 @@ function uploadAll() {
 
 /* XXX Globals */
 
-var progType = "Line";
 var extra = '';
 
 /* XXX these are backend variables */
-var uploadURL = 'https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34';
-uploadURL = 'https://localhost:2324/uploadmultiple';
-var filesName = "uploadFiles";
+//var uploadURL = 'https://run.mocky.io/v3/dfc3d264-e2bc-41f9-82b9-23b0091c5e34';
+var uploadURL = config.uploadURL;
+var filesName = config.filesName;
+var progType = config.progressType;
 var authEnabled = false;
 var authType = "Basic";
 var user = '';

@@ -2,7 +2,7 @@
 export declare const inputs: import("svelte/store").Writable<{
     uploadURL: string;
     filesName: string;
-    progType: string;
+    progressType: string;
     authEnabled: boolean;
     authType: string;
     user: string;

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Progress-Up svelte plugin demo</title>
 
+   <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@300&display=swap"
@@ -14,6 +15,15 @@ rel="stylesheet">
 
   </head>
   <body>
+   <script>
+      const options = {
+            label: '🌓' 
+      }
+
+      const darkmode = new Darkmode(options);
+      darkmode.showWidget();
+   </script>
+ 
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

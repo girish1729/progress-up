@@ -74,7 +74,7 @@ function ProgressUp() {
     const [inputs, setInputs] = useState({
         uploadURL: "",
         filesName: "",
-        progType: "Fan",
+        progressType: "Fan",
         authEnabled: false,
         authType: "",
         user: "",
@@ -157,12 +157,6 @@ function ProgressUp() {
         event.preventDefault();
         console.log(inputs);
     };
-
-    const darkMode = () => {
-        console.log("dark mode change");
-        document.documentElement.classList.toggle('dark');
-    };
-
     const uploadOneFile = async (file: any, idx: number) => {
         let formData = new FormData();
         formData.append(inputs.filesName, file.file);
@@ -281,7 +275,7 @@ function ProgressUp() {
         console.log(inputs);
         console.log(inputs.uploadURL);
         console.log(inputs.filesName);
-        console.log(inputs.progType);
+        console.log(inputs.progressType);
         if (inputs.authEnabled) {
             console.log(inputs.authType);
             console.log(inputs.user, inputs.pass);
@@ -499,6 +493,14 @@ function ProgressUp() {
     };
 
     useEffect(() => {
+    fetch("/config.json")
+      .then((res) => res.json())
+      .then((config) => {
+	 inputs.uploadURL = config.uploadURL;
+	 inputs.filesName = config.filesName;
+	 inputs.progressType = config.progressType;
+      });
+
 	if(uploadFileInfos) {
         	createBars();
 	}
@@ -644,7 +646,7 @@ const createBars = () => {
         for (let j = 0; j < uploadFileInfos.length; j++) {
             let id = 'a' + j;
             let bar = new ldBar('#' + id, {
-                preset: inputs.progType.toLowerCase()
+                preset: inputs.progressType.toLowerCase()
             });
             bar.set(0);
             allBars.push(bar);
@@ -772,18 +774,6 @@ return ( <Fragment>
 
 <section className="dark:bg-gray-800 dark:text-white">
 
-<div className="flex justify-end items-center space-x-2 mx-auto relative">
-  <div className="w-14 h-8">
-
-  <label onClick={darkMode} htmlFor="dark-mode" className="w-full h-full rounded-full p-1 flex justify-between cursor-pointer">
-    <span className="hidden dark:inline">&#127774;</span>
-    <span className="inline dark:hidden">&#127769; </span>
-  </label>
-
-  <input  type="checkbox" name="darkMode" className='hidden' />
-  </div>
-</div>
-
 
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 
@@ -889,7 +879,7 @@ src={uploadIcon} alt="progress-up file submit icon" />
       ) : (
 		<h2 className="leading-tight pb-2">
 	&#128202; Progress type <span
-className='text-sm'>{inputs.progType}</span>  
+className='text-sm'>{inputs.progressType}</span>  
 		<br/>
 			 &#128228; Upload URL <span
 className='text-sm'>{inputs.uploadURL}</span> 
@@ -960,8 +950,8 @@ CORS]" />
 	           Progress indicator type
 	         </label>
 	         <div className="relative">
-	           <select name="progType" onChange={handleChange}
-defaultValue={inputs.progType} className="block appearance-none w-full bg-gray-200 border
+	           <select name="progressType" onChange={handleChange}
+defaultValue={inputs.progressType} className="block appearance-none w-full bg-gray-200 border
 	   border-gray-200 text-dark-700 py-3 px-4 pr-8 rounded leading-tight
 	   focus:outline-none focus:bg-light focus:border-gray-500"
 	   >

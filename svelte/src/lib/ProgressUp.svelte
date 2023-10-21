@@ -1,17 +1,12 @@
 <script lang='ts'>
    import {openTab, totalsize, totalfiles, inputs, uploadFileList, uploadFileInfos, errInfos, progressBars, } from './store.js';
 
-let darkMode = false;
 
     let disableUpload = true;
     let thumbNailsDone = false;
     let isDragged = false;
     let details = '';
 
-   function toggle() {
-        darkMode = !darkMode;
-        window.document.body.classList.toggle('dark');
-    }
 
  
  const checkTotalSize =() => {
@@ -42,18 +37,6 @@ import Tab4 from './tab4.svelte';
 
 
 <main class="dark:bg-gray-800 dark:text-white mx-auto w-full">
-<!-- Dark mode controls -->
-<div class="flex justify-end items-center space-x-2 mx-auto relative">
-  <div class="w-14 h-8">
-
-  <label for="dark-mode" class="w-full h-full rounded-full p-1 flex justify-between cursor-pointer">
-    <span class="hidden dark:inline">&#127774;</span>
-    <span class="inline dark:hidden">&#127769; </span>
-  </label>
-  <input type="checkbox" id="dark-mode" class='hidden' on:change={toggle} />
-  </div>
-</div>
-
 
 <img src="https://cdn.jsdelivr.net/gh/girish1729/progress-up/images/progress-up-logo.svg" width="100" height="100" alt="Progress.Up HTML5 logo" />
 

@@ -12,6 +12,15 @@ let browseInput;
 let details = '';
 let startUploadts = 0;
 let thumbNailsDone = false;
+fetch('config.json').then(res => res.json()).
+    then((res) => {
+    console.log(res);
+    inputs.uploadURL = res.uploadURL;
+    inputs.filesName = res.filesName;
+    inputs.progressType = res.progressType;
+    inputs.set(res);
+    console.log(inputs);
+});
 let isDragActive = false;
 function handleDragEnter(e) {
     isDragActive = true;
@@ -389,7 +398,7 @@ const createBars = () => {
         let f = $uploadFileInfos[i];
         let id = 'a' + i;
         let bar = new ldBar('#' + id, {
-            preset: $inputs.progType.toLowerCase()
+            preset: $inputs.progressType.toLowerCase()
         });
         bar.set(0);
         console.log("Creating progress bar::" + id);
@@ -523,22 +532,22 @@ focus:outline-none focus:ring-0 active:bg-orange-700 active:shadow-lg transition
 	</button>
 	</div>
 
-     <div id="config">
+     <div>
 
     {#if $inputs.uploadURL && $inputs.filesName}
 		<h2 class="leading-tight pb-2">
-	Please configure first
-		</h2>
-   {:else}
-		<h2 class="leading-tight pb-2">
 	&#128202; Progress type <span
-class='text-sm'>{$inputs.progType}</span>  
+class='text-sm'>{$inputs.progressType}</span>  
 		<br/>
 			 &#128228; Upload URL <span
 class='text-sm'>{$inputs.uploadURL}</span> 
 		<br/>
 		&#128218; FilesName <span
 class='text-sm'>{$inputs.filesName}</span>
+		</h2>
+   {:else}
+		<h2 class="leading-tight pb-2">
+	Please configure first
 		</h2>
   {/if}
 

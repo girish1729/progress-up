@@ -1,6 +1,9 @@
 {
   "name": "progress-up-svelte",
   "version": "1.0.1",
+  "dependencies": {
+    "svelte": "*"
+  },
   "devDependencies": {
     "@sveltejs/adapter-static": "1.0.0-next.49",
     "@sveltejs/kit": "*",
@@ -24,6 +27,7 @@
   "type": "module",
   "exports": {
     "./package.json": "./package.json",
+    "./.tab1.svelte.swp": "./.tab1.svelte.swp",
     "./ProgressUp.svelte": "./ProgressUp.svelte",
     "./assets/icons/filetypes/avi.svg": "./assets/icons/filetypes/avi.svg",
     "./assets/icons/filetypes/css.svg": "./assets/icons/filetypes/css.svg",

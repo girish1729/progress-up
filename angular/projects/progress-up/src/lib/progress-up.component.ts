@@ -130,18 +130,13 @@ export class ProgressUpComponent {
         authType: "Basic",
         user: '',
         pass: '',
-        progType: 'Line',
+        progressType: 'Line',
         fileSizeLimit: 10,
         sizeLimitType: "Single file limit",
         fileTypeFilter: "All",
         fileTypeAction: "Allow file type"
 
     };
-
-    darkControls = `
-    <span class="hidden dark:inline">&#127774;</span>
-    <span class="inline dark:hidden">&#127769; </span>
-  `;
 
     configVals1 = '&#128202; Progress type';
     configVals2 = '&#128228; Upload URL';
@@ -176,8 +171,12 @@ export class ProgressUpComponent {
     showProgress: boolean = true;
 
     constructor(private sanitizer: DomSanitizer,
-
-        private ref: ChangeDetectorRef, private http: HttpClient, @Inject(DOCUMENT) document: Document) {}
+        private ref: ChangeDetectorRef, private http: HttpClient, @Inject(DOCUMENT) document: Document) {
+	    fetch('/assets/config.json').then(
+     (res) => res.json())
+    .then((res) => this.form = res); 
+ 
+}
 
     openTab = 1;
     ngAfterContentChecked() {
@@ -348,7 +347,7 @@ export class ProgressUpComponent {
     saveConfig() {
         console.log(this.form.uploadURL);
         console.log(this.form.filesName);
-        console.log(this.form.progType);
+        console.log(this.form.progressType);
 
         if (this.form.authEnabled) {
             console.log(this.form.authType);
@@ -668,7 +667,7 @@ export class ProgressUpComponent {
         for (var i = 0; i < this.uploadFileInfos.length; i++) {
             let id = 'a' + i;
             let bar = new ldBar('#' + id, {
-                preset: this.form.progType.toLowerCase()
+                preset: this.form.progressType.toLowerCase()
             });
             bar.set(0);
             console.log("Creating progress bar::" + id);

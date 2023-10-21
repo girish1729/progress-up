@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 export const inputs = writable({
     uploadURL: "",
     filesName: "",
-    progType: "Line",
+    progressType: "",
     authEnabled: false,
     authType: "",
     user: "",
