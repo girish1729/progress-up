@@ -217,6 +217,12 @@ size and MIME type.
 - [Uploading files over HTTP
   article](https://themightyprogrammer.dev/article/uploading-files)
 
+## Testimonials
+
+<script type="text/javascript" src="https://testimonial.to/js/iframeResizer.min.js"></script>
+<iframe id="testimonialto-embed-text--O2-19bRtbLKO3a5uxmX" src="https://embed-v2.testimonial.to/t/-O2-19bRtbLKO3a5uxmX?design=left-aligned&fontFamily=Inter&fontColor=000000&bgColor=ffffff&borderColor=ABB8C3&starColor=FDCC0D&shadowSize=shadow-none&showBorder=no&showPadding=yes&borderRadius=rounded-lg&borderWidth=border" frameborder="0" scrolling="no" width="100%"></iframe>
+<script type="text/javascript">iFrameResize({log: false, checkOrigin: false}, "#testimonialto-embed-text--O2-19bRtbLKO3a5uxmX");</script>
+
 ## Collaboration
 
 If you wish to collaborate or send pull requests 
