@@ -234,6 +234,7 @@ If you cannot write code, then buying me a coffee can work as well.
 ## Alternatives
 
 - [Uppy](https://github.com/transloadit/uppy)
+- [UploadThing](https://uploadthing.com/)
 - [DropIt](https://github.com/ThalKod/DropIt)
 - [Resumable.js](https://github.com/23/resumable.js)
 - [Filepond](https://github.com/pqina/filepond)
