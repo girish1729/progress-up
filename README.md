@@ -254,6 +254,12 @@ You can [follow me](https://twitter.com/intent/follow?screen_name=girish1729
        <img src="https://raw.githubusercontent.com/girish1729/progress.up/main//images/tweet.png" alt="Tweet this" />
 </a>
 
+## Sponsor me using crypto
+
+[<img src="https://api.gitsponsors.com/api/badge/img?id=551807140" height="20">](https://api.gitsponsors.com/api/badge/link?p=v4LeMgCHEaLKwZ2rJnh+sAEPZt9WWjd0Zk+JyY37F7EbI9XoLtVVtfZMfesmkLXKqJj2LKAZ3JsN6QZ/XwlS77aH6Ckx222Da3WQN9LSow4HcUL+WJ84jn95CDSf4nY27mr9p9HhklpRepHrosBexw==)
+
+
+
 ## Buy me a coffee to accelerate development
 
 <a href="https://www.buymeacoffee.com/girish1729" target="_blank"><img
